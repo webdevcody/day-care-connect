@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+const optionalRate = z
+  .string()
+  .optional()
+  .transform((v) => (v && v.trim() !== "" ? v.trim() : undefined))
+  .refine((v) => v === undefined || !isNaN(Number(v)), {
+    message: "Must be a valid number",
+  });
+
 export const createFacilitySchema = z.object({
   name: z.string().min(1, "Name is required").max(255),
   description: z.string().optional(),
@@ -13,10 +21,10 @@ export const createFacilitySchema = z.object({
   capacity: z.number().int().min(1, "Capacity must be at least 1"),
   ageRangeMin: z.number().int().min(0).default(0),
   ageRangeMax: z.number().int().min(0).default(12),
-  monthlyRate: z.string().optional(),
-  hourlyRate: z.string().optional(),
-  dailyRate: z.string().optional(),
-  weeklyRate: z.string().optional(),
+  monthlyRate: optionalRate,
+  hourlyRate: optionalRate,
+  dailyRate: optionalRate,
+  weeklyRate: optionalRate,
   licenseNumber: z.string().max(100).optional(),
   licenseExpiry: z.string().optional(),
   licensingAuthority: z.string().max(255).optional(),

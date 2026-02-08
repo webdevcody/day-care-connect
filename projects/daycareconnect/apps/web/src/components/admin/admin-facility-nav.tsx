@@ -10,6 +10,7 @@ const tabs = [
   { to: "/facility/$facilityId/reports" as const, label: "Reports" },
   { to: "/facility/$facilityId/reviews" as const, label: "Reviews" },
   { to: "/facility/$facilityId/documents" as const, label: "Documents" },
+  { to: "/facility/$facilityId/invites" as const, label: "Invites" },
   { to: "/facility/$facilityId/billing" as const, label: "Billing" },
   { to: "/facility/$facilityId/edit" as const, label: "Settings" },
 ];

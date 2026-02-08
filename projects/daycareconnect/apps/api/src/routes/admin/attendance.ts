@@ -8,11 +8,106 @@ import {
   facilities,
   eq,
   and,
+  desc,
+  sql,
+  or,
+  isNotNull,
+  count,
 } from "@daycare-hub/db";
 import { assertFacilityStaffOrOwner } from "../../lib/facility-auth";
 import { sendNotification } from "../../lib/notification-service";
 
 const app = new Hono();
+
+// GET /:facilityId/activity-log - Recent check-in/out activity feed
+app.get("/:facilityId/activity-log", async (c) => {
+  const userId = c.get("userId") as string;
+  const facilityId = c.req.param("facilityId");
+  const limit = Math.min(Number(c.req.query("limit") || 20), 50);
+  const cursor = c.req.query("cursor");
+
+  await assertFacilityStaffOrOwner(facilityId, userId);
+
+  const actionTime = sql<string>`coalesce(${attendance.checkOutTime}, ${attendance.checkInTime})`;
+
+  const conditions = [
+    eq(attendance.facilityId, facilityId),
+    or(isNotNull(attendance.checkInTime), isNotNull(attendance.checkOutTime)),
+  ];
+
+  if (cursor) {
+    conditions.push(sql`coalesce(${attendance.checkOutTime}, ${attendance.checkInTime}) < ${cursor}`);
+  }
+
+  const results = await db
+    .select({
+      id: attendance.id,
+      childId: attendance.childId,
+      date: attendance.date,
+      checkInTime: attendance.checkInTime,
+      checkOutTime: attendance.checkOutTime,
+      status: attendance.status,
+      childFirstName: children.firstName,
+      childLastName: children.lastName,
+    })
+    .from(attendance)
+    .innerJoin(children, eq(attendance.childId, children.id))
+    .where(and(...conditions))
+    .orderBy(desc(actionTime))
+    .limit(limit + 1);
+
+  const hasMore = results.length > limit;
+  const items = hasMore ? results.slice(0, limit) : results;
+  const nextCursor = hasMore
+    ? (items[items.length - 1].checkOutTime || items[items.length - 1].checkInTime)
+    : null;
+
+  return c.json({ items, nextCursor });
+});
+
+// GET /:facilityId/child-history/:childId - Attendance history for a specific child
+app.get("/:facilityId/child-history/:childId", async (c) => {
+  const userId = c.get("userId") as string;
+  const facilityId = c.req.param("facilityId");
+  const childId = c.req.param("childId");
+  const limit = Math.min(Number(c.req.query("limit") || 30), 100);
+  const offset = Number(c.req.query("offset") || 0);
+
+  await assertFacilityStaffOrOwner(facilityId, userId);
+
+  const [totalResult] = await db
+    .select({ total: count() })
+    .from(attendance)
+    .where(
+      and(
+        eq(attendance.facilityId, facilityId),
+        eq(attendance.childId, childId)
+      )
+    );
+
+  const items = await db
+    .select({
+      id: attendance.id,
+      date: attendance.date,
+      checkInTime: attendance.checkInTime,
+      checkOutTime: attendance.checkOutTime,
+      status: attendance.status,
+      absenceReason: attendance.absenceReason,
+      notes: attendance.notes,
+    })
+    .from(attendance)
+    .where(
+      and(
+        eq(attendance.facilityId, facilityId),
+        eq(attendance.childId, childId)
+      )
+    )
+    .orderBy(desc(attendance.date))
+    .limit(limit)
+    .offset(offset);
+
+  return c.json({ items, total: totalResult.total });
+});
 
 // GET /:facilityId/:date - Get daily attendance
 app.get("/:facilityId/:date", async (c) => {

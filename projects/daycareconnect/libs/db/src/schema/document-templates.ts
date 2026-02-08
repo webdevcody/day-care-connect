@@ -1,6 +1,6 @@
-import { pgTable, uuid, varchar, text, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, text, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { facilities } from "./facilities";
-import { documentCategoryEnum } from "./enums";
+import { documentCategoryEnum, formTypeEnum } from "./enums";
 
 export const documentTemplates = pgTable("document_templates", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -9,9 +9,14 @@ export const documentTemplates = pgTable("document_templates", {
     .references(() => facilities.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
-  content: text("content").notNull(),
+  content: text("content").default(""),
   category: documentCategoryEnum("category").notNull(),
+  formType: formTypeEnum("form_type").notNull().default("markdown"),
+  formSchema: jsonb("form_schema"),
+  pdfUrl: text("pdf_url"),
+  sortOrder: integer("sort_order").notNull().default(0),
   isRequired: boolean("is_required").notNull().default(false),
+  isRequiredForEnrollment: boolean("is_required_for_enrollment").notNull().default(false),
   isArchived: boolean("is_archived").notNull().default(false),
   version: integer("version").notNull().default(1),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),

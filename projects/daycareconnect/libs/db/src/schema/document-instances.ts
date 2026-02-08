@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, integer, timestamp, index } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, text, integer, timestamp, index, jsonb } from "drizzle-orm/pg-core";
 import { documentTemplates } from "./document-templates";
 import { facilities } from "./facilities";
 import { users } from "./users";
@@ -25,6 +25,7 @@ export const documentInstances = pgTable(
       .notNull()
       .references(() => users.id),
     contentSnapshot: text("content_snapshot").notNull(),
+    formData: jsonb("form_data"),
     expiresAt: timestamp("expires_at", { withTimezone: true }),
     viewedAt: timestamp("viewed_at", { withTimezone: true }),
     signedAt: timestamp("signed_at", { withTimezone: true }),

@@ -7,12 +7,8 @@ import {
   useUpdateNotificationPreferences,
   useQuietHours,
   useUpdateQuietHours,
-  useUserRoles,
-  useActivateRole,
-  useDeactivateRole,
 } from "@daycare-hub/hooks";
-import { NOTIFICATION_TYPES, USER_ROLES, USER_ROLE_LABELS } from "@daycare-hub/shared";
-import type { UserRole } from "@daycare-hub/shared";
+import { NOTIFICATION_TYPES } from "@daycare-hub/shared";
 import { NOTIFICATION_TYPE_LABELS } from "@/lib/notification-templates";
 import {
   Card,
@@ -28,7 +24,6 @@ import {
   TabsTrigger,
   Switch,
 } from "@daycare-hub/ui";
-import { Users, Building2, Briefcase, Check } from "lucide-react";
 
 export function SettingsPageContent() {
   return (
@@ -45,7 +40,6 @@ export function SettingsPageContent() {
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="password">Password</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="roles">Roles</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="mt-6">
@@ -60,9 +54,6 @@ export function SettingsPageContent() {
           <NotificationPreferencesForm />
         </TabsContent>
 
-        <TabsContent value="roles" className="mt-6">
-          <RolesManager />
-        </TabsContent>
       </Tabs>
     </div>
   );
@@ -426,94 +417,3 @@ function NotificationPreferencesForm() {
   );
 }
 
-const ROLE_ICONS: Record<string, typeof Users> = {
-  parent: Users,
-  admin: Building2,
-  staff: Briefcase,
-};
-
-const ROLE_DESCRIPTIONS: Record<string, string> = {
-  parent: "Manage your children, view daily reports, and communicate with facilities.",
-  admin: "Create and manage daycare facilities, handle enrollments and staff.",
-  staff: "View assignments, manage daily activities, and communicate with parents.",
-};
-
-function RolesManager() {
-  const { data: roleData, isLoading } = useUserRoles();
-  const activateMutation = useActivateRole();
-  const deactivateMutation = useDeactivateRole();
-
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="py-12 text-center text-muted-foreground">
-          Loading roles...
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const activeRole = roleData?.activeRole;
-  const userRolesList = roleData?.roles ?? [];
-
-  return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Manage Roles</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="mb-4 text-sm text-muted-foreground">
-            Activate or deactivate roles to customize your experience. You can switch between active roles using the role switcher in the sidebar.
-          </p>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {USER_ROLES.map((role) => {
-              const Icon = ROLE_ICONS[role];
-              const isActive = userRolesList.includes(role);
-              const isCurrent = activeRole === role;
-
-              return (
-                <Card key={role} className={isActive ? "border-primary" : ""}>
-                  <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-full ${isActive ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">{USER_ROLE_LABELS[role]}</p>
-                      {isCurrent && (
-                        <span className="inline-flex items-center gap-1 text-xs text-primary">
-                          <Check className="h-3 w-3" /> Current
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {ROLE_DESCRIPTIONS[role]}
-                    </p>
-                    {isActive ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={isCurrent || deactivateMutation.isPending}
-                        onClick={() => deactivateMutation.mutate(role)}
-                      >
-                        {isCurrent ? "Active" : "Deactivate"}
-                      </Button>
-                    ) : (
-                      <Button
-                        size="sm"
-                        disabled={activateMutation.isPending}
-                        onClick={() => activateMutation.mutate(role)}
-                      >
-                        Activate
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}

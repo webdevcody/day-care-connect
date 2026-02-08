@@ -17,6 +17,7 @@ import { Route as FacilityRouteImport } from './routes/_facility'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FacilitiesIndexRouteImport } from './routes/facilities/index'
+import { Route as InviteCodeRouteImport } from './routes/invite/$code'
 import { Route as AuthVerifyEmailRouteImport } from './routes/_auth/verify-email'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
@@ -58,6 +59,7 @@ import { Route as FacilityFacilityFacilityIdRosterRouteImport } from './routes/_
 import { Route as FacilityFacilityFacilityIdReviewsRouteImport } from './routes/_facility/facility/$facilityId/reviews'
 import { Route as FacilityFacilityFacilityIdReportsRouteImport } from './routes/_facility/facility/$facilityId/reports'
 import { Route as FacilityFacilityFacilityIdPhotosRouteImport } from './routes/_facility/facility/$facilityId/photos'
+import { Route as FacilityFacilityFacilityIdInvitesRouteImport } from './routes/_facility/facility/$facilityId/invites'
 import { Route as FacilityFacilityFacilityIdHoursRouteImport } from './routes/_facility/facility/$facilityId/hours'
 import { Route as FacilityFacilityFacilityIdEnrollmentsRouteImport } from './routes/_facility/facility/$facilityId/enrollments'
 import { Route as FacilityFacilityFacilityIdEditRouteImport } from './routes/_facility/facility/$facilityId/edit'
@@ -70,6 +72,7 @@ import { Route as ParentParentChildrenChildIdPhotosRouteImport } from './routes/
 import { Route as ParentParentChildrenChildIdEditRouteImport } from './routes/_parent/parent/children/$childId/edit'
 import { Route as ParentParentChildrenChildIdActivitiesRouteImport } from './routes/_parent/parent/children/$childId/activities'
 import { Route as ParentParentBillingInvoicesInvoiceIdRouteImport } from './routes/_parent/parent/billing/invoices/$invoiceId'
+import { Route as FacilityFacilityFacilityIdInvitesFormsRouteImport } from './routes/_facility/facility/$facilityId/invites/forms'
 import { Route as FacilityFacilityFacilityIdDocumentsTemplatesRouteImport } from './routes/_facility/facility/$facilityId/documents/templates'
 import { Route as FacilityFacilityFacilityIdDocumentsSendRouteImport } from './routes/_facility/facility/$facilityId/documents/send'
 import { Route as FacilityFacilityFacilityIdDocumentsComplianceRouteImport } from './routes/_facility/facility/$facilityId/documents/compliance'
@@ -112,6 +115,11 @@ const IndexRoute = IndexRouteImport.update({
 const FacilitiesIndexRoute = FacilitiesIndexRouteImport.update({
   id: '/facilities/',
   path: '/facilities/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InviteCodeRoute = InviteCodeRouteImport.update({
+  id: '/invite/$code',
+  path: '/invite/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
@@ -345,6 +353,12 @@ const FacilityFacilityFacilityIdPhotosRoute =
     path: '/facility/$facilityId/photos',
     getParentRoute: () => FacilityRoute,
   } as any)
+const FacilityFacilityFacilityIdInvitesRoute =
+  FacilityFacilityFacilityIdInvitesRouteImport.update({
+    id: '/facility/$facilityId/invites',
+    path: '/facility/$facilityId/invites',
+    getParentRoute: () => FacilityRoute,
+  } as any)
 const FacilityFacilityFacilityIdHoursRoute =
   FacilityFacilityFacilityIdHoursRouteImport.update({
     id: '/facility/$facilityId/hours',
@@ -417,6 +431,12 @@ const ParentParentBillingInvoicesInvoiceIdRoute =
     path: '/parent/billing/invoices/$invoiceId',
     getParentRoute: () => ParentRoute,
   } as any)
+const FacilityFacilityFacilityIdInvitesFormsRoute =
+  FacilityFacilityFacilityIdInvitesFormsRouteImport.update({
+    id: '/forms',
+    path: '/forms',
+    getParentRoute: () => FacilityFacilityFacilityIdInvitesRoute,
+  } as any)
 const FacilityFacilityFacilityIdDocumentsTemplatesRoute =
   FacilityFacilityFacilityIdDocumentsTemplatesRouteImport.update({
     id: '/facility/$facilityId/documents/templates',
@@ -469,6 +489,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/verify-email': typeof AuthVerifyEmailRoute
+  '/invite/$code': typeof InviteCodeRoute
   '/facilities/': typeof FacilitiesIndexRoute
   '/facility/new': typeof FacilityFacilityNewRoute
   '/facility/notifications': typeof FacilityFacilityNotificationsRoute
@@ -490,6 +511,7 @@ export interface FileRoutesByFullPath {
   '/facility/$facilityId/edit': typeof FacilityFacilityFacilityIdEditRoute
   '/facility/$facilityId/enrollments': typeof FacilityFacilityFacilityIdEnrollmentsRoute
   '/facility/$facilityId/hours': typeof FacilityFacilityFacilityIdHoursRoute
+  '/facility/$facilityId/invites': typeof FacilityFacilityFacilityIdInvitesRouteWithChildren
   '/facility/$facilityId/photos': typeof FacilityFacilityFacilityIdPhotosRoute
   '/facility/$facilityId/reports': typeof FacilityFacilityFacilityIdReportsRoute
   '/facility/$facilityId/reviews': typeof FacilityFacilityFacilityIdReviewsRoute
@@ -515,6 +537,7 @@ export interface FileRoutesByFullPath {
   '/facility/$facilityId/documents/compliance': typeof FacilityFacilityFacilityIdDocumentsComplianceRoute
   '/facility/$facilityId/documents/send': typeof FacilityFacilityFacilityIdDocumentsSendRoute
   '/facility/$facilityId/documents/templates': typeof FacilityFacilityFacilityIdDocumentsTemplatesRoute
+  '/facility/$facilityId/invites/forms': typeof FacilityFacilityFacilityIdInvitesFormsRoute
   '/parent/billing/invoices/$invoiceId': typeof ParentParentBillingInvoicesInvoiceIdRoute
   '/parent/children/$childId/activities': typeof ParentParentChildrenChildIdActivitiesRoute
   '/parent/children/$childId/edit': typeof ParentParentChildrenChildIdEditRoute
@@ -535,6 +558,7 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/verify-email': typeof AuthVerifyEmailRoute
+  '/invite/$code': typeof InviteCodeRoute
   '/facilities': typeof FacilitiesIndexRoute
   '/facility/new': typeof FacilityFacilityNewRoute
   '/facility/notifications': typeof FacilityFacilityNotificationsRoute
@@ -556,6 +580,7 @@ export interface FileRoutesByTo {
   '/facility/$facilityId/edit': typeof FacilityFacilityFacilityIdEditRoute
   '/facility/$facilityId/enrollments': typeof FacilityFacilityFacilityIdEnrollmentsRoute
   '/facility/$facilityId/hours': typeof FacilityFacilityFacilityIdHoursRoute
+  '/facility/$facilityId/invites': typeof FacilityFacilityFacilityIdInvitesRouteWithChildren
   '/facility/$facilityId/photos': typeof FacilityFacilityFacilityIdPhotosRoute
   '/facility/$facilityId/reports': typeof FacilityFacilityFacilityIdReportsRoute
   '/facility/$facilityId/reviews': typeof FacilityFacilityFacilityIdReviewsRoute
@@ -581,6 +606,7 @@ export interface FileRoutesByTo {
   '/facility/$facilityId/documents/compliance': typeof FacilityFacilityFacilityIdDocumentsComplianceRoute
   '/facility/$facilityId/documents/send': typeof FacilityFacilityFacilityIdDocumentsSendRoute
   '/facility/$facilityId/documents/templates': typeof FacilityFacilityFacilityIdDocumentsTemplatesRoute
+  '/facility/$facilityId/invites/forms': typeof FacilityFacilityFacilityIdInvitesFormsRoute
   '/parent/billing/invoices/$invoiceId': typeof ParentParentBillingInvoicesInvoiceIdRoute
   '/parent/children/$childId/activities': typeof ParentParentChildrenChildIdActivitiesRoute
   '/parent/children/$childId/edit': typeof ParentParentChildrenChildIdEditRoute
@@ -606,6 +632,7 @@ export interface FileRoutesById {
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/verify-email': typeof AuthVerifyEmailRoute
+  '/invite/$code': typeof InviteCodeRoute
   '/facilities/': typeof FacilitiesIndexRoute
   '/_facility/facility/new': typeof FacilityFacilityNewRoute
   '/_facility/facility/notifications': typeof FacilityFacilityNotificationsRoute
@@ -627,6 +654,7 @@ export interface FileRoutesById {
   '/_facility/facility/$facilityId/edit': typeof FacilityFacilityFacilityIdEditRoute
   '/_facility/facility/$facilityId/enrollments': typeof FacilityFacilityFacilityIdEnrollmentsRoute
   '/_facility/facility/$facilityId/hours': typeof FacilityFacilityFacilityIdHoursRoute
+  '/_facility/facility/$facilityId/invites': typeof FacilityFacilityFacilityIdInvitesRouteWithChildren
   '/_facility/facility/$facilityId/photos': typeof FacilityFacilityFacilityIdPhotosRoute
   '/_facility/facility/$facilityId/reports': typeof FacilityFacilityFacilityIdReportsRoute
   '/_facility/facility/$facilityId/reviews': typeof FacilityFacilityFacilityIdReviewsRoute
@@ -652,6 +680,7 @@ export interface FileRoutesById {
   '/_facility/facility/$facilityId/documents/compliance': typeof FacilityFacilityFacilityIdDocumentsComplianceRoute
   '/_facility/facility/$facilityId/documents/send': typeof FacilityFacilityFacilityIdDocumentsSendRoute
   '/_facility/facility/$facilityId/documents/templates': typeof FacilityFacilityFacilityIdDocumentsTemplatesRoute
+  '/_facility/facility/$facilityId/invites/forms': typeof FacilityFacilityFacilityIdInvitesFormsRoute
   '/_parent/parent/billing/invoices/$invoiceId': typeof ParentParentBillingInvoicesInvoiceIdRoute
   '/_parent/parent/children/$childId/activities': typeof ParentParentChildrenChildIdActivitiesRoute
   '/_parent/parent/children/$childId/edit': typeof ParentParentChildrenChildIdEditRoute
@@ -674,6 +703,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/verify-email'
+    | '/invite/$code'
     | '/facilities/'
     | '/facility/new'
     | '/facility/notifications'
@@ -695,6 +725,7 @@ export interface FileRouteTypes {
     | '/facility/$facilityId/edit'
     | '/facility/$facilityId/enrollments'
     | '/facility/$facilityId/hours'
+    | '/facility/$facilityId/invites'
     | '/facility/$facilityId/photos'
     | '/facility/$facilityId/reports'
     | '/facility/$facilityId/reviews'
@@ -720,6 +751,7 @@ export interface FileRouteTypes {
     | '/facility/$facilityId/documents/compliance'
     | '/facility/$facilityId/documents/send'
     | '/facility/$facilityId/documents/templates'
+    | '/facility/$facilityId/invites/forms'
     | '/parent/billing/invoices/$invoiceId'
     | '/parent/children/$childId/activities'
     | '/parent/children/$childId/edit'
@@ -740,6 +772,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/verify-email'
+    | '/invite/$code'
     | '/facilities'
     | '/facility/new'
     | '/facility/notifications'
@@ -761,6 +794,7 @@ export interface FileRouteTypes {
     | '/facility/$facilityId/edit'
     | '/facility/$facilityId/enrollments'
     | '/facility/$facilityId/hours'
+    | '/facility/$facilityId/invites'
     | '/facility/$facilityId/photos'
     | '/facility/$facilityId/reports'
     | '/facility/$facilityId/reviews'
@@ -786,6 +820,7 @@ export interface FileRouteTypes {
     | '/facility/$facilityId/documents/compliance'
     | '/facility/$facilityId/documents/send'
     | '/facility/$facilityId/documents/templates'
+    | '/facility/$facilityId/invites/forms'
     | '/parent/billing/invoices/$invoiceId'
     | '/parent/children/$childId/activities'
     | '/parent/children/$childId/edit'
@@ -810,6 +845,7 @@ export interface FileRouteTypes {
     | '/_auth/register'
     | '/_auth/reset-password'
     | '/_auth/verify-email'
+    | '/invite/$code'
     | '/facilities/'
     | '/_facility/facility/new'
     | '/_facility/facility/notifications'
@@ -831,6 +867,7 @@ export interface FileRouteTypes {
     | '/_facility/facility/$facilityId/edit'
     | '/_facility/facility/$facilityId/enrollments'
     | '/_facility/facility/$facilityId/hours'
+    | '/_facility/facility/$facilityId/invites'
     | '/_facility/facility/$facilityId/photos'
     | '/_facility/facility/$facilityId/reports'
     | '/_facility/facility/$facilityId/reviews'
@@ -856,6 +893,7 @@ export interface FileRouteTypes {
     | '/_facility/facility/$facilityId/documents/compliance'
     | '/_facility/facility/$facilityId/documents/send'
     | '/_facility/facility/$facilityId/documents/templates'
+    | '/_facility/facility/$facilityId/invites/forms'
     | '/_parent/parent/billing/invoices/$invoiceId'
     | '/_parent/parent/children/$childId/activities'
     | '/_parent/parent/children/$childId/edit'
@@ -876,6 +914,7 @@ export interface RootRouteChildren {
   StaffRoute: typeof StaffRouteWithChildren
   DiscoverRoute: typeof DiscoverRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
+  InviteCodeRoute: typeof InviteCodeRoute
   FacilitiesIndexRoute: typeof FacilitiesIndexRoute
   FacilitiesFacilityIdEnrollRoute: typeof FacilitiesFacilityIdEnrollRoute
   FacilitiesFacilityIdReviewRoute: typeof FacilitiesFacilityIdReviewRoute
@@ -938,6 +977,13 @@ declare module '@tanstack/react-router' {
       path: '/facilities'
       fullPath: '/facilities/'
       preLoaderRoute: typeof FacilitiesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invite/$code': {
+      id: '/invite/$code'
+      path: '/invite/$code'
+      fullPath: '/invite/$code'
+      preLoaderRoute: typeof InviteCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth/verify-email': {
@@ -1227,6 +1273,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FacilityFacilityFacilityIdPhotosRouteImport
       parentRoute: typeof FacilityRoute
     }
+    '/_facility/facility/$facilityId/invites': {
+      id: '/_facility/facility/$facilityId/invites'
+      path: '/facility/$facilityId/invites'
+      fullPath: '/facility/$facilityId/invites'
+      preLoaderRoute: typeof FacilityFacilityFacilityIdInvitesRouteImport
+      parentRoute: typeof FacilityRoute
+    }
     '/_facility/facility/$facilityId/hours': {
       id: '/_facility/facility/$facilityId/hours'
       path: '/facility/$facilityId/hours'
@@ -1311,6 +1364,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParentParentBillingInvoicesInvoiceIdRouteImport
       parentRoute: typeof ParentRoute
     }
+    '/_facility/facility/$facilityId/invites/forms': {
+      id: '/_facility/facility/$facilityId/invites/forms'
+      path: '/forms'
+      fullPath: '/facility/$facilityId/invites/forms'
+      preLoaderRoute: typeof FacilityFacilityFacilityIdInvitesFormsRouteImport
+      parentRoute: typeof FacilityFacilityFacilityIdInvitesRoute
+    }
     '/_facility/facility/$facilityId/documents/templates': {
       id: '/_facility/facility/$facilityId/documents/templates'
       path: '/facility/$facilityId/documents/templates'
@@ -1381,6 +1441,21 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface FacilityFacilityFacilityIdInvitesRouteChildren {
+  FacilityFacilityFacilityIdInvitesFormsRoute: typeof FacilityFacilityFacilityIdInvitesFormsRoute
+}
+
+const FacilityFacilityFacilityIdInvitesRouteChildren: FacilityFacilityFacilityIdInvitesRouteChildren =
+  {
+    FacilityFacilityFacilityIdInvitesFormsRoute:
+      FacilityFacilityFacilityIdInvitesFormsRoute,
+  }
+
+const FacilityFacilityFacilityIdInvitesRouteWithChildren =
+  FacilityFacilityFacilityIdInvitesRoute._addFileChildren(
+    FacilityFacilityFacilityIdInvitesRouteChildren,
+  )
+
 interface FacilityRouteChildren {
   FacilityFacilityNewRoute: typeof FacilityFacilityNewRoute
   FacilityFacilityNotificationsRoute: typeof FacilityFacilityNotificationsRoute
@@ -1392,6 +1467,7 @@ interface FacilityRouteChildren {
   FacilityFacilityFacilityIdEditRoute: typeof FacilityFacilityFacilityIdEditRoute
   FacilityFacilityFacilityIdEnrollmentsRoute: typeof FacilityFacilityFacilityIdEnrollmentsRoute
   FacilityFacilityFacilityIdHoursRoute: typeof FacilityFacilityFacilityIdHoursRoute
+  FacilityFacilityFacilityIdInvitesRoute: typeof FacilityFacilityFacilityIdInvitesRouteWithChildren
   FacilityFacilityFacilityIdPhotosRoute: typeof FacilityFacilityFacilityIdPhotosRoute
   FacilityFacilityFacilityIdReportsRoute: typeof FacilityFacilityFacilityIdReportsRoute
   FacilityFacilityFacilityIdReviewsRoute: typeof FacilityFacilityFacilityIdReviewsRoute
@@ -1426,6 +1502,8 @@ const FacilityRouteChildren: FacilityRouteChildren = {
   FacilityFacilityFacilityIdEnrollmentsRoute:
     FacilityFacilityFacilityIdEnrollmentsRoute,
   FacilityFacilityFacilityIdHoursRoute: FacilityFacilityFacilityIdHoursRoute,
+  FacilityFacilityFacilityIdInvitesRoute:
+    FacilityFacilityFacilityIdInvitesRouteWithChildren,
   FacilityFacilityFacilityIdPhotosRoute: FacilityFacilityFacilityIdPhotosRoute,
   FacilityFacilityFacilityIdReportsRoute:
     FacilityFacilityFacilityIdReportsRoute,
@@ -1556,6 +1634,7 @@ const rootRouteChildren: RootRouteChildren = {
   StaffRoute: StaffRouteWithChildren,
   DiscoverRoute: DiscoverRoute,
   UnauthorizedRoute: UnauthorizedRoute,
+  InviteCodeRoute: InviteCodeRoute,
   FacilitiesIndexRoute: FacilitiesIndexRoute,
   FacilitiesFacilityIdEnrollRoute: FacilitiesFacilityIdEnrollRoute,
   FacilitiesFacilityIdReviewRoute: FacilitiesFacilityIdReviewRoute,

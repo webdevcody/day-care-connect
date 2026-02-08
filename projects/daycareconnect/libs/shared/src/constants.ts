@@ -136,6 +136,12 @@ export type ReviewSortOption = (typeof REVIEW_SORT_OPTIONS)[number];
 
 export const REVIEW_ELIGIBLE_STATUSES = ["active", "approved", "withdrawn"] as const;
 
+export const FORM_TYPES = ["markdown", "pdf", "custom_form"] as const;
+export type FormType = (typeof FORM_TYPES)[number];
+
+export const FORM_FIELD_TYPES = ["text", "textarea", "checkbox", "select", "date", "email", "phone", "number"] as const;
+export type FormFieldType = (typeof FORM_FIELD_TYPES)[number];
+
 export const USER_ROLE_LABELS: Record<UserRole, string> = {
   parent: "Parent",
   admin: "Facility Admin",

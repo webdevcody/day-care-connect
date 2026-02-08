@@ -87,6 +87,13 @@ export const queryKeys = {
     roster: (facilityId: string) => ["admin", "roster", facilityId] as const,
     stripeStatus: (facilityId: string) => ["admin", "stripe-status", facilityId] as const,
     reportTemplates: (facilityId: string) => ["admin", "report-templates", facilityId] as const,
+    attendanceActivityLog: (facilityId: string) => ["admin", "attendance-activity-log", facilityId] as const,
+    childAttendanceHistory: (facilityId: string, childId: string) => ["admin", "child-attendance-history", facilityId, childId] as const,
+    invites: (facilityId: string) => ["admin", "invites", facilityId] as const,
+    inviteSubmissions: (inviteId: string) => ["admin", "invite-submissions", inviteId] as const,
+  },
+  invites: {
+    info: (code: string) => ["invites", code] as const,
   },
   staff: {
     assignments: ["staff", "assignments"] as const,

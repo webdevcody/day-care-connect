@@ -5,7 +5,7 @@ import { Button } from "@daycare-hub/ui";
 import { MessagesNavLink } from "@/components/messaging/unread-badge";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { RoleSwitcher } from "@/components/role-switcher";
+
 import {
   LayoutDashboard,
   Users,
@@ -32,7 +32,6 @@ function ParentLayout() {
           </a>
           <p className="mt-1 text-xs text-muted-foreground">Parent Dashboard</p>
         </div>
-        <RoleSwitcher />
         <nav className="flex-1 space-y-1 overflow-y-auto px-3">
           <Link
             to="/parent"

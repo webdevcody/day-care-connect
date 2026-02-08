@@ -5,7 +5,7 @@ import { Button } from "@daycare-hub/ui";
 import { MessagesNavLink } from "@/components/messaging/unread-badge";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { RoleSwitcher } from "@/components/role-switcher";
+
 import { Briefcase, Bell, Settings } from "lucide-react";
 
 export const Route = createFileRoute("/_staff")({
@@ -24,7 +24,6 @@ function StaffLayout() {
           </a>
           <p className="mt-1 text-xs text-muted-foreground">Staff Dashboard</p>
         </div>
-        <RoleSwitcher />
         <nav className="flex-1 space-y-1 overflow-y-auto px-3">
           <Link
             to="/staff"

@@ -13,6 +13,7 @@ import {
   BILLING_FREQUENCIES,
   INVOICE_STATUSES,
   PAYMENT_STATUSES,
+  FORM_TYPES,
 } from "@daycare-hub/shared";
 
 export const enrollmentStatusEnum = pgEnum("enrollment_status", ENROLLMENT_STATUSES);
@@ -28,3 +29,4 @@ export const documentInstanceStatusEnum = pgEnum("document_instance_status", DOC
 export const billingFrequencyEnum = pgEnum("billing_frequency", BILLING_FREQUENCIES);
 export const invoiceStatusEnum = pgEnum("invoice_status", INVOICE_STATUSES);
 export const paymentStatusEnum = pgEnum("payment_status", PAYMENT_STATUSES);
+export const formTypeEnum = pgEnum("form_type", FORM_TYPES);

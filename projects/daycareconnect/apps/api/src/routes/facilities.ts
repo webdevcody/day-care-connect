@@ -286,6 +286,11 @@ app.post("/", async (c) => {
       ownerId: userId,
       email: data.email || null,
       website: data.website || null,
+      monthlyRate: data.monthlyRate ?? null,
+      hourlyRate: data.hourlyRate ?? null,
+      dailyRate: data.dailyRate ?? null,
+      weeklyRate: data.weeklyRate ?? null,
+      licenseExpiry: data.licenseExpiry || null,
     })
     .returning();
 

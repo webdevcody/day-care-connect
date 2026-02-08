@@ -25,3 +25,6 @@ export * as adminReportsService from "./admin/reports";
 export * as adminRosterService from "./admin/roster";
 export * as adminStripeService from "./admin/stripe";
 export * as adminReportTemplatesService from "./admin/report-templates";
+export * as adminInvitesService from "./admin/invites";
+export * as invitesService from "./invites";
+export * as uploadsService from "./uploads";

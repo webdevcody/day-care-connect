@@ -1,11 +1,14 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { serveStatic } from "@hono/node-server/serve-static";
 import { errorHandler } from "./middleware/error-handler";
 import { authMiddleware } from "./middleware/auth";
 import { auth } from "./lib/auth";
 
 // Route imports
 import { authRoutes } from "./routes/auth";
+import { inviteRoutes } from "./routes/invites";
+import { uploadRoutes } from "./routes/uploads";
 import { accountRoutes } from "./routes/account";
 import { dashboardRoutes } from "./routes/dashboard";
 import { childrenRoutes } from "./routes/children";
@@ -30,6 +33,7 @@ import { adminReportsRoutes } from "./routes/admin/reports";
 import { adminRosterRoutes } from "./routes/admin/roster";
 import { adminStripeRoutes } from "./routes/admin/stripe";
 import { adminReportTemplatesRoutes } from "./routes/admin/report-templates";
+import { adminInvitesRoutes } from "./routes/admin/invites";
 import { staffRoutes } from "./routes/staff/index";
 import { stripeWebhookRoutes } from "./routes/webhooks/stripe";
 
@@ -58,8 +62,15 @@ app.route("/api/auth", authRoutes);
 // Stripe webhooks (no auth middleware - verified by signature)
 app.route("/api/webhooks", stripeWebhookRoutes);
 
+// Public invite info route (no auth middleware - public access)
+app.route("/api/invites", inviteRoutes);
+
+// Static file serving for uploads
+app.use("/uploads/*", serveStatic({ root: "./" }));
+
 // Protected routes
 app.use("/api/*", authMiddleware);
+app.route("/api/uploads", uploadRoutes);
 app.route("/api/account", accountRoutes);
 app.route("/api/dashboard", dashboardRoutes);
 app.route("/api/children", childrenRoutes);
@@ -84,6 +95,7 @@ app.route("/api/admin/reports", adminReportsRoutes);
 app.route("/api/admin/roster", adminRosterRoutes);
 app.route("/api/admin/stripe", adminStripeRoutes);
 app.route("/api/admin/report-templates", adminReportTemplatesRoutes);
+app.route("/api/admin/invites", adminInvitesRoutes);
 app.route("/api/staff", staffRoutes);
 
 export { app };

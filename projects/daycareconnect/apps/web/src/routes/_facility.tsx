@@ -5,7 +5,7 @@ import { Button } from "@daycare-hub/ui";
 import { MessagesNavLink } from "@/components/messaging/unread-badge";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { RoleSwitcher } from "@/components/role-switcher";
+
 import { Building2, PlusCircle, Bell, Settings } from "lucide-react";
 
 export const Route = createFileRoute("/_facility")({
@@ -24,10 +24,10 @@ function FacilityLayout() {
           </a>
           <p className="mt-1 text-xs text-muted-foreground">Facility Admin</p>
         </div>
-        <RoleSwitcher />
         <nav className="flex-1 space-y-1 overflow-y-auto px-3">
           <Link
             to="/facility"
+            activeOptions={{ exact: true }}
             className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground [&.active]:bg-accent [&.active]:text-foreground"
           >
             <Building2 className="h-4 w-4" />

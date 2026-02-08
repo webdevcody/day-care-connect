@@ -488,4 +488,24 @@ app.get("/parents/:facilityId", async (c) => {
   return c.json(Array.from(parentMap.values()));
 });
 
+// POST /templates/reorder - Batch update sortOrder for templates
+app.post("/templates/reorder", async (c) => {
+  const userId = c.get("userId") as string;
+  const body = await c.req.json();
+  const { facilityId, items } = body;
+
+  await assertFacilityManager(facilityId, userId);
+
+  await Promise.all(
+    items.map(async (item: { id: string; sortOrder: number }) => {
+      await db
+        .update(documentTemplates)
+        .set({ sortOrder: item.sortOrder, updatedAt: new Date() })
+        .where(eq(documentTemplates.id, item.id));
+    })
+  );
+
+  return c.json({ success: true });
+});
+
 export { app as adminDocumentsRoutes };

@@ -163,7 +163,7 @@ app.post("/", async (c) => {
         enrollmentId: enrollment.id,
         facilityName: facility.name,
       },
-      actionUrl: `/admin/enrollments/${enrollment.id}`,
+      actionUrl: `/facility/${body.facilityId}/enrollments`,
     });
   }
 
@@ -226,7 +226,7 @@ app.post("/:enrollmentId/withdraw", async (c) => {
         enrollmentId,
         facilityName: facility.name,
       },
-      actionUrl: `/admin/enrollments/${enrollmentId}`,
+      actionUrl: `/facility/${enrollment.facilityId}/enrollments`,
     });
   }
 
