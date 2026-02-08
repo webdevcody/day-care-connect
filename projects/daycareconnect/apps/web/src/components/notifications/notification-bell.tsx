@@ -1,17 +1,12 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Popover, PopoverContent, PopoverTrigger } from "@daycare-hub/ui";
-import { getUnreadNotificationCount } from "@/lib/server/notifications";
+import { useUnreadNotificationCount } from "@daycare-hub/hooks";
 import { NotificationPanel } from "./notification-panel";
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
 
-  const { data } = useQuery({
-    queryKey: ["unread-notifications-count"],
-    queryFn: () => getUnreadNotificationCount(),
-    refetchInterval: 30_000,
-  });
+  const { data } = useUnreadNotificationCount();
 
   const count = data?.count ?? 0;
 

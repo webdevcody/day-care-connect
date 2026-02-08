@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@daycare-hub/ui";
-import { getParentPaymentHistory } from "@/lib/server/parent-billing";
+import { useParentPaymentHistory } from "@daycare-hub/hooks";
 
 const statusColors: Record<string, string> = {
   pending: "bg-gray-100 text-gray-800",
@@ -22,18 +22,21 @@ const statusColors: Record<string, string> = {
 export const Route = createFileRoute(
   "/_parent/parent/billing/payments"
 )({
-  loader: () => getParentPaymentHistory(),
   component: PaymentHistoryPage,
 });
 
 function PaymentHistoryPage() {
-  const paymentsList = Route.useLoaderData();
+  const { data: paymentsList, isLoading } = useParentPaymentHistory();
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  const payments = paymentsList ?? [];
 
   return (
     <div>
       <h1 className="mb-6 text-2xl font-bold">Payment History</h1>
 
-      {paymentsList.length === 0 ? (
+      {payments.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">No payments yet.</p>
@@ -52,7 +55,7 @@ function PaymentHistoryPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paymentsList.map((payment) => (
+              {payments.map((payment) => (
                 <TableRow key={payment.id}>
                   <TableCell>
                     {new Date(payment.createdAt).toLocaleDateString()}

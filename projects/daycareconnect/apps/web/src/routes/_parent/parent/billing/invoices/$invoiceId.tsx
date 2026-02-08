@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Card,
@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@daycare-hub/ui";
-import { getParentInvoiceDetail, createCheckoutSession } from "@/lib/server/parent-billing";
+import { useParentInvoiceDetail, useCreateCheckoutSession } from "@daycare-hub/hooks";
 
 const statusColors: Record<string, string> = {
   sent: "bg-blue-100 text-blue-800",
@@ -26,22 +26,24 @@ export const Route = createFileRoute(
   validateSearch: (search: Record<string, unknown>) => ({
     payment: search.payment as string | undefined,
   }),
-  loader: ({ params }) =>
-    getParentInvoiceDetail({ data: { invoiceId: params.invoiceId } }),
   component: ParentInvoiceDetail,
 });
 
 function ParentInvoiceDetail() {
-  const invoice = Route.useLoaderData();
+  const { invoiceId } = Route.useParams();
   const { payment } = Route.useSearch();
+  const { data: invoice, isLoading } = useParentInvoiceDetail(invoiceId);
+  const checkoutMutation = useCreateCheckoutSession();
   const [paying, setPaying] = useState(false);
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  if (!invoice) return null;
 
   const handlePay = async () => {
     setPaying(true);
     try {
-      const result = await createCheckoutSession({
-        data: { invoiceId: invoice.id },
-      });
+      const result = await checkoutMutation.mutateAsync(invoice.id);
       if (result.url) {
         window.location.href = result.url;
       }

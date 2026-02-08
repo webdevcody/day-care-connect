@@ -1,11 +1,11 @@
-import { createFileRoute, useRouter, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  getFacilityDocumentTemplates,
-  getFacilityParents,
-  sendDocument,
-  sendBulkDocument,
-} from "@/lib/server/admin-documents";
+  useAdminDocumentTemplates,
+  useAdminDocumentParents,
+  useSendDocument,
+  useSendBulkDocument,
+} from "@daycare-hub/hooks";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import {
   Card,
@@ -26,24 +26,18 @@ import {
 export const Route = createFileRoute(
   "/_facility/facility/$facilityId/documents/send"
 )({
-  loader: async ({ params }) => {
-    const [templates, parents] = await Promise.all([
-      getFacilityDocumentTemplates({ data: { facilityId: params.facilityId } }),
-      getFacilityParents({ data: { facilityId: params.facilityId } }),
-    ]);
-    return {
-      templates: templates.filter((t) => !t.isArchived),
-      parents,
-    };
-  },
   component: SendDocumentPage,
 });
 
 function SendDocumentPage() {
-  const { templates, parents } = Route.useLoaderData();
   const { facilityId } = Route.useParams();
-  const router = useRouter();
   const navigate = useNavigate();
+  const { data: allTemplates = [], isLoading: templatesLoading } = useAdminDocumentTemplates(facilityId);
+  const { data: parents = [], isLoading: parentsLoading } = useAdminDocumentParents(facilityId);
+  const sendDocument = useSendDocument();
+  const sendBulkDocument = useSendBulkDocument();
+
+  const templates = allTemplates.filter((t) => !t.isArchived);
 
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
   const [sendToAll, setSendToAll] = useState(false);
@@ -51,6 +45,8 @@ function SendDocumentPage() {
   const [expiresAt, setExpiresAt] = useState("");
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+
+  if (templatesLoading || parentsLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
 
   const selectedTemplate = templates.find((t) => t.id === selectedTemplateId);
 
@@ -69,21 +65,17 @@ function SendDocumentPage() {
     setSuccessMessage("");
     try {
       if (sendToAll) {
-        const result = await sendBulkDocument({
-          data: {
-            templateId: selectedTemplateId,
-            facilityId,
-            expiresAt: expiresAt || undefined,
-          },
+        const result = await sendBulkDocument.mutateAsync({
+          templateId: selectedTemplateId,
+          facilityId,
+          expiresAt: expiresAt || undefined,
         });
         setSuccessMessage(`Document sent to ${result.length} parent(s).`);
       } else {
-        const result = await sendDocument({
-          data: {
-            templateId: selectedTemplateId,
-            parentIds: Array.from(selectedParentIds),
-            expiresAt: expiresAt || undefined,
-          },
+        const result = await sendDocument.mutateAsync({
+          templateId: selectedTemplateId,
+          parentIds: Array.from(selectedParentIds),
+          expiresAt: expiresAt || undefined,
         });
         setSuccessMessage(`Document sent to ${result.length} parent(s).`);
       }

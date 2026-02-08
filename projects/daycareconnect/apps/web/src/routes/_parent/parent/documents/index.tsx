@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getMyDocuments } from "@/lib/server/parent-documents";
+import { useMyDocuments } from "@daycare-hub/hooks";
 import { DocumentStatusBadge } from "@/components/documents/document-status-badge";
 import {
   Card,
@@ -10,18 +10,21 @@ import {
 } from "@daycare-hub/ui";
 
 export const Route = createFileRoute("/_parent/parent/documents/")({
-  loader: () => getMyDocuments(),
   component: ParentDocumentsPage,
 });
 
 function ParentDocumentsPage() {
-  const documents = Route.useLoaderData();
+  const { data: documents, isLoading } = useMyDocuments();
 
-  const actionNeeded = documents.filter(
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  const docs = documents ?? [];
+
+  const actionNeeded = docs.filter(
     (d) => d.status === "pending" || d.status === "viewed"
   );
-  const signed = documents.filter((d) => d.status === "signed");
-  const other = documents.filter(
+  const signed = docs.filter((d) => d.status === "signed");
+  const other = docs.filter(
     (d) => d.status !== "pending" && d.status !== "viewed" && d.status !== "signed"
   );
 
@@ -123,7 +126,7 @@ function ParentDocumentsPage() {
         </div>
       )}
 
-      {documents.length === 0 && (
+      {docs.length === 0 && (
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">No documents yet.</p>

@@ -1,23 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { getMyReviews, deleteReview } from "@/lib/server/reviews";
+import { useMyReviews, useDeleteReview } from "@daycare-hub/hooks";
 import { ReviewCard } from "@/components/reviews/review-card";
 import { Card, CardContent } from "@daycare-hub/ui";
 
 export const Route = createFileRoute("/_parent/parent/reviews")({
-  loader: () => getMyReviews(),
   component: MyReviewsPage,
 });
 
 function MyReviewsPage() {
-  const initialReviews = Route.useLoaderData();
-  const [reviewsList, setReviewsList] = useState(initialReviews);
+  const { data: reviews, isLoading } = useMyReviews();
+  const deleteReviewMutation = useDeleteReview();
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  const reviewsList = reviews ?? [];
 
   async function handleDelete(reviewId: string) {
     if (!confirm("Are you sure you want to delete this review?")) return;
     try {
-      await deleteReview({ data: { reviewId } });
-      setReviewsList((prev) => prev.filter((r) => r.id !== reviewId));
+      await deleteReviewMutation.mutateAsync(reviewId);
     } catch (err) {
       console.error(err);
     }

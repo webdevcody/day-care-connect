@@ -1,7 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@daycare-hub/ui";
-import { markNotificationRead } from "@/lib/server/notifications";
+import { useMarkNotificationRead } from "@daycare-hub/hooks";
 import { formatRelativeTime } from "@/lib/format-relative-time";
 import { useSession } from "@/lib/auth-client";
 import { ROLE_DASHBOARD_PATHS } from "@daycare-hub/shared";
@@ -49,22 +48,14 @@ function resolveActionUrl(actionUrl: string, role: UserRole): string {
 
 export function NotificationItem({ notification, truncate = true }: NotificationItemProps) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { data: session } = useSession();
   const role = ((session?.user as any)?.role || "parent") as UserRole;
 
-  const markReadMutation = useMutation({
-    mutationFn: () =>
-      markNotificationRead({ data: { notificationId: notification.id } }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      queryClient.invalidateQueries({ queryKey: ["unread-notifications-count"] });
-    },
-  });
+  const markReadMutation = useMarkNotificationRead();
 
   function handleClick() {
     if (!notification.isRead) {
-      markReadMutation.mutate();
+      markReadMutation.mutate(notification.id);
     }
     if (notification.actionUrl) {
       navigate({ to: resolveActionUrl(notification.actionUrl, role) });

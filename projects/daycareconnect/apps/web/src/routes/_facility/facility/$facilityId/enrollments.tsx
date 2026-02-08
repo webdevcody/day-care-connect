@@ -1,12 +1,12 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  getFacilityEnrollments,
-  getEnrollmentDetail,
-  approveEnrollment,
-  rejectEnrollment,
-  bulkEnrollmentAction,
-} from "@/lib/server/admin-enrollments";
+  useAdminEnrollments,
+  useAdminEnrollmentDetail,
+  useApproveEnrollment,
+  useRejectEnrollment,
+  useBulkEnrollmentAction,
+} from "@daycare-hub/hooks";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { EnrollmentReviewDialog } from "@/components/admin/enrollment-review-dialog";
 import { EnrollmentStatusBadge } from "@/components/admin/status-badge";
@@ -25,29 +25,30 @@ export const Route = createFileRoute(
   validateSearch: (search: Record<string, unknown>) => ({
     status: (search.status as string) || "all",
   }),
-  loaderDeps: ({ search }) => ({ status: search.status }),
-  loader: ({ params, deps }) =>
-    getFacilityEnrollments({
-      data: { facilityId: params.facilityId, status: deps.status },
-    }),
   component: EnrollmentsPage,
 });
 
 function EnrollmentsPage() {
-  const enrollments = Route.useLoaderData();
   const { facilityId } = Route.useParams();
   const { status: activeTab } = Route.useSearch();
-  const router = useRouter();
   const navigate = Route.useNavigate();
+  const statusFilter = activeTab === "all" ? undefined : activeTab;
+  const { data: enrollments = [], isLoading } = useAdminEnrollments(facilityId, statusFilter);
+  const approveEnrollment = useApproveEnrollment();
+  const rejectEnrollment = useRejectEnrollment();
+  const bulkEnrollmentAction = useBulkEnrollmentAction();
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [reviewEnrollment, setReviewEnrollment] = useState<any>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [reviewEnrollmentId, setReviewEnrollmentId] = useState<string | null>(null);
+  const { data: reviewEnrollment = null } = useAdminEnrollmentDetail(facilityId, reviewEnrollmentId ?? "");
 
   const pendingEnrollments = enrollments.filter((e) => e.status === "pending");
   const canBulkSelect = activeTab === "pending" || activeTab === "all";
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -67,24 +68,17 @@ function EnrollmentsPage() {
   };
 
   const openReview = async (enrollmentId: string) => {
-    try {
-      const detail = await getEnrollmentDetail({
-        data: { enrollmentId, facilityId },
-      });
-      setReviewEnrollment(detail);
-      setReviewOpen(true);
-    } catch (err) {
-      console.error("Failed to load enrollment detail:", err);
-    }
+    setReviewEnrollmentId(enrollmentId);
+    setReviewOpen(true);
   };
 
   const handleApprove = async (enrollmentId: string) => {
     setLoading(true);
     try {
-      await approveEnrollment({ data: { enrollmentId } });
+      await approveEnrollment.mutateAsync({ enrollmentId });
       setReviewOpen(false);
-      setReviewEnrollment(null);
-      router.invalidate();
+
+      setReviewEnrollmentId(null);
     } catch (err) {
       console.error("Failed to approve:", err);
     } finally {
@@ -95,10 +89,10 @@ function EnrollmentsPage() {
   const handleReject = async (enrollmentId: string, reason: string) => {
     setLoading(true);
     try {
-      await rejectEnrollment({ data: { enrollmentId, reason } });
+      await rejectEnrollment.mutateAsync({ enrollmentId, reason });
       setReviewOpen(false);
-      setReviewEnrollment(null);
-      router.invalidate();
+
+      setReviewEnrollmentId(null);
     } catch (err) {
       console.error("Failed to reject:", err);
     } finally {
@@ -112,11 +106,12 @@ function EnrollmentsPage() {
       if (!reason) return;
       setBulkLoading(true);
       try {
-        await bulkEnrollmentAction({
-          data: { enrollmentIds: Array.from(selectedIds), action, reason },
+        await bulkEnrollmentAction.mutateAsync({
+          enrollmentIds: Array.from(selectedIds),
+          action,
+          reason,
         });
         setSelectedIds(new Set());
-        router.invalidate();
       } catch (err) {
         console.error("Bulk action failed:", err);
       } finally {
@@ -125,11 +120,11 @@ function EnrollmentsPage() {
     } else {
       setBulkLoading(true);
       try {
-        await bulkEnrollmentAction({
-          data: { enrollmentIds: Array.from(selectedIds), action },
+        await bulkEnrollmentAction.mutateAsync({
+          enrollmentIds: Array.from(selectedIds),
+          action,
         });
         setSelectedIds(new Set());
-        router.invalidate();
       } catch (err) {
         console.error("Bulk action failed:", err);
       } finally {
@@ -245,7 +240,10 @@ function EnrollmentsPage() {
         open={reviewOpen}
         onOpenChange={(open) => {
           setReviewOpen(open);
-          if (!open) setReviewEnrollment(null);
+          if (!open) {
+      
+            setReviewEnrollmentId(null);
+          }
         }}
         onApprove={handleApprove}
         onReject={handleReject}

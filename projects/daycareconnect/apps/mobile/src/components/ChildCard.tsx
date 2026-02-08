@@ -3,7 +3,18 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { colors } from "../theme/colors";
 import { typography } from "../theme/typography";
 import { spacing, borderRadius } from "../theme/spacing";
-import type { Child } from "../api/endpoints";
+interface Child {
+  id: string;
+  parentId: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  gender: string | null;
+  allergies: string | null;
+  medicalNotes: string | null;
+  photo: string | null;
+  createdAt: string;
+}
 
 interface ChildCardProps {
   child: Child;

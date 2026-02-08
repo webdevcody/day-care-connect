@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@daycare-hub/ui";
-import { getParentBillingSummary, getParentInvoices } from "@/lib/server/parent-billing";
+import { useParentBillingSummary, useParentInvoices } from "@daycare-hub/hooks";
 
 const statusColors: Record<string, string> = {
   sent: "bg-blue-100 text-blue-800",
@@ -20,18 +20,18 @@ const statusColors: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/_parent/parent/billing/")({
-  loader: async () => {
-    const [summary, invoicesList] = await Promise.all([
-      getParentBillingSummary(),
-      getParentInvoices({ data: {} }),
-    ]);
-    return { summary, invoices: invoicesList };
-  },
   component: ParentBillingDashboard,
 });
 
 function ParentBillingDashboard() {
-  const { summary, invoices: invoicesList } = Route.useLoaderData();
+  const { data: summary, isLoading: summaryLoading } = useParentBillingSummary();
+  const { data: invoicesList, isLoading: invoicesLoading } = useParentInvoices();
+
+  const isLoading = summaryLoading || invoicesLoading;
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  const invoices = invoicesList ?? [];
 
   return (
     <div>
@@ -43,10 +43,10 @@ function ParentBillingDashboard() {
           <CardContent className="py-6">
             <p className="text-sm text-muted-foreground">Outstanding Balance</p>
             <p className="text-2xl font-bold">
-              ${parseFloat(summary.outstandingAmount).toFixed(2)}
+              ${parseFloat(summary?.outstandingAmount ?? "0").toFixed(2)}
             </p>
             <p className="text-xs text-muted-foreground">
-              {summary.outstandingCount} unpaid invoice{summary.outstandingCount !== 1 ? "s" : ""}
+              {summary?.outstandingCount ?? 0} unpaid invoice{summary?.outstandingCount !== 1 ? "s" : ""}
             </p>
           </CardContent>
         </Card>
@@ -54,11 +54,11 @@ function ParentBillingDashboard() {
           <CardContent className="py-6">
             <p className="text-sm text-muted-foreground">Total Paid</p>
             <p className="text-2xl font-bold">
-              ${parseFloat(summary.totalPaid).toFixed(2)}
+              ${parseFloat(summary?.totalPaid ?? "0").toFixed(2)}
             </p>
           </CardContent>
         </Card>
-        {summary.nextDueInvoice && (
+        {summary?.nextDueInvoice && (
           <Card>
             <CardContent className="py-6">
               <p className="text-sm text-muted-foreground">Next Payment Due</p>
@@ -90,7 +90,7 @@ function ParentBillingDashboard() {
       {/* Invoice List */}
       <h2 className="mb-4 text-lg font-semibold">Invoices</h2>
 
-      {invoicesList.length === 0 ? (
+      {invoices.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">No invoices yet.</p>
@@ -110,7 +110,7 @@ function ParentBillingDashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {invoicesList.map((inv) => (
+              {invoices.map((inv) => (
                 <TableRow key={inv.id}>
                   <TableCell>
                     <Link

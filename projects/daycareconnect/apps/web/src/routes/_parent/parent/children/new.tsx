@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { createChild } from "@/lib/server/children";
+import { useCreateChild } from "@daycare-hub/hooks";
 import { ChildForm } from "@/components/children/child-form";
 import type { CreateChildInput } from "@daycare-hub/shared";
 
@@ -9,9 +9,10 @@ export const Route = createFileRoute("/_parent/parent/children/new")({
 
 function NewChildPage() {
   const navigate = useNavigate();
+  const createChild = useCreateChild();
 
   async function handleSubmit(data: CreateChildInput) {
-    await createChild({ data });
+    await createChild.mutateAsync(data);
     navigate({ to: "/parent/children" });
   }
 

@@ -1,11 +1,11 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  getFacilityDocumentTemplates,
-  createDocumentTemplate,
-  updateDocumentTemplate,
-  archiveDocumentTemplate,
-} from "@/lib/server/admin-documents";
+  useAdminDocumentTemplates,
+  useCreateDocumentTemplate,
+  useUpdateDocumentTemplate,
+  useArchiveDocumentTemplate,
+} from "@daycare-hub/hooks";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { TemplateFormDialog } from "@/components/documents/template-form-dialog";
 import {
@@ -18,26 +18,27 @@ import {
 export const Route = createFileRoute(
   "/_facility/facility/$facilityId/documents/templates"
 )({
-  loader: ({ params }) =>
-    getFacilityDocumentTemplates({ data: { facilityId: params.facilityId } }),
   component: TemplatesPage,
 });
 
 function TemplatesPage() {
-  const templates = Route.useLoaderData();
   const { facilityId } = Route.useParams();
-  const router = useRouter();
+  const { data: templates = [], isLoading } = useAdminDocumentTemplates(facilityId);
+  const createDocumentTemplate = useCreateDocumentTemplate();
+  const updateDocumentTemplate = useUpdateDocumentTemplate();
+  const archiveDocumentTemplate = useArchiveDocumentTemplate();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editTemplate, setEditTemplate] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
   const handleCreate = async (data: any) => {
     setLoading(true);
     try {
-      await createDocumentTemplate({ data: { facilityId, ...data } });
+      await createDocumentTemplate.mutateAsync({ facilityId, data });
       setCreateOpen(false);
-      router.invalidate();
     } catch (err) {
       console.error("Failed to create template:", err);
     } finally {
@@ -49,9 +50,8 @@ function TemplatesPage() {
     if (!editTemplate) return;
     setLoading(true);
     try {
-      await updateDocumentTemplate({ data: { templateId: editTemplate.id, ...data } });
+      await updateDocumentTemplate.mutateAsync({ templateId: editTemplate.id, data });
       setEditTemplate(null);
-      router.invalidate();
     } catch (err) {
       console.error("Failed to update template:", err);
     } finally {
@@ -62,8 +62,7 @@ function TemplatesPage() {
   const handleArchive = async (templateId: string) => {
     if (!window.confirm("Archive this template? It can no longer be sent to parents.")) return;
     try {
-      await archiveDocumentTemplate({ data: { templateId } });
-      router.invalidate();
+      await archiveDocumentTemplate.mutateAsync(templateId);
     } catch (err) {
       console.error("Failed to archive template:", err);
     }

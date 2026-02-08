@@ -1,11 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState, useRef, useCallback, useEffect, lazy, Suspense } from "react";
 import { APP_NAME, discoverSearchParamsSchema } from "@daycare-hub/shared";
 import type { DiscoverSearchParams } from "@daycare-hub/shared";
 import { useSession } from "@/lib/auth-client";
-import { searchFacilities } from "@/lib/server/discovery";
-import { toggleFavorite } from "@/lib/server/favorites";
+import { useSearchFacilities, useToggleFavorite } from "@daycare-hub/hooks";
 import { SearchBar } from "@/components/discovery/search-bar";
 import { FilterBar } from "@/components/discovery/filter-bar";
 import { FacilityCard } from "@/components/discovery/facility-card";
@@ -58,44 +57,18 @@ function DiscoverPage() {
     isFetchingNextPage,
     isLoading,
     isError,
-  } = useInfiniteQuery({
-    queryKey: [
-      "discover",
-      searchParams.lat,
-      searchParams.lng,
-      searchParams.radius,
-      searchParams.age,
-      searchParams.maxPrice,
-      searchParams.services,
-      searchParams.available,
-      searchParams.openBefore,
-      searchParams.sort,
-      searchParams.minRating,
-    ],
-    queryFn: async ({ pageParam = 1 }) => {
-      return searchFacilities({
-        data: {
-          lat: searchParams.lat!,
-          lng: searchParams.lng!,
-          radius: searchParams.radius ?? 25,
-          age: searchParams.age,
-          maxPrice: searchParams.maxPrice,
-          services: searchParams.services,
-          available: searchParams.available,
-          openBefore: searchParams.openBefore,
-          minRating: searchParams.minRating,
-          sort: searchParams.sort ?? "distance",
-          page: pageParam,
-          limit: 12,
-        },
-      });
-    },
-    getNextPageParam: (lastPage, pages) => {
-      if (lastPage.hasMore) return pages.length + 1;
-      return undefined;
-    },
-    initialPageParam: 1,
-    enabled: hasLocation,
+  } = useSearchFacilities({
+    lat: searchParams.lat,
+    lng: searchParams.lng,
+    radius: searchParams.radius ?? 25,
+    age: searchParams.age,
+    maxPrice: searchParams.maxPrice,
+    services: searchParams.services,
+    available: searchParams.available,
+    openBefore: searchParams.openBefore,
+    minRating: searchParams.minRating,
+    sort: searchParams.sort ?? "distance",
+    limit: 12,
   });
 
   // Infinite scroll via IntersectionObserver
@@ -117,34 +90,7 @@ function DiscoverPage() {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Favorite toggle mutation with optimistic updates
-  const favoriteMutation = useMutation({
-    mutationFn: (facilityId: string) => toggleFavorite({ data: { facilityId } }),
-    onMutate: async (facilityId) => {
-      await queryClient.cancelQueries({ queryKey: ["discover"] });
-
-      const previousData = queryClient.getQueryData(["discover"]);
-
-      queryClient.setQueriesData({ queryKey: ["discover"] }, (old: any) => {
-        if (!old) return old;
-        return {
-          ...old,
-          pages: old.pages.map((page: any) => ({
-            ...page,
-            facilities: page.facilities.map((f: any) =>
-              f.id === facilityId ? { ...f, isFavorited: !f.isFavorited } : f
-            ),
-          })),
-        };
-      });
-
-      return { previousData };
-    },
-    onError: (_err, _facilityId, context) => {
-      if (context?.previousData) {
-        queryClient.setQueriesData({ queryKey: ["discover"] }, context.previousData);
-      }
-    },
-  });
+  const favoriteMutation = useToggleFavorite();
 
   const handleSearch = useCallback(
     (location: { lat: number; lng: number; query: string }) => {

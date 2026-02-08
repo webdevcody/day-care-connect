@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { getChildActivities } from "@/lib/server/parent-activities";
+import { useChildActivities } from "@daycare-hub/hooks";
 import { ActivityTimeline } from "@/components/activities/activity-timeline";
-import { Button, Input, Card, CardContent } from "@daycare-hub/ui";
+import { Button, Card, CardContent } from "@daycare-hub/ui";
 import { ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute(
@@ -13,39 +12,10 @@ export const Route = createFileRoute(
 
 function ChildActivitiesPage() {
   const { childId } = Route.useParams();
-  const [activities, setActivities] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useChildActivities(childId);
 
-  const fetchActivities = async (cursor?: string) => {
-    try {
-      const data = await getChildActivities({
-        data: { childId, cursor, limit: 20 },
-      });
-      if (cursor) {
-        setActivities((prev) => [...prev, ...data.activities]);
-      } else {
-        setActivities(data.activities);
-      }
-      setNextCursor(data.nextCursor);
-    } catch (err) {
-      console.error("Failed to fetch activities:", err);
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchActivities();
-  }, [childId]);
-
-  const handleLoadMore = () => {
-    if (!nextCursor) return;
-    setLoadingMore(true);
-    fetchActivities(nextCursor);
-  };
+  const activities = data?.pages.flatMap((p) => p.activities) ?? [];
 
   return (
     <div className="space-y-6">
@@ -62,7 +32,7 @@ function ChildActivitiesPage() {
         <h1 className="text-2xl font-bold">Activity Feed</h1>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">Loading activities...</p>
@@ -75,14 +45,14 @@ function ChildActivitiesPage() {
             showChildName={false}
             showStaffName={true}
           />
-          {nextCursor && (
+          {hasNextPage && (
             <div className="text-center">
               <Button
                 variant="outline"
-                onClick={handleLoadMore}
-                disabled={loadingMore}
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
               >
-                {loadingMore ? "Loading..." : "Load More"}
+                {isFetchingNextPage ? "Loading..." : "Load More"}
               </Button>
             </div>
           )}

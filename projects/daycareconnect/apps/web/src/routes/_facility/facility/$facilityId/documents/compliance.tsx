@@ -1,6 +1,6 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { getComplianceReport, sendDocument } from "@/lib/server/admin-documents";
+import { useAdminComplianceReport, useSendDocument } from "@daycare-hub/hooks";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { DocumentStatusBadge } from "@/components/documents/document-status-badge";
 import {
@@ -20,24 +20,27 @@ import {
 export const Route = createFileRoute(
   "/_facility/facility/$facilityId/documents/compliance"
 )({
-  loader: ({ params }) =>
-    getComplianceReport({ data: { facilityId: params.facilityId } }),
   component: CompliancePage,
 });
 
 function CompliancePage() {
-  const { requiredTemplates, compliance } = Route.useLoaderData();
   const { facilityId } = Route.useParams();
-  const router = useRouter();
+  const { data, isLoading } = useAdminComplianceReport(facilityId);
+  const sendDocument = useSendDocument();
   const [loading, setLoading] = useState(false);
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (!data) return null;
+
+  const { requiredTemplates, compliance } = data;
 
   const handleSendMissing = async (parentId: string, templateId: string) => {
     setLoading(true);
     try {
-      await sendDocument({
-        data: { templateId, parentIds: [parentId] },
+      await sendDocument.mutateAsync({
+        templateId,
+        parentIds: [parentId],
       });
-      router.invalidate();
     } catch (err) {
       console.error("Failed to send document:", err);
     } finally {

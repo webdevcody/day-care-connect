@@ -1,14 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { getUnreadCount } from "@/lib/server/messaging";
+import { useUnreadMessageCount } from "@daycare-hub/hooks";
 import { MessageSquare } from "lucide-react";
 
 export function MessagesNavLink({ to = "/parent/messages" }: { to?: string }) {
-  const { data } = useQuery({
-    queryKey: ["unread-messages-count"],
-    queryFn: () => getUnreadCount(),
-    refetchInterval: 30_000,
-  });
+  const { data } = useUnreadMessageCount();
 
   const count = data?.count ?? 0;
 

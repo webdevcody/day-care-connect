@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
-  getActivityEntries,
-  getEnrolledChildren,
-  createActivityEntry,
-  bulkCreateActivityEntries,
-  deleteActivityEntry,
-} from "@/lib/server/admin-activities";
+  useAdminActivities,
+  useEnrolledChildren,
+  useCreateActivityEntry,
+  useBulkCreateActivityEntries,
+  useDeleteActivityEntry,
+} from "@daycare-hub/hooks";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { ActivityTimeline } from "@/components/activities/activity-timeline";
 import { ActivityEntryForm } from "@/components/activities/activity-entry-form";
@@ -34,37 +34,17 @@ function ActivitiesPage() {
   const { facilityId } = Route.useParams();
   const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [childFilter, setChildFilter] = useState<string>("all");
-  const [entries, setEntries] = useState<any[]>([]);
-  const [children, setChildren] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [defaultType, setDefaultType] = useState<ActivityType | undefined>();
 
-  const fetchData = async () => {
-    try {
-      const [entriesData, childrenData] = await Promise.all([
-        getActivityEntries({
-          data: {
-            facilityId,
-            date,
-            childId: childFilter !== "all" ? childFilter : undefined,
-          },
-        }),
-        getEnrolledChildren({ data: { facilityId } }),
-      ]);
-      setEntries(entriesData);
-      setChildren(childrenData);
-    } catch (err) {
-      console.error("Failed to fetch activities:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    setLoading(true);
-    fetchData();
-  }, [date, childFilter, facilityId]);
+  const { data: entries = [], isLoading: loading } = useAdminActivities(facilityId, {
+    childId: childFilter !== "all" ? childFilter : undefined,
+    date,
+  });
+  const { data: children = [] } = useEnrolledChildren(facilityId);
+  const createActivityEntry = useCreateActivityEntry();
+  const bulkCreateActivityEntries = useBulkCreateActivityEntries();
+  const deleteActivityEntry = useDeleteActivityEntry();
 
   const handleQuickAdd = (type: ActivityType) => {
     setDefaultType(type);
@@ -79,36 +59,30 @@ function ActivitiesPage() {
     occurredAt: string;
   }) => {
     if (data.childIds.length === 1) {
-      await createActivityEntry({
-        data: {
-          childId: data.childIds[0],
-          facilityId,
-          type: data.type,
-          data: data.data,
-          photoUrl: data.photoUrl || null,
-          occurredAt: data.occurredAt,
-        },
+      await createActivityEntry.mutateAsync({
+        childId: data.childIds[0],
+        facilityId,
+        type: data.type,
+        data: data.data,
+        photoUrl: data.photoUrl || null,
+        occurredAt: data.occurredAt,
       });
     } else {
-      await bulkCreateActivityEntries({
-        data: {
-          childIds: data.childIds,
-          facilityId,
-          type: data.type,
-          data: data.data,
-          photoUrl: data.photoUrl || null,
-          occurredAt: data.occurredAt,
-        },
+      await bulkCreateActivityEntries.mutateAsync({
+        childIds: data.childIds,
+        facilityId,
+        type: data.type,
+        data: data.data,
+        photoUrl: data.photoUrl || null,
+        occurredAt: data.occurredAt,
       });
     }
-    await fetchData();
   };
 
   const handleDelete = async (entryId: string) => {
     if (!confirm("Delete this activity entry?")) return;
     try {
-      await deleteActivityEntry({ data: { activityId: entryId } });
-      await fetchData();
+      await deleteActivityEntry.mutateAsync(entryId);
     } catch (err) {
       console.error("Failed to delete:", err);
     }

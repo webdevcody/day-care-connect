@@ -1,0 +1,27 @@
+export { createApiClient, getApiClient } from "./client";
+
+export * as accountService from "./account";
+export * as dashboardService from "./dashboard";
+export * as childrenService from "./children";
+export * as enrollmentsService from "./enrollments";
+export * as facilitiesService from "./facilities";
+export * as favoritesService from "./favorites";
+export * as activitiesService from "./activities";
+export * as notificationsService from "./notifications";
+export * as messagingService from "./messaging";
+export * as documentsService from "./documents";
+export * as billingService from "./billing";
+export * as reviewsService from "./reviews";
+export * as userRolesService from "./user-roles";
+
+export * as adminDashboardService from "./admin/dashboard";
+export * as adminAttendanceService from "./admin/attendance";
+export * as adminActivitiesService from "./admin/activities";
+export * as adminDailyReportsService from "./admin/daily-reports";
+export * as adminEnrollmentsService from "./admin/enrollments";
+export * as adminBillingService from "./admin/billing";
+export * as adminDocumentsService from "./admin/documents";
+export * as adminReportsService from "./admin/reports";
+export * as adminRosterService from "./admin/roster";
+export * as adminStripeService from "./admin/stripe";
+export * as adminReportTemplatesService from "./admin/report-templates";

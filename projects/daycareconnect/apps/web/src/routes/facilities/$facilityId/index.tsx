@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { getFacility } from "@/lib/server/facilities";
-import { checkReviewEligibility, getReviewSummary } from "@/lib/server/reviews";
+import { useState } from "react";
+import { useFacility, useReviewEligibility, useReviewSummary } from "@daycare-hub/hooks";
 import { useSession } from "@/lib/auth-client";
 import { PhotoCarousel } from "@/components/facility/photo-carousel";
 import { HoursTable } from "@/components/facility/hours-table";
@@ -25,21 +24,20 @@ import {
 } from "@daycare-hub/ui";
 
 export const Route = createFileRoute("/facilities/$facilityId/")({
-  loader: ({ params }) => getFacility({ data: { facilityId: params.facilityId } }),
   component: FacilityProfilePage,
 });
 
 function FacilityProfilePage() {
-  const facility = Route.useLoaderData();
+  const { facilityId } = Route.useParams();
+  const { data: facility, isLoading } = useFacility(facilityId);
   const { data: session } = useSession();
-  const [reviewSummary, setReviewSummary] = useState<Awaited<ReturnType<typeof getReviewSummary>> | null>(null);
-  const [eligibility, setEligibility] = useState<Awaited<ReturnType<typeof checkReviewEligibility>> | null>(null);
+  const { data: reviewSummary } = useReviewSummary(facilityId);
+  const { data: eligibility } = useReviewEligibility(facilityId);
   const [ratingFilter, setRatingFilter] = useState<number | undefined>();
 
-  useEffect(() => {
-    getReviewSummary({ data: { facilityId: facility.id } }).then(setReviewSummary).catch(console.error);
-    checkReviewEligibility({ data: { facilityId: facility.id } }).then(setEligibility).catch(console.error);
-  }, [facility.id]);
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  if (!facility) return null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -187,7 +185,7 @@ function FacilityProfilePage() {
               <p className="text-muted-foreground">No photos available.</p>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {facility.photos.map((photo) => (
+                {facility.photos.map((photo: any) => (
                   <img
                     key={photo.id}
                     src={photo.url}

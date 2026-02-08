@@ -1,46 +1,48 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Card, CardContent, Button, Badge } from "@daycare-hub/ui";
 import {
-  getParentPaymentMethods,
-  removePaymentMethod,
-  setDefaultPaymentMethod,
-} from "@/lib/server/parent-billing";
+  useParentPaymentMethods,
+  useRemovePaymentMethod,
+  useSetDefaultPaymentMethod,
+} from "@daycare-hub/hooks";
 
 export const Route = createFileRoute(
   "/_parent/parent/billing/payment-methods"
 )({
-  loader: () => getParentPaymentMethods(),
   component: PaymentMethodsPage,
 });
 
 function PaymentMethodsPage() {
-  const methods = Route.useLoaderData();
-  const router = useRouter();
-  const [loading, setLoading] = useState<string | null>(null);
+  const { data: methods, isLoading } = useParentPaymentMethods();
+  const removeMutation = useRemovePaymentMethod();
+  const setDefaultMutation = useSetDefaultPaymentMethod();
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  const paymentMethods = methods ?? [];
 
   const handleRemove = async (id: string) => {
     if (!confirm("Remove this payment method?")) return;
-    setLoading(id);
+    setLoadingId(id);
     try {
-      await removePaymentMethod({ data: { paymentMethodId: id } });
-      router.invalidate();
+      await removeMutation.mutateAsync(id);
     } catch (err) {
       console.error("Failed to remove payment method:", err);
     } finally {
-      setLoading(null);
+      setLoadingId(null);
     }
   };
 
   const handleSetDefault = async (id: string) => {
-    setLoading(id);
+    setLoadingId(id);
     try {
-      await setDefaultPaymentMethod({ data: { paymentMethodId: id } });
-      router.invalidate();
+      await setDefaultMutation.mutateAsync(id);
     } catch (err) {
       console.error("Failed to set default:", err);
     } finally {
-      setLoading(null);
+      setLoadingId(null);
     }
   };
 
@@ -52,7 +54,7 @@ function PaymentMethodsPage() {
         Payment methods are saved automatically when you pay via Stripe Checkout.
       </p>
 
-      {methods.length === 0 ? (
+      {paymentMethods.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">
@@ -63,7 +65,7 @@ function PaymentMethodsPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {methods.map((method) => (
+          {paymentMethods.map((method) => (
             <Card key={method.id}>
               <CardContent className="flex items-center justify-between py-4">
                 <div className="flex items-center gap-4">
@@ -88,7 +90,7 @@ function PaymentMethodsPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleSetDefault(method.id)}
-                      disabled={loading === method.id}
+                      disabled={loadingId === method.id}
                     >
                       Set Default
                     </Button>
@@ -97,7 +99,7 @@ function PaymentMethodsPage() {
                     variant="destructive"
                     size="sm"
                     onClick={() => handleRemove(method.id)}
-                    disabled={loading === method.id}
+                    disabled={loadingId === method.id}
                   >
                     Remove
                   </Button>

@@ -1,0 +1,113 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - link "DayCareConnect" [ref=e5] [cursor=pointer]:
+          - /url: /
+        - paragraph [ref=e6]: Parent Dashboard
+      - navigation [ref=e7]:
+        - link "Dashboard" [ref=e8] [cursor=pointer]:
+          - /url: /parent
+          - img [ref=e9]
+          - text: Dashboard
+        - link "My Children" [ref=e14] [cursor=pointer]:
+          - /url: /parent/children
+          - img [ref=e15]
+          - text: My Children
+        - link "Messages" [ref=e20] [cursor=pointer]:
+          - /url: /parent/messages
+          - generic [ref=e21]:
+            - img [ref=e22]
+            - text: Messages
+        - link "Documents" [ref=e24] [cursor=pointer]:
+          - /url: /parent/documents
+          - img [ref=e25]
+          - text: Documents
+        - link "Billing" [ref=e28] [cursor=pointer]:
+          - /url: /parent/billing
+          - img [ref=e29]
+          - text: Billing
+        - link "My Reviews" [ref=e31] [cursor=pointer]:
+          - /url: /parent/reviews
+          - img [ref=e32]
+          - text: My Reviews
+        - link "Notifications" [ref=e34] [cursor=pointer]:
+          - /url: /parent/notifications
+          - img [ref=e35]
+          - text: Notifications
+        - link "Settings" [ref=e38] [cursor=pointer]:
+          - /url: /parent/settings
+          - img [ref=e39]
+          - text: Settings
+      - generic [ref=e43]:
+        - button "Light" [ref=e44]:
+          - img [ref=e45]
+          - text: Light
+        - button "Dark" [ref=e51]:
+          - img [ref=e52]
+          - text: Dark
+        - button "System" [ref=e54]:
+          - img [ref=e55]
+          - text: System
+    - generic [ref=e57]:
+      - banner [ref=e58]:
+        - heading "Parent Dashboard" [level=2] [ref=e59]
+        - generic [ref=e60]:
+          - button "Notifications" [ref=e61]:
+            - img [ref=e62]
+            - generic [ref=e65]: "38"
+          - generic [ref=e66]: Parent User
+          - button "Sign Out" [ref=e67]
+      - main [ref=e68]:
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - heading "Add Child" [level=1] [ref=e71]
+            - paragraph [ref=e72]: Add a new child to your profile.
+          - generic [ref=e74]:
+            - generic [ref=e75]:
+              - heading "Basic Information" [level=3] [ref=e76]
+              - generic [ref=e77]:
+                - generic [ref=e78]:
+                  - generic [ref=e79]: First Name *
+                  - textbox "First Name *" [ref=e80]
+                - generic [ref=e81]:
+                  - generic [ref=e82]: Last Name *
+                  - textbox "Last Name *" [ref=e83]
+                - generic [ref=e84]:
+                  - generic [ref=e85]: Date of Birth *
+                  - textbox "Date of Birth *" [ref=e86]
+                - generic [ref=e87]:
+                  - generic [ref=e88]: Gender
+                  - combobox "Gender" [ref=e89]:
+                    - option "Select..." [selected]
+                    - option "Male"
+                    - option "Female"
+                    - option "Other"
+            - generic [ref=e90]:
+              - heading "Medical Information" [level=3] [ref=e91]
+              - generic [ref=e92]:
+                - generic [ref=e93]:
+                  - generic [ref=e94]: Allergies
+                  - textbox "Allergies" [ref=e95]:
+                    - /placeholder: List any known allergies...
+                - generic [ref=e96]:
+                  - generic [ref=e97]: Medical Notes
+                  - textbox "Medical Notes" [ref=e98]:
+                    - /placeholder: Any medical conditions or notes...
+            - generic [ref=e99]:
+              - heading "Emergency Contact" [level=3] [ref=e100]
+              - generic [ref=e101]:
+                - generic [ref=e102]:
+                  - generic [ref=e103]: Contact Name
+                  - textbox "Contact Name" [ref=e104]
+                - generic [ref=e105]:
+                  - generic [ref=e106]: Contact Phone
+                  - textbox "Contact Phone" [ref=e107]
+            - generic [ref=e108]:
+              - button "Add Child" [ref=e109]
+              - button "Cancel" [ref=e110]
+  - button "Dev Login" [ref=e112]
+```

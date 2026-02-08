@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Button,
   Card,
@@ -11,43 +10,26 @@ import {
   SelectValue,
 } from "@daycare-hub/ui";
 import { NOTIFICATION_TYPES } from "@daycare-hub/shared";
-import { getNotifications, markAllNotificationsRead } from "@/lib/server/notifications";
+import { useNotifications, useMarkAllNotificationsRead } from "@daycare-hub/hooks";
 import { NotificationItem } from "@/components/notifications/notification-item";
 import { NOTIFICATION_TYPE_LABELS } from "@/lib/notification-templates";
 
 export function NotificationsPageContent() {
-  const queryClient = useQueryClient();
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [readFilter, setReadFilter] = useState<string>("all");
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery({
-      queryKey: ["notifications", "page", typeFilter, readFilter],
-      queryFn: ({ pageParam }) =>
-        getNotifications({
-          data: {
-            cursor: pageParam || undefined,
-            limit: 20,
-            type: typeFilter !== "all" ? (typeFilter as any) : undefined,
-            isRead:
-              readFilter === "read"
-                ? true
-                : readFilter === "unread"
-                  ? false
-                  : undefined,
-          },
-        }),
-      initialPageParam: "" as string,
-      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    useNotifications({
+      type: typeFilter !== "all" ? typeFilter : undefined,
+      isRead:
+        readFilter === "read"
+          ? true
+          : readFilter === "unread"
+            ? false
+            : undefined,
     });
 
-  const markAllReadMutation = useMutation({
-    mutationFn: () => markAllNotificationsRead(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      queryClient.invalidateQueries({ queryKey: ["unread-notifications-count"] });
-    },
-  });
+  const markAllReadMutation = useMarkAllNotificationsRead();
 
   const allNotifications = data?.pages.flatMap((p) => p.notifications) ?? [];
 
@@ -62,7 +44,7 @@ export function NotificationsPageContent() {
         </div>
         <Button
           variant="outline"
-          onClick={() => markAllReadMutation.mutate()}
+          onClick={() => markAllReadMutation.mutate(undefined)}
           disabled={markAllReadMutation.isPending}
         >
           Mark all as read

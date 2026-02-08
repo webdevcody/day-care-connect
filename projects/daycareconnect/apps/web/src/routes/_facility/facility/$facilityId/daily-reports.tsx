@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
-  getDailyReports,
-  updateDailyReport,
-  publishDailyReport,
-  bulkPublishDailyReports,
-} from "@/lib/server/admin-daily-reports";
+  useAdminDailyReports,
+  useUpdateDailyReport,
+  usePublishDailyReport,
+  useBulkPublishDailyReports,
+} from "@daycare-hub/hooks";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import {
   Card,
@@ -27,36 +27,20 @@ export const Route = createFileRoute(
 function DailyReportsPage() {
   const { facilityId } = Route.useParams();
   const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
-  const [reports, setReports] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [editingSummary, setEditingSummary] = useState<string | null>(null);
   const [summaryText, setSummaryText] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const fetchReports = async () => {
-    try {
-      const data = await getDailyReports({ data: { facilityId, date } });
-      setReports(data);
-    } catch (err) {
-      console.error("Failed to fetch reports:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    setLoading(true);
-    fetchReports();
-  }, [date, facilityId]);
+  const { data: reports = [], isLoading: loading } = useAdminDailyReports(facilityId, { date });
+  const updateDailyReport = useUpdateDailyReport();
+  const publishDailyReport = usePublishDailyReport();
+  const bulkPublishDailyReports = useBulkPublishDailyReports();
 
   const handleSaveSummary = async (reportId: string) => {
     setActionLoading(reportId);
     try {
-      await updateDailyReport({
-        data: { reportId, summary: summaryText },
-      });
+      await updateDailyReport.mutateAsync({ reportId, summary: summaryText });
       setEditingSummary(null);
-      await fetchReports();
     } catch (err) {
       console.error("Failed to save summary:", err);
     } finally {
@@ -67,8 +51,7 @@ function DailyReportsPage() {
   const handlePublish = async (reportId: string) => {
     setActionLoading(reportId);
     try {
-      await publishDailyReport({ data: { reportId } });
-      await fetchReports();
+      await publishDailyReport.mutateAsync(reportId);
     } catch (err) {
       console.error("Failed to publish:", err);
     } finally {
@@ -83,13 +66,10 @@ function DailyReportsPage() {
 
     setActionLoading("bulk");
     try {
-      await bulkPublishDailyReports({
-        data: {
-          reportIds: draftReports.map((r: any) => r.id),
-          facilityId,
-        },
+      await bulkPublishDailyReports.mutateAsync({
+        reportIds: draftReports.map((r: any) => r.id),
+        facilityId,
       });
-      await fetchReports();
     } catch (err) {
       console.error("Failed to bulk publish:", err);
     } finally {

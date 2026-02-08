@@ -1,5 +1,4 @@
 import { createFileRoute, Outlet, Link } from "@tanstack/react-router";
-import { parentMiddleware } from "@/lib/middleware";
 import { useSession, signOut } from "@/lib/auth-client";
 import { APP_NAME } from "@daycare-hub/shared";
 import { Button } from "@daycare-hub/ui";
@@ -18,9 +17,6 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/_parent")({
-  server: {
-    middleware: [parentMiddleware],
-  },
   component: ParentLayout,
 });
 

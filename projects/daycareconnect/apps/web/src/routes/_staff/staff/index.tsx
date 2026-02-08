@@ -1,45 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
-import { auth } from "@/lib/auth";
-import { db, facilityStaff, facilities, eq } from "@daycare-hub/db";
+import { useStaffAssignments } from "@daycare-hub/hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@daycare-hub/ui";
 import { Building2, MapPin } from "lucide-react";
-
-const getStaffAssignments = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const headers = getRequestHeaders();
-    const session = await auth.api.getSession({ headers });
-    if (!session) throw new Error("Not authenticated");
-
-    const assignments = await db
-      .select({
-        id: facilityStaff.id,
-        staffRole: facilityStaff.staffRole,
-        facilityId: facilities.id,
-        facilityName: facilities.name,
-        facilityAddress: facilities.address,
-        facilityCity: facilities.city,
-        facilityState: facilities.state,
-      })
-      .from(facilityStaff)
-      .innerJoin(facilities, eq(facilityStaff.facilityId, facilities.id))
-      .where(eq(facilityStaff.userId, session.user.id));
-
-    return assignments;
-  }
-);
 
 export const Route = createFileRoute("/_staff/staff/")({
   component: StaffDashboard,
 });
 
 function StaffDashboard() {
-  const { data: assignments, isLoading } = useQuery({
-    queryKey: ["staff-assignments"],
-    queryFn: () => getStaffAssignments(),
-  });
+  const { data, isLoading } = useStaffAssignments();
+
+  const assignments = data?.assignments ?? [];
 
   return (
     <div className="space-y-6">

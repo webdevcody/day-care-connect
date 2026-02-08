@@ -2,31 +2,34 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { Card, CardContent, Button, Badge } from "@daycare-hub/ui";
-import { getStripeAccountStatus, createStripeConnectLink, getStripeDashboardLink } from "@/lib/server/admin-stripe";
-import { getFacilityBillingOverview } from "@/lib/server/admin-billing";
+import {
+  useStripeAccountStatus,
+  useCreateStripeConnectLink,
+  useGetStripeDashboardLink,
+  useAdminBillingOverview,
+} from "@daycare-hub/hooks";
 
 export const Route = createFileRoute(
   "/_facility/facility/$facilityId/billing/"
 )({
-  loader: async ({ params }) => {
-    const [stripeStatus, overview] = await Promise.all([
-      getStripeAccountStatus({ data: { facilityId: params.facilityId } }),
-      getFacilityBillingOverview({ data: { facilityId: params.facilityId } }),
-    ]);
-    return { stripeStatus, overview };
-  },
   component: BillingDashboard,
 });
 
 function BillingDashboard() {
-  const { stripeStatus, overview } = Route.useLoaderData();
   const { facilityId } = Route.useParams();
+  const { data: stripeStatus, isLoading: stripeLoading } = useStripeAccountStatus(facilityId);
+  const { data: overview, isLoading: overviewLoading } = useAdminBillingOverview(facilityId);
+  const createStripeConnectLink = useCreateStripeConnectLink();
+  const getStripeDashboardLink = useGetStripeDashboardLink();
   const [connecting, setConnecting] = useState(false);
+
+  if (stripeLoading || overviewLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (!stripeStatus || !overview) return null;
 
   const handleConnectStripe = async () => {
     setConnecting(true);
     try {
-      const result = await createStripeConnectLink({ data: { facilityId } });
+      const result = await createStripeConnectLink.mutateAsync(facilityId);
       if (result.url) {
         window.location.href = result.url;
       }
@@ -39,7 +42,7 @@ function BillingDashboard() {
 
   const handleOpenDashboard = async () => {
     try {
-      const result = await getStripeDashboardLink({ data: { facilityId } });
+      const result = await getStripeDashboardLink.mutateAsync(facilityId);
       if (result.url) {
         window.open(result.url, "_blank");
       }

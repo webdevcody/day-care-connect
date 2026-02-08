@@ -4,9 +4,11 @@ import {
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
+import { DevUserSwitcher } from "@/components/dev-user-switcher";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/lib/theme";
 import appCss from "../styles.css?url";
+import "@/lib/api-setup";
 
 const themeScript = `(function(){try{var t=localStorage.getItem("daycare-theme")||"system";var d=t==="system"?window.matchMedia("(prefers-color-scheme:dark)").matches:t==="dark";if(d)document.documentElement.classList.add("dark")}catch(e){}})()`;
 
@@ -75,6 +77,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="font-sans antialiased" style={{ fontFamily: "'Inter', sans-serif" }}>
         {children}
+        {import.meta.env.DEV && <DevUserSwitcher />}
         <Scripts />
       </body>
     </html>

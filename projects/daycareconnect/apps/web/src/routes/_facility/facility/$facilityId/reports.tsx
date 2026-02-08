@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import {
-  getEnrollmentReport,
-  getAttendanceReport,
-  getRevenueEstimate,
-} from "@/lib/server/admin-reports";
+  useEnrollmentReport,
+  useAttendanceReport,
+  useRevenueEstimate,
+} from "@daycare-hub/hooks";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { EnrollmentChart } from "@/components/admin/charts/enrollment-chart";
 import {
@@ -49,28 +49,26 @@ export const Route = createFileRoute(
 function ReportsPage() {
   const { facilityId } = Route.useParams();
   const [preset, setPreset] = useState(30);
-  const [enrollmentData, setEnrollmentData] = useState<any>(null);
-  const [attendanceData, setAttendanceData] = useState<any>(null);
-  const [revenueData, setRevenueData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
 
-  const range = getDateRange(preset);
+  const range = useMemo(() => getDateRange(preset), [preset]);
 
-  useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      getEnrollmentReport({ data: { facilityId, ...range } }),
-      getAttendanceReport({ data: { facilityId, ...range } }),
-      getRevenueEstimate({ data: { facilityId, ...range } }),
-    ])
-      .then(([enrollment, att, revenue]) => {
-        setEnrollmentData(enrollment);
-        setAttendanceData(att);
-        setRevenueData(revenue);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [facilityId, preset]);
+  const { data: enrollmentData, isLoading: enrollmentLoading } = useEnrollmentReport({
+    facilityId,
+    startDate: range.startDate,
+    endDate: range.endDate,
+  });
+  const { data: attendanceData, isLoading: attendanceLoading } = useAttendanceReport({
+    facilityId,
+    startDate: range.startDate,
+    endDate: range.endDate,
+  });
+  const { data: revenueData, isLoading: revenueLoading } = useRevenueEstimate({
+    facilityId,
+    startDate: range.startDate,
+    endDate: range.endDate,
+  });
+
+  const loading = enrollmentLoading || attendanceLoading || revenueLoading;
 
   return (
     <div>

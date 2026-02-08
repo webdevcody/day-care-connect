@@ -1,0 +1,14 @@
+{
+  "name": "@daycare-hub/hooks",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@daycare-hub/services": "workspace:*",
+    "@tanstack/react-query": "^5.90.20"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}

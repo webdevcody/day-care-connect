@@ -1,6 +1,6 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
-import { getFacility, updateFacility, toggleFacilityStatus } from "@/lib/server/facilities";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { useFacility, useUpdateFacility, useToggleFacilityStatus } from "@daycare-hub/hooks";
 import { FacilitySubNav } from "@/components/admin/facility-sub-nav";
 import {
   Button,
@@ -17,37 +17,66 @@ import {
 export const Route = createFileRoute(
   "/_facility/facility/$facilityId/edit"
 )({
-  loader: ({ params }) => getFacility({ data: { facilityId: params.facilityId } }),
   component: EditFacilityPage,
 });
 
 function EditFacilityPage() {
-  const facility = Route.useLoaderData();
   const { facilityId } = Route.useParams();
-  const router = useRouter();
+  const { data: facility, isLoading } = useFacility(facilityId);
+  const updateFacility = useUpdateFacility();
+  const toggleFacilityStatus = useToggleFacilityStatus();
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
-    name: facility.name,
-    description: facility.description || "",
-    phone: facility.phone,
-    email: facility.email || "",
-    website: facility.website || "",
-    address: facility.address,
-    city: facility.city,
-    state: facility.state,
-    zipCode: facility.zipCode,
-    capacity: facility.capacity,
-    ageRangeMin: facility.ageRangeMin,
-    ageRangeMax: facility.ageRangeMax,
-    monthlyRate: facility.monthlyRate || "",
-    hourlyRate: facility.hourlyRate || "",
-    dailyRate: facility.dailyRate || "",
-    weeklyRate: facility.weeklyRate || "",
-    licenseNumber: facility.licenseNumber || "",
-    licenseExpiry: facility.licenseExpiry || "",
-    licensingAuthority: facility.licensingAuthority || "",
+    name: "",
+    description: "",
+    phone: "",
+    email: "",
+    website: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    capacity: 0,
+    ageRangeMin: 0,
+    ageRangeMax: 0,
+    monthlyRate: "",
+    hourlyRate: "",
+    dailyRate: "",
+    weeklyRate: "",
+    licenseNumber: "",
+    licenseExpiry: "",
+    licensingAuthority: "",
   });
+
+  useEffect(() => {
+    if (facility) {
+      setForm({
+        name: facility.name,
+        description: facility.description || "",
+        phone: facility.phone,
+        email: facility.email || "",
+        website: facility.website || "",
+        address: facility.address,
+        city: facility.city,
+        state: facility.state,
+        zipCode: facility.zipCode,
+        capacity: facility.capacity,
+        ageRangeMin: facility.ageRangeMin,
+        ageRangeMax: facility.ageRangeMax,
+        monthlyRate: facility.monthlyRate || "",
+        hourlyRate: facility.hourlyRate || "",
+        dailyRate: facility.dailyRate || "",
+        weeklyRate: facility.weeklyRate || "",
+        licenseNumber: facility.licenseNumber || "",
+        licenseExpiry: facility.licenseExpiry || "",
+        licensingAuthority: facility.licensingAuthority || "",
+      });
+    }
+  }, [facility]);
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (!facility) return null;
 
   const update = (field: string, value: string | number) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -56,8 +85,7 @@ function EditFacilityPage() {
     setError("");
     setSaving(true);
     try {
-      await updateFacility({ data: { facilityId, ...form } });
-      router.invalidate();
+      await updateFacility.mutateAsync({ facilityId, data: form });
     } catch (err: any) {
       setError(err.message || "Failed to update");
     } finally {
@@ -67,8 +95,7 @@ function EditFacilityPage() {
 
   const handleToggle = async () => {
     try {
-      await toggleFacilityStatus({ data: { facilityId } });
-      router.invalidate();
+      await toggleFacilityStatus.mutateAsync(facilityId);
     } catch (err: any) {
       setError(err.message || "Failed to toggle status");
     }

@@ -1,14 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getMyFacilities } from "@/lib/server/facilities";
+import { useMyFacilities } from "@daycare-hub/hooks";
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from "@daycare-hub/ui";
 
 export const Route = createFileRoute("/_facility/facility/")({
-  loader: () => getMyFacilities(),
   component: FacilitiesListPage,
 });
 
 function FacilitiesListPage() {
-  const facilities = Route.useLoaderData();
+  const { data, isLoading } = useMyFacilities();
+  const facilities = Array.isArray(data) ? data : (data?.facilities ?? []);
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
 
   return (
     <div>

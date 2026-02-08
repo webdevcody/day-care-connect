@@ -26,7 +26,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: "com.daycareconnect.app",
   },
   extra: {
-    apiUrl: process.env.API_URL || "http://localhost:3000",
+    apiUrl: process.env.API_URL || "http://localhost:4000",
   },
   plugins: ["expo-secure-store", "expo-notifications"],
 });

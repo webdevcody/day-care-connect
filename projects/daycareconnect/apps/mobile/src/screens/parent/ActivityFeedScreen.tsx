@@ -8,8 +8,7 @@ import {
   ScrollView,
   RefreshControl,
 } from "react-native";
-import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
-import { getMyChildren, getChildActivities } from "../../api/endpoints";
+import { useChildren, useChildActivities } from "@daycare-hub/hooks";
 import { LoadingView } from "../../components/LoadingView";
 import { EmptyState } from "../../components/EmptyState";
 import { ActivityCard } from "../../components/ActivityCard";
@@ -20,10 +19,7 @@ import { spacing, borderRadius } from "../../theme/spacing";
 export function ActivityFeedScreen() {
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
 
-  const { data: childrenData, isLoading: loadingChildren } = useQuery({
-    queryKey: ["children"],
-    queryFn: getMyChildren,
-  });
+  const { data: childrenData, isLoading: loadingChildren } = useChildren();
 
   const children = childrenData?.children || [];
   const activeChildId = selectedChildId || children[0]?.id;
@@ -36,14 +32,7 @@ export function ActivityFeedScreen() {
     isFetchingNextPage,
     refetch,
     isRefetching,
-  } = useInfiniteQuery({
-    queryKey: ["activities", activeChildId],
-    queryFn: ({ pageParam }) =>
-      getChildActivities(activeChildId!, pageParam as string | undefined),
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    initialPageParam: null as string | null,
-    enabled: !!activeChildId,
-  });
+  } = useChildActivities(activeChildId!);
 
   if (loadingChildren) return <LoadingView />;
 

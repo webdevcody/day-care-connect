@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getAdminDashboard } from "@/lib/server/admin-dashboard";
+import { useAdminDashboard } from "@daycare-hub/hooks";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { EnrollmentStatusBadge } from "@/components/admin/status-badge";
 import {
@@ -13,15 +13,16 @@ import {
 export const Route = createFileRoute(
   "/_facility/facility/$facilityId/"
 )({
-  loader: ({ params }) =>
-    getAdminDashboard({ data: { facilityId: params.facilityId } }),
   component: AdminDashboardPage,
 });
 
 function AdminDashboardPage() {
-  const { facility, enrollmentCounts, attendanceCounts, pendingEnrollments } =
-    Route.useLoaderData();
   const { facilityId } = Route.useParams();
+  const { data, isLoading } = useAdminDashboard(facilityId);
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  const { facility, enrollmentCounts, attendanceCounts, pendingEnrollments } = data!;
 
   const activeEnrollments = enrollmentCounts["active"] ?? 0;
   const pendingCount = enrollmentCounts["pending"] ?? 0;

@@ -3,7 +3,18 @@ import { View, Text, StyleSheet } from "react-native";
 import { colors } from "../theme/colors";
 import { typography } from "../theme/typography";
 import { spacing, borderRadius } from "../theme/spacing";
-import type { Activity } from "../api/endpoints";
+interface Activity {
+  id: string;
+  childId: string;
+  facilityId: string;
+  staffId: string;
+  type: string;
+  data: Record<string, unknown> | null;
+  photoUrl: string | null;
+  occurredAt: string;
+  createdAt: string;
+  facilityName: string | null;
+}
 
 const ACTIVITY_ICONS: Record<string, string> = {
   meal: "🍽️",

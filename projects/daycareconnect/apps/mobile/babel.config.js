@@ -9,6 +9,8 @@ module.exports = function (api) {
           alias: {
             "@": "./src",
             "@daycare-hub/shared": "../../libs/shared/src/index.ts",
+            "@daycare-hub/services": "../../libs/services/src/index.ts",
+            "@daycare-hub/hooks": "../../libs/hooks/src/index.ts",
           },
         },
       ],

@@ -1,10 +1,10 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  getFacilityDocumentInstances,
-  sendDocumentReminder,
-  voidDocument,
-} from "@/lib/server/admin-documents";
+  useAdminDocumentInstances,
+  useSendDocumentReminder,
+  useVoidDocument,
+} from "@daycare-hub/hooks";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { DocumentStatusBadge } from "@/components/documents/document-status-badge";
 import {
@@ -21,27 +21,25 @@ export const Route = createFileRoute(
   validateSearch: (search: Record<string, unknown>) => ({
     status: (search.status as string) || "all",
   }),
-  loaderDeps: ({ search }) => ({ status: search.status }),
-  loader: ({ params, deps }) =>
-    getFacilityDocumentInstances({
-      data: { facilityId: params.facilityId, status: deps.status },
-    }),
   component: DocumentsPage,
 });
 
 function DocumentsPage() {
-  const instances = Route.useLoaderData();
   const { facilityId } = Route.useParams();
   const { status: activeTab } = Route.useSearch();
-  const router = useRouter();
   const navigate = Route.useNavigate();
+  const statusFilter = activeTab === "all" ? undefined : activeTab;
+  const { data: instances = [], isLoading } = useAdminDocumentInstances(facilityId, { status: statusFilter });
+  const sendDocumentReminder = useSendDocumentReminder();
+  const voidDocument = useVoidDocument();
   const [loadingId, setLoadingId] = useState<string | null>(null);
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
 
   const handleRemind = async (instanceId: string) => {
     setLoadingId(instanceId);
     try {
-      await sendDocumentReminder({ data: { instanceId } });
-      router.invalidate();
+      await sendDocumentReminder.mutateAsync(instanceId);
     } catch (err) {
       console.error("Failed to send reminder:", err);
     } finally {
@@ -53,8 +51,7 @@ function DocumentsPage() {
     if (!window.confirm("Are you sure you want to void this document?")) return;
     setLoadingId(instanceId);
     try {
-      await voidDocument({ data: { instanceId } });
-      router.invalidate();
+      await voidDocument.mutateAsync(instanceId);
     } catch (err) {
       console.error("Failed to void document:", err);
     } finally {

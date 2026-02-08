@@ -7,22 +7,30 @@ import {
   TouchableOpacity,
   RefreshControl,
 } from "react-native";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  getNotifications,
-  markRead,
-  markAllRead,
-  type AppNotification,
-} from "../../api/endpoints";
+  useNotifications,
+  useMarkNotificationRead,
+  useMarkAllNotificationsRead,
+} from "@daycare-hub/hooks";
 import { LoadingView } from "../../components/LoadingView";
 import { EmptyState } from "../../components/EmptyState";
 import { colors } from "../../theme/colors";
 import { typography } from "../../theme/typography";
 import { spacing, borderRadius } from "../../theme/spacing";
 
-export function NotificationsScreen() {
-  const queryClient = useQueryClient();
+interface AppNotification {
+  id: string;
+  userId: string;
+  type: string;
+  title: string;
+  body: string;
+  actionUrl: string | null;
+  data: unknown;
+  isRead: boolean;
+  createdAt: string;
+}
 
+export function NotificationsScreen() {
   const {
     data,
     isLoading,
@@ -31,29 +39,10 @@ export function NotificationsScreen() {
     isFetchingNextPage,
     refetch,
     isRefetching,
-  } = useInfiniteQuery({
-    queryKey: ["notifications"],
-    queryFn: ({ pageParam }) =>
-      getNotifications(pageParam as string | undefined),
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    initialPageParam: null as string | null,
-  });
+  } = useNotifications();
 
-  const markReadMutation = useMutation({
-    mutationFn: markRead,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      queryClient.invalidateQueries({ queryKey: ["unread-count"] });
-    },
-  });
-
-  const markAllMutation = useMutation({
-    mutationFn: markAllRead,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      queryClient.invalidateQueries({ queryKey: ["unread-count"] });
-    },
-  });
+  const markReadMutation = useMarkNotificationRead();
+  const markAllMutation = useMarkAllNotificationsRead();
 
   if (isLoading) return <LoadingView />;
 

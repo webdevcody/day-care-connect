@@ -1,9 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getMyChildren } from "@/lib/server/children";
+import { useChildren } from "@daycare-hub/hooks";
 import { Card, CardContent, Badge, Button } from "@daycare-hub/ui";
 
 export const Route = createFileRoute("/_parent/parent/children/")({
-  loader: () => getMyChildren(),
   component: ChildrenListPage,
 });
 
@@ -19,7 +18,11 @@ function calculateAge(dateOfBirth: string) {
 }
 
 function ChildrenListPage() {
-  const children = Route.useLoaderData();
+  const { data, isLoading } = useChildren();
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  const children = Array.isArray(data) ? data : (data?.children ?? []);
 
   return (
     <div className="space-y-6">

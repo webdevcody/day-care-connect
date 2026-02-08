@@ -1,5 +1,5 @@
-import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
-import { getEnrollment, getEnrollmentHistory, withdrawEnrollment } from "@/lib/server/enrollments";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEnrollment, useEnrollmentHistory, useWithdrawEnrollment } from "@daycare-hub/hooks";
 import { StatusTimeline } from "@/components/enrollment/status-timeline";
 import { WithdrawDialog } from "@/components/enrollment/withdraw-dialog";
 import { Card, CardContent, CardHeader, CardTitle, Badge } from "@daycare-hub/ui";
@@ -7,13 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle, Badge } from "@daycare-hub/ui
 export const Route = createFileRoute(
   "/_parent/parent/enrollments/$enrollmentId"
 )({
-  loader: async ({ params }) => {
-    const [enrollment, history] = await Promise.all([
-      getEnrollment({ data: { enrollmentId: params.enrollmentId } }),
-      getEnrollmentHistory({ data: { enrollmentId: params.enrollmentId } }),
-    ]);
-    return { enrollment, history };
-  },
   component: EnrollmentDetailPage,
 });
 
@@ -33,15 +26,22 @@ function statusBadgeVariant(status: string) {
 }
 
 function EnrollmentDetailPage() {
-  const { enrollment, history } = Route.useLoaderData();
-  const router = useRouter();
-  const navigate = useNavigate();
+  const { enrollmentId } = Route.useParams();
+  const { data: enrollment, isLoading: enrollmentLoading } = useEnrollment(enrollmentId);
+  const { data: history, isLoading: historyLoading } = useEnrollmentHistory(enrollmentId);
+  const withdrawMutation = useWithdrawEnrollment();
+
+  const isLoading = enrollmentLoading || historyLoading;
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  if (!enrollment) return null;
 
   async function handleWithdraw(reason?: string) {
-    await withdrawEnrollment({
-      data: { enrollmentId: enrollment.id, reason },
+    await withdrawMutation.mutateAsync({
+      enrollmentId: enrollment!.id,
+      reason,
     });
-    router.invalidate();
   }
 
   return (
@@ -163,7 +163,7 @@ function EnrollmentDetailPage() {
             <CardTitle>Status History</CardTitle>
           </CardHeader>
           <CardContent>
-            <StatusTimeline history={history} />
+            <StatusTimeline history={history ?? []} />
           </CardContent>
         </Card>
       </div>

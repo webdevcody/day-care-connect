@@ -1,12 +1,12 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
-  getDocumentDetail,
-  markDocumentViewed,
-  signDocument,
-} from "@/lib/server/parent-documents";
+  useDocumentDetail,
+  useMarkDocumentViewed,
+  useSignDocument,
+} from "@daycare-hub/hooks";
 import { DocumentStatusBadge } from "@/components/documents/document-status-badge";
 import {
   Card,
@@ -22,19 +22,29 @@ import {
 export const Route = createFileRoute(
   "/_parent/parent/documents/$documentId"
 )({
-  loader: ({ params }) =>
-    getDocumentDetail({ data: { instanceId: params.documentId } }),
   component: DocumentDetailPage,
 });
 
 function DocumentDetailPage() {
-  const doc = Route.useLoaderData();
-  const router = useRouter();
+  const { documentId } = Route.useParams();
+  const { data: doc, isLoading } = useDocumentDetail(documentId);
+  const markViewedMutation = useMarkDocumentViewed();
+  const signDocumentMutation = useSignDocument();
 
   const [signatureName, setSignatureName] = useState("");
   const [agreed, setAgreed] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Mark as viewed when opened
+  useEffect(() => {
+    if (doc?.status === "pending") {
+      markViewedMutation.mutateAsync(documentId).catch(() => {});
+    }
+  }, [doc?.id, doc?.status]);
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  if (!doc) return null;
 
   const canSign =
     doc.status === "pending" || doc.status === "viewed";
@@ -43,26 +53,16 @@ function DocumentDetailPage() {
     doc.status === "expired" ||
     (doc.expiresAt && new Date(doc.expiresAt) < new Date());
 
-  // Mark as viewed when opened
-  useEffect(() => {
-    if (doc.status === "pending") {
-      markDocumentViewed({ data: { instanceId: doc.id } }).catch(() => {});
-    }
-  }, [doc.id, doc.status]);
-
   const handleSign = async () => {
     if (!agreed || signatureName.length < 2) return;
-    setLoading(true);
     setError("");
     try {
-      await signDocument({
-        data: { instanceId: doc.id, signatureName },
+      await signDocumentMutation.mutateAsync({
+        instanceId: doc.id,
+        data: { signatureName },
       });
-      router.invalidate();
     } catch (err: any) {
       setError(err.message || "Failed to sign document");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -158,9 +158,9 @@ function DocumentDetailPage() {
             <Button
               className="w-full"
               onClick={handleSign}
-              disabled={!agreed || signatureName.length < 2 || loading}
+              disabled={!agreed || signatureName.length < 2 || signDocumentMutation.isPending}
             >
-              {loading ? "Signing..." : "Sign Document"}
+              {signDocumentMutation.isPending ? "Signing..." : "Sign Document"}
             </Button>
           </CardContent>
         </Card>

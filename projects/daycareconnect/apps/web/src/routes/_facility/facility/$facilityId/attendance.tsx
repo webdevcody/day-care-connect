@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
-  getDailyAttendance,
-  checkInChild,
-  checkOutChild,
-  markAbsent,
-} from "@/lib/server/admin-attendance";
+  useAdminAttendance,
+  useCheckInChild,
+  useCheckOutChild,
+  useMarkAbsent,
+} from "@daycare-hub/hooks";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { AttendanceStatusBadge } from "@/components/admin/status-badge";
 import { ABSENCE_REASONS } from "@daycare-hub/shared";
@@ -38,37 +38,17 @@ export const Route = createFileRoute(
 function AttendancePage() {
   const { facilityId } = Route.useParams();
   const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
-  const [records, setRecords] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const fetchAttendance = async () => {
-    try {
-      const data = await getDailyAttendance({ data: { facilityId, date } });
-      setRecords(data);
-    } catch (err) {
-      console.error("Failed to fetch attendance:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    setLoading(true);
-    fetchAttendance();
-  }, [date, facilityId]);
-
-  // 30-second polling
-  useEffect(() => {
-    const interval = setInterval(fetchAttendance, 30000);
-    return () => clearInterval(interval);
-  }, [date, facilityId]);
+  const { data: records = [], isLoading: loading } = useAdminAttendance(facilityId, date);
+  const checkInChild = useCheckInChild();
+  const checkOutChild = useCheckOutChild();
+  const markAbsent = useMarkAbsent();
 
   const handleCheckIn = async (attendanceId: string) => {
     setActionLoading(attendanceId);
     try {
-      await checkInChild({ data: { attendanceId } });
-      await fetchAttendance();
+      await checkInChild.mutateAsync({ attendanceId });
     } catch (err) {
       console.error("Check-in failed:", err);
     } finally {
@@ -79,8 +59,7 @@ function AttendancePage() {
   const handleCheckOut = async (attendanceId: string) => {
     setActionLoading(attendanceId);
     try {
-      await checkOutChild({ data: { attendanceId } });
-      await fetchAttendance();
+      await checkOutChild.mutateAsync({ attendanceId });
     } catch (err) {
       console.error("Check-out failed:", err);
     } finally {
@@ -91,8 +70,7 @@ function AttendancePage() {
   const handleMarkAbsent = async (attendanceId: string, reason: string) => {
     setActionLoading(attendanceId);
     try {
-      await markAbsent({ data: { attendanceId, reason: reason as any } });
-      await fetchAttendance();
+      await markAbsent.mutateAsync({ attendanceId, reason: reason as any });
     } catch (err) {
       console.error("Mark absent failed:", err);
     } finally {

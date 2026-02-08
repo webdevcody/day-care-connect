@@ -1,9 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { authMiddleware } from "@/lib/middleware";
-import { getFacility } from "@/lib/server/facilities";
-import { getMyChildren } from "@/lib/server/children";
-import { createEnrollment } from "@/lib/server/enrollments";
+import { useFacility, useChildren, useCreateEnrollment } from "@daycare-hub/hooks";
 import { SCHEDULE_TYPES } from "@daycare-hub/shared";
 import {
   Button,
@@ -19,23 +16,16 @@ import {
 import { APP_NAME } from "@daycare-hub/shared";
 
 export const Route = createFileRoute("/facilities/$facilityId/enroll")({
-  server: {
-    middleware: [authMiddleware],
-  },
-  loader: async ({ params }) => {
-    const [facility, children] = await Promise.all([
-      getFacility({ data: { facilityId: params.facilityId } }),
-      getMyChildren(),
-    ]);
-    return { facility, children };
-  },
   component: EnrollmentWizardPage,
 });
 
 type Step = "child" | "schedule" | "notes" | "review";
 
 function EnrollmentWizardPage() {
-  const { facility, children } = Route.useLoaderData();
+  const { facilityId } = Route.useParams();
+  const { data: facility, isLoading: facilityLoading } = useFacility(facilityId);
+  const { data: childrenData, isLoading: childrenLoading } = useChildren();
+  const createEnrollmentMutation = useCreateEnrollment();
   const navigate = useNavigate();
 
   const [step, setStep] = useState<Step>("child");
@@ -46,20 +36,25 @@ function EnrollmentWizardPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const selectedChild = children.find((c) => c.id === selectedChildId);
+  const isLoading = facilityLoading || childrenLoading;
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  if (!facility) return null;
+
+  const children = Array.isArray(childrenData) ? childrenData : (childrenData?.children ?? []);
+  const selectedChild = children.find((c: any) => c.id === selectedChildId);
 
   async function handleSubmit() {
     setLoading(true);
     setError("");
     try {
-      await createEnrollment({
-        data: {
-          childId: selectedChildId,
-          facilityId: facility.id,
-          scheduleType: scheduleType as any,
-          startDate,
-          notes: notes || undefined,
-        },
+      await createEnrollmentMutation.mutateAsync({
+        childId: selectedChildId,
+        facilityId: facility!.id,
+        scheduleType: scheduleType as any,
+        startDate,
+        notes: notes || undefined,
       });
       navigate({ to: "/parent" });
     } catch (err: any) {
@@ -131,7 +126,7 @@ function EnrollmentWizardPage() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {children.map((child) => (
+                    {children.map((child: any) => (
                       <button
                         key={child.id}
                         type="button"

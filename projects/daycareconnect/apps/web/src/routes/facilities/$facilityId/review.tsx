@@ -1,34 +1,28 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { authMiddleware } from "@/lib/middleware";
-import { getFacility } from "@/lib/server/facilities";
-import {
-  checkReviewEligibility,
-  createReview,
-  updateReview,
-} from "@/lib/server/reviews";
+import { useFacility, useReviewEligibility, useCreateReview, useUpdateReview } from "@daycare-hub/hooks";
 import { ReviewForm } from "@/components/reviews/review-form";
 import { APP_NAME } from "@daycare-hub/shared";
 import { Card, CardContent, CardHeader, CardTitle } from "@daycare-hub/ui";
 
 export const Route = createFileRoute("/facilities/$facilityId/review")({
-  server: {
-    middleware: [authMiddleware],
-  },
-  loader: async ({ params }) => {
-    const [facility, eligibility] = await Promise.all([
-      getFacility({ data: { facilityId: params.facilityId } }),
-      checkReviewEligibility({ data: { facilityId: params.facilityId } }),
-    ]);
-    return { facility, eligibility };
-  },
   component: ReviewPage,
 });
 
 function ReviewPage() {
-  const { facility, eligibility } = Route.useLoaderData();
+  const { facilityId } = Route.useParams();
+  const { data: facility, isLoading: facilityLoading } = useFacility(facilityId);
+  const { data: eligibility, isLoading: eligibilityLoading } = useReviewEligibility(facilityId);
+  const createReviewMutation = useCreateReview();
+  const updateReviewMutation = useUpdateReview();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isLoading = facilityLoading || eligibilityLoading;
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  if (!facility || !eligibility) return null;
 
   if (!eligibility.eligible) {
     return (
@@ -60,21 +54,23 @@ function ReviewPage() {
 
   const isEditing = !!eligibility.existingReview;
 
-  async function handleSubmit(data: Parameters<typeof createReview>[0]["data"] & { overallRating: number }) {
+  async function handleSubmit(data: any) {
     setIsSubmitting(true);
     try {
       if (isEditing) {
-        await updateReview({
-          data: { reviewId: eligibility.existingReview.id, ...data },
+        await updateReviewMutation.mutateAsync({
+          reviewId: eligibility!.existingReview.id,
+          data,
         });
       } else {
-        await createReview({
-          data: { facilityId: facility.id, ...data },
+        await createReviewMutation.mutateAsync({
+          facilityId: facility!.id,
+          ...data,
         });
       }
       navigate({
         to: "/facilities/$facilityId",
-        params: { facilityId: facility.id },
+        params: { facilityId: facility!.id },
       });
     } catch (err) {
       console.error(err);
@@ -111,7 +107,7 @@ function ReviewPage() {
               onCancel={() =>
                 navigate({
                   to: "/facilities/$facilityId",
-                  params: { facilityId: facility.id },
+                  params: { facilityId: facility!.id },
                 })
               }
               isSubmitting={isSubmitting}

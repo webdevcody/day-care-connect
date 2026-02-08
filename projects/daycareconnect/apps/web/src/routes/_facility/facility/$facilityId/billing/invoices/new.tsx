@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import {
@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@daycare-hub/ui";
-import { createManualInvoice, getFacilityParents } from "@/lib/server/admin-billing";
+import { useCreateManualInvoice, useAdminBillingParents } from "@daycare-hub/hooks";
 
 interface LineItem {
   description: string;
@@ -25,15 +25,13 @@ interface LineItem {
 export const Route = createFileRoute(
   "/_facility/facility/$facilityId/billing/invoices/new"
 )({
-  loader: ({ params }) =>
-    getFacilityParents({ data: { facilityId: params.facilityId } }),
   component: CreateInvoicePage,
 });
 
 function CreateInvoicePage() {
-  const parents = Route.useLoaderData();
   const { facilityId } = Route.useParams();
-  const router = useRouter();
+  const { data: parents = [], isLoading } = useAdminBillingParents(facilityId);
+  const createManualInvoice = useCreateManualInvoice();
   const navigate = Route.useNavigate();
 
   const [parentId, setParentId] = useState("");
@@ -47,6 +45,8 @@ function CreateInvoicePage() {
   ]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
 
   const addLineItem = () => {
     setLineItems([...lineItems, { description: "", quantity: 1, unitPrice: "" }]);
@@ -77,21 +77,19 @@ function CreateInvoicePage() {
     setSubmitting(true);
 
     try {
-      const invoice = await createManualInvoice({
-        data: {
-          facilityId,
-          parentId,
-          dueDate,
-          billingPeriodStart: billingPeriodStart || undefined,
-          billingPeriodEnd: billingPeriodEnd || undefined,
-          taxAmount: taxAmount || "0",
-          notes: notes || undefined,
-          lineItems: lineItems.map((item) => ({
-            description: item.description,
-            quantity: item.quantity,
-            unitPrice: item.unitPrice,
-          })),
-        },
+      const invoice = await createManualInvoice.mutateAsync({
+        facilityId,
+        parentId,
+        dueDate,
+        billingPeriodStart: billingPeriodStart || undefined,
+        billingPeriodEnd: billingPeriodEnd || undefined,
+        taxAmount: taxAmount || "0",
+        notes: notes || undefined,
+        lineItems: lineItems.map((item) => ({
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+        })),
       });
 
       navigate({

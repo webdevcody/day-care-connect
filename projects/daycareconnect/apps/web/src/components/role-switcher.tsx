@@ -1,5 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { getUserRoles, switchRole } from "@/lib/server/user-roles";
+import { useUserRoles, useSwitchRole } from "@daycare-hub/hooks";
 import { USER_ROLE_LABELS, ROLE_DASHBOARD_PATHS } from "@daycare-hub/shared";
 import type { UserRole } from "@daycare-hub/shared";
 import {
@@ -10,7 +9,6 @@ import {
   SelectValue,
 } from "@daycare-hub/ui";
 import { Users, Building2, Briefcase } from "lucide-react";
-import { useState } from "react";
 
 const ROLE_ICONS: Record<string, typeof Users> = {
   parent: Users,
@@ -19,12 +17,8 @@ const ROLE_ICONS: Record<string, typeof Users> = {
 };
 
 export function RoleSwitcher() {
-  const [switching, setSwitching] = useState(false);
-
-  const { data: roleData } = useQuery({
-    queryKey: ["user-roles"],
-    queryFn: () => getUserRoles(),
-  });
+  const { data: roleData } = useUserRoles();
+  const switchRoleMutation = useSwitchRole();
 
   if (!roleData || roleData.roles.length <= 1) {
     return null;
@@ -32,12 +26,11 @@ export function RoleSwitcher() {
 
   async function handleSwitch(newRole: string) {
     if (newRole === roleData?.activeRole) return;
-    setSwitching(true);
     try {
-      await switchRole({ data: { role: newRole } });
+      await switchRoleMutation.mutateAsync(newRole);
       window.location.href = ROLE_DASHBOARD_PATHS[newRole as UserRole];
     } catch {
-      setSwitching(false);
+      // Mutation error is handled by react-query
     }
   }
 
@@ -46,7 +39,7 @@ export function RoleSwitcher() {
       <Select
         value={roleData.activeRole}
         onValueChange={handleSwitch}
-        disabled={switching}
+        disabled={switchRoleMutation.isPending}
       >
         <SelectTrigger className="w-full">
           <SelectValue />

@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { getChildPhotos } from "@/lib/server/parent-activities";
+import { useChildPhotos } from "@daycare-hub/hooks";
 import { Card, CardContent, Button, Input, Label } from "@daycare-hub/ui";
 import { ArrowLeft } from "lucide-react";
 
@@ -12,32 +11,7 @@ export const Route = createFileRoute(
 
 function ChildPhotosPage() {
   const { childId } = Route.useParams();
-  const [photos, setPhotos] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-
-  const fetchPhotos = async () => {
-    setLoading(true);
-    try {
-      const data = await getChildPhotos({
-        data: {
-          childId,
-          startDate: startDate || undefined,
-          endDate: endDate || undefined,
-        },
-      });
-      setPhotos(data);
-    } catch (err) {
-      console.error("Failed to fetch photos:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchPhotos();
-  }, [childId, startDate, endDate]);
+  const { data: photos, isLoading } = useChildPhotos(childId);
 
   return (
     <div className="space-y-6">
@@ -54,49 +28,13 @@ function ChildPhotosPage() {
         <h1 className="text-2xl font-bold">Photos</h1>
       </div>
 
-      {/* Date filter */}
-      <div className="flex items-end gap-3">
-        <div>
-          <Label htmlFor="startDate" className="text-sm">From</Label>
-          <Input
-            id="startDate"
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="mt-1 w-auto"
-          />
-        </div>
-        <div>
-          <Label htmlFor="endDate" className="text-sm">To</Label>
-          <Input
-            id="endDate"
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="mt-1 w-auto"
-          />
-        </div>
-        {(startDate || endDate) && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setStartDate("");
-              setEndDate("");
-            }}
-          >
-            Clear
-          </Button>
-        )}
-      </div>
-
-      {loading ? (
+      {isLoading ? (
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">Loading photos...</p>
           </CardContent>
         </Card>
-      ) : photos.length === 0 ? (
+      ) : !photos || photos.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">No photos found.</p>

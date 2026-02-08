@@ -6,8 +6,7 @@ import {
   FlatList,
   RefreshControl,
 } from "react-native";
-import { useQuery } from "@tanstack/react-query";
-import { getDashboard } from "../../api/endpoints";
+import { useDashboard } from "@daycare-hub/hooks";
 import { useAuth } from "../../auth/AuthContext";
 import { LoadingView } from "../../components/LoadingView";
 import { EmptyState } from "../../components/EmptyState";
@@ -19,10 +18,7 @@ import { spacing, borderRadius } from "../../theme/spacing";
 
 export function DashboardScreen({ navigation }: { navigation: any }) {
   const { user } = useAuth();
-  const { data, isLoading, refetch, isRefetching } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: getDashboard,
-  });
+  const { data, isLoading, refetch, isRefetching } = useDashboard();
 
   if (isLoading) return <LoadingView />;
 

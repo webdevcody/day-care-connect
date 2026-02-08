@@ -1,24 +1,29 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { getChild, updateChild } from "@/lib/server/children";
+import { useChild, useUpdateChild } from "@daycare-hub/hooks";
 import { ChildForm } from "@/components/children/child-form";
 import type { CreateChildInput } from "@daycare-hub/shared";
 
 export const Route = createFileRoute(
   "/_parent/parent/children/$childId/edit"
 )({
-  loader: ({ params }) => getChild({ data: { childId: params.childId } }),
   component: EditChildPage,
 });
 
 function EditChildPage() {
-  const child = Route.useLoaderData();
+  const { childId } = Route.useParams();
+  const { data: child, isLoading } = useChild(childId);
+  const updateChild = useUpdateChild();
   const navigate = useNavigate();
 
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  if (!child) return null;
+
   async function handleSubmit(data: CreateChildInput) {
-    await updateChild({ data: { childId: child.id, ...data } });
+    await updateChild.mutateAsync({ childId: child!.id, data });
     navigate({
       to: "/parent/children/$childId",
-      params: { childId: child.id },
+      params: { childId: child!.id },
     });
   }
 

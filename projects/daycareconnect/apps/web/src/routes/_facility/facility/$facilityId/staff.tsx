@@ -1,7 +1,6 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { getFacility } from "@/lib/server/facilities";
-import { addStaffMember, removeStaffMember } from "@/lib/server/facility-staff";
+import { useFacility, useAddStaffMember, useRemoveStaffMember } from "@daycare-hub/hooks";
 import { FacilitySubNav } from "@/components/admin/facility-sub-nav";
 import { STAFF_ROLES } from "@daycare-hub/shared";
 import type { StaffRole } from "@daycare-hub/shared";
@@ -32,7 +31,6 @@ import {
 export const Route = createFileRoute(
   "/_facility/facility/$facilityId/staff"
 )({
-  loader: ({ params }) => getFacility({ data: { facilityId: params.facilityId } }),
   component: FacilityStaffPage,
 });
 
@@ -41,24 +39,27 @@ function formatRole(role: string) {
 }
 
 function FacilityStaffPage() {
-  const facility = Route.useLoaderData();
   const { facilityId } = Route.useParams();
-  const router = useRouter();
+  const { data: facility, isLoading } = useFacility(facilityId);
+  const addStaffMember = useAddStaffMember();
+  const removeStaffMember = useRemoveStaffMember();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [staffRole, setStaffRole] = useState<StaffRole>("lead_teacher");
   const [error, setError] = useState("");
   const [adding, setAdding] = useState(false);
 
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (!facility) return null;
+
   const handleAdd = async () => {
     if (!email) return;
     setError("");
     setAdding(true);
     try {
-      await addStaffMember({ data: { facilityId, email, staffRole } });
+      await addStaffMember.mutateAsync({ facilityId, data: { email, staffRole } });
       setEmail("");
       setDialogOpen(false);
-      router.invalidate();
     } catch (err: any) {
       setError(err.message || "Failed to add staff member");
     } finally {
@@ -69,8 +70,7 @@ function FacilityStaffPage() {
   const handleRemove = async (staffId: string) => {
     if (!confirm("Remove this staff member?")) return;
     try {
-      await removeStaffMember({ data: { facilityId, staffId } });
-      router.invalidate();
+      await removeStaffMember.mutateAsync({ facilityId, staffId });
     } catch (err: any) {
       setError(err.message || "Failed to remove staff member");
     }

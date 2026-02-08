@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getChildDailyReport } from "@/lib/server/parent-activities";
+import { useChildDailyReport } from "@daycare-hub/hooks";
 import { ActivityIcon, getActivityLabel } from "@/components/activities/activity-icon";
 import {
   Card,
@@ -15,10 +15,6 @@ import type { ActivityType } from "@daycare-hub/shared";
 export const Route = createFileRoute(
   "/_parent/parent/children/$childId/daily-report/$date"
 )({
-  loader: ({ params }) =>
-    getChildDailyReport({
-      data: { childId: params.childId, date: params.date },
-    }),
   component: DailyReportDetailPage,
 });
 
@@ -69,8 +65,12 @@ function getDataSummary(type: string, data: Record<string, unknown> | null): str
 }
 
 function DailyReportDetailPage() {
-  const report = Route.useLoaderData();
-  const { childId } = Route.useParams();
+  const { childId, date } = Route.useParams();
+  const { data: report, isLoading } = useChildDailyReport(childId, date);
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  if (!report) return null;
 
   const formattedDate = new Date(report.date + "T00:00:00").toLocaleDateString(
     "en-US",

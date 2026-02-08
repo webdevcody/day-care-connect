@@ -1,19 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { getActiveFacilities } from "@/lib/server/facilities";
+import { useActiveFacilities } from "@daycare-hub/hooks";
 import { APP_NAME } from "@daycare-hub/shared";
 import { Card, CardContent, CardHeader, CardTitle, Input, Badge } from "@daycare-hub/ui";
 
 export const Route = createFileRoute("/facilities/")({
-  loader: () => getActiveFacilities(),
   component: FacilitiesBrowsePage,
 });
 
 function FacilitiesBrowsePage() {
-  const facilities = Route.useLoaderData();
+  const { data: facilities, isLoading } = useActiveFacilities();
   const [filter, setFilter] = useState("");
 
-  const filtered = facilities.filter((f) => {
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  const allFacilities = facilities ?? [];
+
+  const filtered = allFacilities.filter((f: any) => {
     const search = filter.toLowerCase();
     return (
       f.name.toLowerCase().includes(search) ||
@@ -51,7 +54,7 @@ function FacilitiesBrowsePage() {
           <p className="text-muted-foreground">No facilities found.</p>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((facility) => (
+            {filtered.map((facility: any) => (
               <Link
                 key={facility.id}
                 to="/facilities/$facilityId"
@@ -85,7 +88,7 @@ function FacilitiesBrowsePage() {
                     </div>
                     {facility.services.length > 0 && (
                       <div className="mt-3 flex flex-wrap gap-1">
-                        {facility.services.slice(0, 3).map((s) => (
+                        {facility.services.slice(0, 3).map((s: any) => (
                           <Badge key={s.id} variant="secondary" className="text-xs">
                             {s.serviceName}
                           </Badge>

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { getChild, deleteChild } from "@/lib/server/children";
+import { useChild, useDeleteChild } from "@daycare-hub/hooks";
 import {
   Card,
   CardContent,
@@ -19,7 +19,6 @@ import {
 export const Route = createFileRoute(
   "/_parent/parent/children/$childId"
 )({
-  loader: ({ params }) => getChild({ data: { childId: params.childId } }),
   component: ChildDetailPage,
 });
 
@@ -35,21 +34,24 @@ function calculateAge(dateOfBirth: string) {
 }
 
 function ChildDetailPage() {
-  const child = Route.useLoaderData();
+  const { childId } = Route.useParams();
+  const { data: child, isLoading } = useChild(childId);
+  const deleteChildMutation = useDeleteChild();
   const navigate = useNavigate();
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+
+  if (!child) return null;
+
   async function handleDelete() {
-    setDeleting(true);
     setDeleteError("");
     try {
-      await deleteChild({ data: { childId: child.id } });
+      await deleteChildMutation.mutateAsync(childId);
       navigate({ to: "/parent/children" });
     } catch (err: any) {
       setDeleteError(err.message || "Failed to delete");
-      setDeleting(false);
     }
   }
 
@@ -112,9 +114,9 @@ function ChildDetailPage() {
                 <Button
                   variant="destructive"
                   onClick={handleDelete}
-                  disabled={deleting}
+                  disabled={deleteChildMutation.isPending}
                 >
-                  {deleting ? "Deleting..." : "Delete"}
+                  {deleteChildMutation.isPending ? "Deleting..." : "Delete"}
                 </Button>
               </div>
             </DialogContent>

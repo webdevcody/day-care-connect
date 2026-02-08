@@ -28,9 +28,6 @@ import { Route as ParentParentIndexRouteImport } from './routes/_parent/parent/i
 import { Route as FacilityFacilityIndexRouteImport } from './routes/_facility/facility/index'
 import { Route as FacilitiesFacilityIdReviewRouteImport } from './routes/facilities/$facilityId/review'
 import { Route as FacilitiesFacilityIdEnrollRouteImport } from './routes/facilities/$facilityId/enroll'
-import { Route as ApiWebhooksStripeRouteImport } from './routes/api/webhooks/stripe'
-import { Route as ApiMobileDashboardRouteImport } from './routes/api/mobile/dashboard'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as StaffStaffSettingsRouteImport } from './routes/_staff/staff/settings'
 import { Route as StaffStaffNotificationsRouteImport } from './routes/_staff/staff/notifications'
 import { Route as ParentParentSettingsRouteImport } from './routes/_parent/parent/settings'
@@ -39,8 +36,6 @@ import { Route as ParentParentNotificationsRouteImport } from './routes/_parent/
 import { Route as FacilityFacilitySettingsRouteImport } from './routes/_facility/facility/settings'
 import { Route as FacilityFacilityNotificationsRouteImport } from './routes/_facility/facility/notifications'
 import { Route as FacilityFacilityNewRouteImport } from './routes/_facility/facility/new'
-import { Route as ApiMobileNotificationsIndexRouteImport } from './routes/api/mobile/notifications/index'
-import { Route as ApiMobileChildrenIndexRouteImport } from './routes/api/mobile/children/index'
 import { Route as StaffStaffMessagesIndexRouteImport } from './routes/_staff/staff/messages/index'
 import { Route as ParentParentMessagesIndexRouteImport } from './routes/_parent/parent/messages/index'
 import { Route as ParentParentDocumentsIndexRouteImport } from './routes/_parent/parent/documents/index'
@@ -48,11 +43,6 @@ import { Route as ParentParentChildrenIndexRouteImport } from './routes/_parent/
 import { Route as ParentParentBillingIndexRouteImport } from './routes/_parent/parent/billing/index'
 import { Route as FacilityFacilityMessagesIndexRouteImport } from './routes/_facility/facility/messages/index'
 import { Route as FacilityFacilityFacilityIdIndexRouteImport } from './routes/_facility/facility/$facilityId/index'
-import { Route as ApiMobilePushUnregisterRouteImport } from './routes/api/mobile/push/unregister'
-import { Route as ApiMobilePushRegisterRouteImport } from './routes/api/mobile/push/register'
-import { Route as ApiMobileNotificationsUnreadCountRouteImport } from './routes/api/mobile/notifications/unread-count'
-import { Route as ApiMobileNotificationsReadAllRouteImport } from './routes/api/mobile/notifications/read-all'
-import { Route as ApiMobileChildrenChildIdRouteImport } from './routes/api/mobile/children/$childId'
 import { Route as StaffStaffMessagesConversationIdRouteImport } from './routes/_staff/staff/messages/$conversationId'
 import { Route as ParentParentMessagesConversationIdRouteImport } from './routes/_parent/parent/messages/$conversationId'
 import { Route as ParentParentEnrollmentsEnrollmentIdRouteImport } from './routes/_parent/parent/enrollments/$enrollmentId'
@@ -76,9 +66,6 @@ import { Route as FacilityFacilityFacilityIdAttendanceRouteImport } from './rout
 import { Route as FacilityFacilityFacilityIdActivitiesRouteImport } from './routes/_facility/facility/$facilityId/activities'
 import { Route as FacilityFacilityFacilityIdDocumentsIndexRouteImport } from './routes/_facility/facility/$facilityId/documents/index'
 import { Route as FacilityFacilityFacilityIdBillingIndexRouteImport } from './routes/_facility/facility/$facilityId/billing/index'
-import { Route as ApiMobileNotificationsNotificationIdReadRouteImport } from './routes/api/mobile/notifications/$notificationId/read'
-import { Route as ApiMobileChildrenChildIdDailyReportsRouteImport } from './routes/api/mobile/children/$childId/daily-reports'
-import { Route as ApiMobileChildrenChildIdActivitiesRouteImport } from './routes/api/mobile/children/$childId/activities'
 import { Route as ParentParentChildrenChildIdPhotosRouteImport } from './routes/_parent/parent/children/$childId/photos'
 import { Route as ParentParentChildrenChildIdEditRouteImport } from './routes/_parent/parent/children/$childId/edit'
 import { Route as ParentParentChildrenChildIdActivitiesRouteImport } from './routes/_parent/parent/children/$childId/activities'
@@ -185,21 +172,6 @@ const FacilitiesFacilityIdEnrollRoute =
     path: '/facilities/$facilityId/enroll',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiWebhooksStripeRoute = ApiWebhooksStripeRouteImport.update({
-  id: '/api/webhooks/stripe',
-  path: '/api/webhooks/stripe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiMobileDashboardRoute = ApiMobileDashboardRouteImport.update({
-  id: '/api/mobile/dashboard',
-  path: '/api/mobile/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const StaffStaffSettingsRoute = StaffStaffSettingsRouteImport.update({
   id: '/staff/settings',
   path: '/staff/settings',
@@ -243,17 +215,6 @@ const FacilityFacilityNewRoute = FacilityFacilityNewRouteImport.update({
   path: '/facility/new',
   getParentRoute: () => FacilityRoute,
 } as any)
-const ApiMobileNotificationsIndexRoute =
-  ApiMobileNotificationsIndexRouteImport.update({
-    id: '/api/mobile/notifications/',
-    path: '/api/mobile/notifications/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiMobileChildrenIndexRoute = ApiMobileChildrenIndexRouteImport.update({
-  id: '/api/mobile/children/',
-  path: '/api/mobile/children/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const StaffStaffMessagesIndexRoute = StaffStaffMessagesIndexRouteImport.update({
   id: '/staff/messages/',
   path: '/staff/messages/',
@@ -294,34 +255,6 @@ const FacilityFacilityFacilityIdIndexRoute =
     id: '/facility/$facilityId/',
     path: '/facility/$facilityId/',
     getParentRoute: () => FacilityRoute,
-  } as any)
-const ApiMobilePushUnregisterRoute = ApiMobilePushUnregisterRouteImport.update({
-  id: '/api/mobile/push/unregister',
-  path: '/api/mobile/push/unregister',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiMobilePushRegisterRoute = ApiMobilePushRegisterRouteImport.update({
-  id: '/api/mobile/push/register',
-  path: '/api/mobile/push/register',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiMobileNotificationsUnreadCountRoute =
-  ApiMobileNotificationsUnreadCountRouteImport.update({
-    id: '/api/mobile/notifications/unread-count',
-    path: '/api/mobile/notifications/unread-count',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiMobileNotificationsReadAllRoute =
-  ApiMobileNotificationsReadAllRouteImport.update({
-    id: '/api/mobile/notifications/read-all',
-    path: '/api/mobile/notifications/read-all',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiMobileChildrenChildIdRoute =
-  ApiMobileChildrenChildIdRouteImport.update({
-    id: '/api/mobile/children/$childId',
-    path: '/api/mobile/children/$childId',
-    getParentRoute: () => rootRouteImport,
   } as any)
 const StaffStaffMessagesConversationIdRoute =
   StaffStaffMessagesConversationIdRouteImport.update({
@@ -460,24 +393,6 @@ const FacilityFacilityFacilityIdBillingIndexRoute =
     path: '/facility/$facilityId/billing/',
     getParentRoute: () => FacilityRoute,
   } as any)
-const ApiMobileNotificationsNotificationIdReadRoute =
-  ApiMobileNotificationsNotificationIdReadRouteImport.update({
-    id: '/api/mobile/notifications/$notificationId/read',
-    path: '/api/mobile/notifications/$notificationId/read',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiMobileChildrenChildIdDailyReportsRoute =
-  ApiMobileChildrenChildIdDailyReportsRouteImport.update({
-    id: '/daily-reports',
-    path: '/daily-reports',
-    getParentRoute: () => ApiMobileChildrenChildIdRoute,
-  } as any)
-const ApiMobileChildrenChildIdActivitiesRoute =
-  ApiMobileChildrenChildIdActivitiesRouteImport.update({
-    id: '/activities',
-    path: '/activities',
-    getParentRoute: () => ApiMobileChildrenChildIdRoute,
-  } as any)
 const ParentParentChildrenChildIdPhotosRoute =
   ParentParentChildrenChildIdPhotosRouteImport.update({
     id: '/photos',
@@ -563,9 +478,6 @@ export interface FileRoutesByFullPath {
   '/parent/settings': typeof ParentParentSettingsRoute
   '/staff/notifications': typeof StaffStaffNotificationsRoute
   '/staff/settings': typeof StaffStaffSettingsRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/mobile/dashboard': typeof ApiMobileDashboardRoute
-  '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
   '/facilities/$facilityId/enroll': typeof FacilitiesFacilityIdEnrollRoute
   '/facilities/$facilityId/review': typeof FacilitiesFacilityIdReviewRoute
   '/facility/': typeof FacilityFacilityIndexRoute
@@ -593,11 +505,6 @@ export interface FileRoutesByFullPath {
   '/parent/enrollments/$enrollmentId': typeof ParentParentEnrollmentsEnrollmentIdRoute
   '/parent/messages/$conversationId': typeof ParentParentMessagesConversationIdRoute
   '/staff/messages/$conversationId': typeof StaffStaffMessagesConversationIdRoute
-  '/api/mobile/children/$childId': typeof ApiMobileChildrenChildIdRouteWithChildren
-  '/api/mobile/notifications/read-all': typeof ApiMobileNotificationsReadAllRoute
-  '/api/mobile/notifications/unread-count': typeof ApiMobileNotificationsUnreadCountRoute
-  '/api/mobile/push/register': typeof ApiMobilePushRegisterRoute
-  '/api/mobile/push/unregister': typeof ApiMobilePushUnregisterRoute
   '/facility/$facilityId/': typeof FacilityFacilityFacilityIdIndexRoute
   '/facility/messages/': typeof FacilityFacilityMessagesIndexRoute
   '/parent/billing/': typeof ParentParentBillingIndexRoute
@@ -605,8 +512,6 @@ export interface FileRoutesByFullPath {
   '/parent/documents/': typeof ParentParentDocumentsIndexRoute
   '/parent/messages/': typeof ParentParentMessagesIndexRoute
   '/staff/messages/': typeof StaffStaffMessagesIndexRoute
-  '/api/mobile/children/': typeof ApiMobileChildrenIndexRoute
-  '/api/mobile/notifications/': typeof ApiMobileNotificationsIndexRoute
   '/facility/$facilityId/documents/compliance': typeof FacilityFacilityFacilityIdDocumentsComplianceRoute
   '/facility/$facilityId/documents/send': typeof FacilityFacilityFacilityIdDocumentsSendRoute
   '/facility/$facilityId/documents/templates': typeof FacilityFacilityFacilityIdDocumentsTemplatesRoute
@@ -614,9 +519,6 @@ export interface FileRoutesByFullPath {
   '/parent/children/$childId/activities': typeof ParentParentChildrenChildIdActivitiesRoute
   '/parent/children/$childId/edit': typeof ParentParentChildrenChildIdEditRoute
   '/parent/children/$childId/photos': typeof ParentParentChildrenChildIdPhotosRoute
-  '/api/mobile/children/$childId/activities': typeof ApiMobileChildrenChildIdActivitiesRoute
-  '/api/mobile/children/$childId/daily-reports': typeof ApiMobileChildrenChildIdDailyReportsRoute
-  '/api/mobile/notifications/$notificationId/read': typeof ApiMobileNotificationsNotificationIdReadRoute
   '/facility/$facilityId/billing/': typeof FacilityFacilityFacilityIdBillingIndexRoute
   '/facility/$facilityId/documents/': typeof FacilityFacilityFacilityIdDocumentsIndexRoute
   '/facility/$facilityId/billing/invoices/$invoiceId': typeof FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute
@@ -642,9 +544,6 @@ export interface FileRoutesByTo {
   '/parent/settings': typeof ParentParentSettingsRoute
   '/staff/notifications': typeof StaffStaffNotificationsRoute
   '/staff/settings': typeof StaffStaffSettingsRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/mobile/dashboard': typeof ApiMobileDashboardRoute
-  '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
   '/facilities/$facilityId/enroll': typeof FacilitiesFacilityIdEnrollRoute
   '/facilities/$facilityId/review': typeof FacilitiesFacilityIdReviewRoute
   '/facility': typeof FacilityFacilityIndexRoute
@@ -672,11 +571,6 @@ export interface FileRoutesByTo {
   '/parent/enrollments/$enrollmentId': typeof ParentParentEnrollmentsEnrollmentIdRoute
   '/parent/messages/$conversationId': typeof ParentParentMessagesConversationIdRoute
   '/staff/messages/$conversationId': typeof StaffStaffMessagesConversationIdRoute
-  '/api/mobile/children/$childId': typeof ApiMobileChildrenChildIdRouteWithChildren
-  '/api/mobile/notifications/read-all': typeof ApiMobileNotificationsReadAllRoute
-  '/api/mobile/notifications/unread-count': typeof ApiMobileNotificationsUnreadCountRoute
-  '/api/mobile/push/register': typeof ApiMobilePushRegisterRoute
-  '/api/mobile/push/unregister': typeof ApiMobilePushUnregisterRoute
   '/facility/$facilityId': typeof FacilityFacilityFacilityIdIndexRoute
   '/facility/messages': typeof FacilityFacilityMessagesIndexRoute
   '/parent/billing': typeof ParentParentBillingIndexRoute
@@ -684,8 +578,6 @@ export interface FileRoutesByTo {
   '/parent/documents': typeof ParentParentDocumentsIndexRoute
   '/parent/messages': typeof ParentParentMessagesIndexRoute
   '/staff/messages': typeof StaffStaffMessagesIndexRoute
-  '/api/mobile/children': typeof ApiMobileChildrenIndexRoute
-  '/api/mobile/notifications': typeof ApiMobileNotificationsIndexRoute
   '/facility/$facilityId/documents/compliance': typeof FacilityFacilityFacilityIdDocumentsComplianceRoute
   '/facility/$facilityId/documents/send': typeof FacilityFacilityFacilityIdDocumentsSendRoute
   '/facility/$facilityId/documents/templates': typeof FacilityFacilityFacilityIdDocumentsTemplatesRoute
@@ -693,9 +585,6 @@ export interface FileRoutesByTo {
   '/parent/children/$childId/activities': typeof ParentParentChildrenChildIdActivitiesRoute
   '/parent/children/$childId/edit': typeof ParentParentChildrenChildIdEditRoute
   '/parent/children/$childId/photos': typeof ParentParentChildrenChildIdPhotosRoute
-  '/api/mobile/children/$childId/activities': typeof ApiMobileChildrenChildIdActivitiesRoute
-  '/api/mobile/children/$childId/daily-reports': typeof ApiMobileChildrenChildIdDailyReportsRoute
-  '/api/mobile/notifications/$notificationId/read': typeof ApiMobileNotificationsNotificationIdReadRoute
   '/facility/$facilityId/billing': typeof FacilityFacilityFacilityIdBillingIndexRoute
   '/facility/$facilityId/documents': typeof FacilityFacilityFacilityIdDocumentsIndexRoute
   '/facility/$facilityId/billing/invoices/$invoiceId': typeof FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute
@@ -726,9 +615,6 @@ export interface FileRoutesById {
   '/_parent/parent/settings': typeof ParentParentSettingsRoute
   '/_staff/staff/notifications': typeof StaffStaffNotificationsRoute
   '/_staff/staff/settings': typeof StaffStaffSettingsRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/mobile/dashboard': typeof ApiMobileDashboardRoute
-  '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
   '/facilities/$facilityId/enroll': typeof FacilitiesFacilityIdEnrollRoute
   '/facilities/$facilityId/review': typeof FacilitiesFacilityIdReviewRoute
   '/_facility/facility/': typeof FacilityFacilityIndexRoute
@@ -756,11 +642,6 @@ export interface FileRoutesById {
   '/_parent/parent/enrollments/$enrollmentId': typeof ParentParentEnrollmentsEnrollmentIdRoute
   '/_parent/parent/messages/$conversationId': typeof ParentParentMessagesConversationIdRoute
   '/_staff/staff/messages/$conversationId': typeof StaffStaffMessagesConversationIdRoute
-  '/api/mobile/children/$childId': typeof ApiMobileChildrenChildIdRouteWithChildren
-  '/api/mobile/notifications/read-all': typeof ApiMobileNotificationsReadAllRoute
-  '/api/mobile/notifications/unread-count': typeof ApiMobileNotificationsUnreadCountRoute
-  '/api/mobile/push/register': typeof ApiMobilePushRegisterRoute
-  '/api/mobile/push/unregister': typeof ApiMobilePushUnregisterRoute
   '/_facility/facility/$facilityId/': typeof FacilityFacilityFacilityIdIndexRoute
   '/_facility/facility/messages/': typeof FacilityFacilityMessagesIndexRoute
   '/_parent/parent/billing/': typeof ParentParentBillingIndexRoute
@@ -768,8 +649,6 @@ export interface FileRoutesById {
   '/_parent/parent/documents/': typeof ParentParentDocumentsIndexRoute
   '/_parent/parent/messages/': typeof ParentParentMessagesIndexRoute
   '/_staff/staff/messages/': typeof StaffStaffMessagesIndexRoute
-  '/api/mobile/children/': typeof ApiMobileChildrenIndexRoute
-  '/api/mobile/notifications/': typeof ApiMobileNotificationsIndexRoute
   '/_facility/facility/$facilityId/documents/compliance': typeof FacilityFacilityFacilityIdDocumentsComplianceRoute
   '/_facility/facility/$facilityId/documents/send': typeof FacilityFacilityFacilityIdDocumentsSendRoute
   '/_facility/facility/$facilityId/documents/templates': typeof FacilityFacilityFacilityIdDocumentsTemplatesRoute
@@ -777,9 +656,6 @@ export interface FileRoutesById {
   '/_parent/parent/children/$childId/activities': typeof ParentParentChildrenChildIdActivitiesRoute
   '/_parent/parent/children/$childId/edit': typeof ParentParentChildrenChildIdEditRoute
   '/_parent/parent/children/$childId/photos': typeof ParentParentChildrenChildIdPhotosRoute
-  '/api/mobile/children/$childId/activities': typeof ApiMobileChildrenChildIdActivitiesRoute
-  '/api/mobile/children/$childId/daily-reports': typeof ApiMobileChildrenChildIdDailyReportsRoute
-  '/api/mobile/notifications/$notificationId/read': typeof ApiMobileNotificationsNotificationIdReadRoute
   '/_facility/facility/$facilityId/billing/': typeof FacilityFacilityFacilityIdBillingIndexRoute
   '/_facility/facility/$facilityId/documents/': typeof FacilityFacilityFacilityIdDocumentsIndexRoute
   '/_facility/facility/$facilityId/billing/invoices/$invoiceId': typeof FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute
@@ -807,9 +683,6 @@ export interface FileRouteTypes {
     | '/parent/settings'
     | '/staff/notifications'
     | '/staff/settings'
-    | '/api/auth/$'
-    | '/api/mobile/dashboard'
-    | '/api/webhooks/stripe'
     | '/facilities/$facilityId/enroll'
     | '/facilities/$facilityId/review'
     | '/facility/'
@@ -837,11 +710,6 @@ export interface FileRouteTypes {
     | '/parent/enrollments/$enrollmentId'
     | '/parent/messages/$conversationId'
     | '/staff/messages/$conversationId'
-    | '/api/mobile/children/$childId'
-    | '/api/mobile/notifications/read-all'
-    | '/api/mobile/notifications/unread-count'
-    | '/api/mobile/push/register'
-    | '/api/mobile/push/unregister'
     | '/facility/$facilityId/'
     | '/facility/messages/'
     | '/parent/billing/'
@@ -849,8 +717,6 @@ export interface FileRouteTypes {
     | '/parent/documents/'
     | '/parent/messages/'
     | '/staff/messages/'
-    | '/api/mobile/children/'
-    | '/api/mobile/notifications/'
     | '/facility/$facilityId/documents/compliance'
     | '/facility/$facilityId/documents/send'
     | '/facility/$facilityId/documents/templates'
@@ -858,9 +724,6 @@ export interface FileRouteTypes {
     | '/parent/children/$childId/activities'
     | '/parent/children/$childId/edit'
     | '/parent/children/$childId/photos'
-    | '/api/mobile/children/$childId/activities'
-    | '/api/mobile/children/$childId/daily-reports'
-    | '/api/mobile/notifications/$notificationId/read'
     | '/facility/$facilityId/billing/'
     | '/facility/$facilityId/documents/'
     | '/facility/$facilityId/billing/invoices/$invoiceId'
@@ -886,9 +749,6 @@ export interface FileRouteTypes {
     | '/parent/settings'
     | '/staff/notifications'
     | '/staff/settings'
-    | '/api/auth/$'
-    | '/api/mobile/dashboard'
-    | '/api/webhooks/stripe'
     | '/facilities/$facilityId/enroll'
     | '/facilities/$facilityId/review'
     | '/facility'
@@ -916,11 +776,6 @@ export interface FileRouteTypes {
     | '/parent/enrollments/$enrollmentId'
     | '/parent/messages/$conversationId'
     | '/staff/messages/$conversationId'
-    | '/api/mobile/children/$childId'
-    | '/api/mobile/notifications/read-all'
-    | '/api/mobile/notifications/unread-count'
-    | '/api/mobile/push/register'
-    | '/api/mobile/push/unregister'
     | '/facility/$facilityId'
     | '/facility/messages'
     | '/parent/billing'
@@ -928,8 +783,6 @@ export interface FileRouteTypes {
     | '/parent/documents'
     | '/parent/messages'
     | '/staff/messages'
-    | '/api/mobile/children'
-    | '/api/mobile/notifications'
     | '/facility/$facilityId/documents/compliance'
     | '/facility/$facilityId/documents/send'
     | '/facility/$facilityId/documents/templates'
@@ -937,9 +790,6 @@ export interface FileRouteTypes {
     | '/parent/children/$childId/activities'
     | '/parent/children/$childId/edit'
     | '/parent/children/$childId/photos'
-    | '/api/mobile/children/$childId/activities'
-    | '/api/mobile/children/$childId/daily-reports'
-    | '/api/mobile/notifications/$notificationId/read'
     | '/facility/$facilityId/billing'
     | '/facility/$facilityId/documents'
     | '/facility/$facilityId/billing/invoices/$invoiceId'
@@ -969,9 +819,6 @@ export interface FileRouteTypes {
     | '/_parent/parent/settings'
     | '/_staff/staff/notifications'
     | '/_staff/staff/settings'
-    | '/api/auth/$'
-    | '/api/mobile/dashboard'
-    | '/api/webhooks/stripe'
     | '/facilities/$facilityId/enroll'
     | '/facilities/$facilityId/review'
     | '/_facility/facility/'
@@ -999,11 +846,6 @@ export interface FileRouteTypes {
     | '/_parent/parent/enrollments/$enrollmentId'
     | '/_parent/parent/messages/$conversationId'
     | '/_staff/staff/messages/$conversationId'
-    | '/api/mobile/children/$childId'
-    | '/api/mobile/notifications/read-all'
-    | '/api/mobile/notifications/unread-count'
-    | '/api/mobile/push/register'
-    | '/api/mobile/push/unregister'
     | '/_facility/facility/$facilityId/'
     | '/_facility/facility/messages/'
     | '/_parent/parent/billing/'
@@ -1011,8 +853,6 @@ export interface FileRouteTypes {
     | '/_parent/parent/documents/'
     | '/_parent/parent/messages/'
     | '/_staff/staff/messages/'
-    | '/api/mobile/children/'
-    | '/api/mobile/notifications/'
     | '/_facility/facility/$facilityId/documents/compliance'
     | '/_facility/facility/$facilityId/documents/send'
     | '/_facility/facility/$facilityId/documents/templates'
@@ -1020,9 +860,6 @@ export interface FileRouteTypes {
     | '/_parent/parent/children/$childId/activities'
     | '/_parent/parent/children/$childId/edit'
     | '/_parent/parent/children/$childId/photos'
-    | '/api/mobile/children/$childId/activities'
-    | '/api/mobile/children/$childId/daily-reports'
-    | '/api/mobile/notifications/$notificationId/read'
     | '/_facility/facility/$facilityId/billing/'
     | '/_facility/facility/$facilityId/documents/'
     | '/_facility/facility/$facilityId/billing/invoices/$invoiceId'
@@ -1040,20 +877,9 @@ export interface RootRouteChildren {
   DiscoverRoute: typeof DiscoverRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
   FacilitiesIndexRoute: typeof FacilitiesIndexRoute
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-  ApiMobileDashboardRoute: typeof ApiMobileDashboardRoute
-  ApiWebhooksStripeRoute: typeof ApiWebhooksStripeRoute
   FacilitiesFacilityIdEnrollRoute: typeof FacilitiesFacilityIdEnrollRoute
   FacilitiesFacilityIdReviewRoute: typeof FacilitiesFacilityIdReviewRoute
   FacilitiesFacilityIdIndexRoute: typeof FacilitiesFacilityIdIndexRoute
-  ApiMobileChildrenChildIdRoute: typeof ApiMobileChildrenChildIdRouteWithChildren
-  ApiMobileNotificationsReadAllRoute: typeof ApiMobileNotificationsReadAllRoute
-  ApiMobileNotificationsUnreadCountRoute: typeof ApiMobileNotificationsUnreadCountRoute
-  ApiMobilePushRegisterRoute: typeof ApiMobilePushRegisterRoute
-  ApiMobilePushUnregisterRoute: typeof ApiMobilePushUnregisterRoute
-  ApiMobileChildrenIndexRoute: typeof ApiMobileChildrenIndexRoute
-  ApiMobileNotificationsIndexRoute: typeof ApiMobileNotificationsIndexRoute
-  ApiMobileNotificationsNotificationIdReadRoute: typeof ApiMobileNotificationsNotificationIdReadRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1191,27 +1017,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FacilitiesFacilityIdEnrollRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/webhooks/stripe': {
-      id: '/api/webhooks/stripe'
-      path: '/api/webhooks/stripe'
-      fullPath: '/api/webhooks/stripe'
-      preLoaderRoute: typeof ApiWebhooksStripeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/mobile/dashboard': {
-      id: '/api/mobile/dashboard'
-      path: '/api/mobile/dashboard'
-      fullPath: '/api/mobile/dashboard'
-      preLoaderRoute: typeof ApiMobileDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_staff/staff/settings': {
       id: '/_staff/staff/settings'
       path: '/staff/settings'
@@ -1268,20 +1073,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FacilityFacilityNewRouteImport
       parentRoute: typeof FacilityRoute
     }
-    '/api/mobile/notifications/': {
-      id: '/api/mobile/notifications/'
-      path: '/api/mobile/notifications'
-      fullPath: '/api/mobile/notifications/'
-      preLoaderRoute: typeof ApiMobileNotificationsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/mobile/children/': {
-      id: '/api/mobile/children/'
-      path: '/api/mobile/children'
-      fullPath: '/api/mobile/children/'
-      preLoaderRoute: typeof ApiMobileChildrenIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_staff/staff/messages/': {
       id: '/_staff/staff/messages/'
       path: '/staff/messages'
@@ -1330,41 +1121,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/facility/$facilityId/'
       preLoaderRoute: typeof FacilityFacilityFacilityIdIndexRouteImport
       parentRoute: typeof FacilityRoute
-    }
-    '/api/mobile/push/unregister': {
-      id: '/api/mobile/push/unregister'
-      path: '/api/mobile/push/unregister'
-      fullPath: '/api/mobile/push/unregister'
-      preLoaderRoute: typeof ApiMobilePushUnregisterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/mobile/push/register': {
-      id: '/api/mobile/push/register'
-      path: '/api/mobile/push/register'
-      fullPath: '/api/mobile/push/register'
-      preLoaderRoute: typeof ApiMobilePushRegisterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/mobile/notifications/unread-count': {
-      id: '/api/mobile/notifications/unread-count'
-      path: '/api/mobile/notifications/unread-count'
-      fullPath: '/api/mobile/notifications/unread-count'
-      preLoaderRoute: typeof ApiMobileNotificationsUnreadCountRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/mobile/notifications/read-all': {
-      id: '/api/mobile/notifications/read-all'
-      path: '/api/mobile/notifications/read-all'
-      fullPath: '/api/mobile/notifications/read-all'
-      preLoaderRoute: typeof ApiMobileNotificationsReadAllRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/mobile/children/$childId': {
-      id: '/api/mobile/children/$childId'
-      path: '/api/mobile/children/$childId'
-      fullPath: '/api/mobile/children/$childId'
-      preLoaderRoute: typeof ApiMobileChildrenChildIdRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/_staff/staff/messages/$conversationId': {
       id: '/_staff/staff/messages/$conversationId'
@@ -1526,27 +1282,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/facility/$facilityId/billing/'
       preLoaderRoute: typeof FacilityFacilityFacilityIdBillingIndexRouteImport
       parentRoute: typeof FacilityRoute
-    }
-    '/api/mobile/notifications/$notificationId/read': {
-      id: '/api/mobile/notifications/$notificationId/read'
-      path: '/api/mobile/notifications/$notificationId/read'
-      fullPath: '/api/mobile/notifications/$notificationId/read'
-      preLoaderRoute: typeof ApiMobileNotificationsNotificationIdReadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/mobile/children/$childId/daily-reports': {
-      id: '/api/mobile/children/$childId/daily-reports'
-      path: '/daily-reports'
-      fullPath: '/api/mobile/children/$childId/daily-reports'
-      preLoaderRoute: typeof ApiMobileChildrenChildIdDailyReportsRouteImport
-      parentRoute: typeof ApiMobileChildrenChildIdRoute
-    }
-    '/api/mobile/children/$childId/activities': {
-      id: '/api/mobile/children/$childId/activities'
-      path: '/activities'
-      fullPath: '/api/mobile/children/$childId/activities'
-      preLoaderRoute: typeof ApiMobileChildrenChildIdActivitiesRouteImport
-      parentRoute: typeof ApiMobileChildrenChildIdRoute
     }
     '/_parent/parent/children/$childId/photos': {
       id: '/_parent/parent/children/$childId/photos'
@@ -1813,24 +1548,6 @@ const StaffRouteChildren: StaffRouteChildren = {
 
 const StaffRouteWithChildren = StaffRoute._addFileChildren(StaffRouteChildren)
 
-interface ApiMobileChildrenChildIdRouteChildren {
-  ApiMobileChildrenChildIdActivitiesRoute: typeof ApiMobileChildrenChildIdActivitiesRoute
-  ApiMobileChildrenChildIdDailyReportsRoute: typeof ApiMobileChildrenChildIdDailyReportsRoute
-}
-
-const ApiMobileChildrenChildIdRouteChildren: ApiMobileChildrenChildIdRouteChildren =
-  {
-    ApiMobileChildrenChildIdActivitiesRoute:
-      ApiMobileChildrenChildIdActivitiesRoute,
-    ApiMobileChildrenChildIdDailyReportsRoute:
-      ApiMobileChildrenChildIdDailyReportsRoute,
-  }
-
-const ApiMobileChildrenChildIdRouteWithChildren =
-  ApiMobileChildrenChildIdRoute._addFileChildren(
-    ApiMobileChildrenChildIdRouteChildren,
-  )
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
@@ -1840,22 +1557,9 @@ const rootRouteChildren: RootRouteChildren = {
   DiscoverRoute: DiscoverRoute,
   UnauthorizedRoute: UnauthorizedRoute,
   FacilitiesIndexRoute: FacilitiesIndexRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
-  ApiMobileDashboardRoute: ApiMobileDashboardRoute,
-  ApiWebhooksStripeRoute: ApiWebhooksStripeRoute,
   FacilitiesFacilityIdEnrollRoute: FacilitiesFacilityIdEnrollRoute,
   FacilitiesFacilityIdReviewRoute: FacilitiesFacilityIdReviewRoute,
   FacilitiesFacilityIdIndexRoute: FacilitiesFacilityIdIndexRoute,
-  ApiMobileChildrenChildIdRoute: ApiMobileChildrenChildIdRouteWithChildren,
-  ApiMobileNotificationsReadAllRoute: ApiMobileNotificationsReadAllRoute,
-  ApiMobileNotificationsUnreadCountRoute:
-    ApiMobileNotificationsUnreadCountRoute,
-  ApiMobilePushRegisterRoute: ApiMobilePushRegisterRoute,
-  ApiMobilePushUnregisterRoute: ApiMobilePushUnregisterRoute,
-  ApiMobileChildrenIndexRoute: ApiMobileChildrenIndexRoute,
-  ApiMobileNotificationsIndexRoute: ApiMobileNotificationsIndexRoute,
-  ApiMobileNotificationsNotificationIdReadRoute:
-    ApiMobileNotificationsNotificationIdReadRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { createFacility } from "@/lib/server/facilities";
+import { useCreateFacility } from "@daycare-hub/hooks";
 import { createFacilitySchema } from "@daycare-hub/shared";
 import {
   Button,
@@ -23,6 +23,7 @@ type Step = (typeof STEPS)[number];
 
 function CreateFacilityPage() {
   const navigate = useNavigate();
+  const createFacility = useCreateFacility();
   const [step, setStep] = useState<Step>("basic");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -65,7 +66,7 @@ function CreateFacilityPage() {
     }
     setSubmitting(true);
     try {
-      const facility = await createFacility({ data: form });
+      const facility = await createFacility.mutateAsync(form);
       navigate({
         to: "/facility/$facilityId/edit",
         params: { facilityId: facility.id },

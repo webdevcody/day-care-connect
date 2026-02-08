@@ -1,18 +1,16 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "@/lib/auth-client";
-import { updateProfile, changePassword } from "@/lib/server/account";
 import {
-  getNotificationPreferences,
-  updateNotificationPreferences,
-  getQuietHours,
-  updateQuietHours,
-} from "@/lib/server/notifications";
-import {
-  getUserRoles,
-  activateRole,
-  deactivateRole,
-} from "@/lib/server/user-roles";
+  useUpdateProfile,
+  useChangePassword,
+  useNotificationPreferences,
+  useUpdateNotificationPreferences,
+  useQuietHours,
+  useUpdateQuietHours,
+  useUserRoles,
+  useActivateRole,
+  useDeactivateRole,
+} from "@daycare-hub/hooks";
 import { NOTIFICATION_TYPES, USER_ROLES, USER_ROLE_LABELS } from "@daycare-hub/shared";
 import type { UserRole } from "@daycare-hub/shared";
 import { NOTIFICATION_TYPE_LABELS } from "@/lib/notification-templates";
@@ -73,30 +71,26 @@ export function SettingsPageContent() {
 function ProfileForm() {
   const { data: session } = useSession();
   const user = session?.user as any;
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  const updateProfileMutation = useUpdateProfile();
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading(true);
     setMessage("");
     setError("");
 
     const formData = new FormData(e.currentTarget);
     try {
-      await updateProfile({
-        data: {
-          firstName: formData.get("firstName") as string,
-          lastName: formData.get("lastName") as string,
-          phone: (formData.get("phone") as string) || "",
-        },
+      await updateProfileMutation.mutateAsync({
+        firstName: formData.get("firstName") as string,
+        lastName: formData.get("lastName") as string,
+        phone: (formData.get("phone") as string) || "",
       });
       setMessage("Profile updated successfully.");
     } catch (err: any) {
       setError(err.message || "Failed to update profile");
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -152,8 +146,8 @@ function ProfileForm() {
               Email cannot be changed.
             </p>
           </div>
-          <Button type="submit" disabled={loading}>
-            {loading ? "Saving..." : "Save Changes"}
+          <Button type="submit" disabled={updateProfileMutation.isPending}>
+            {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
           </Button>
         </form>
       </CardContent>
@@ -162,13 +156,13 @@ function ProfileForm() {
 }
 
 function PasswordForm() {
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  const changePasswordMutation = useChangePassword();
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading(true);
     setMessage("");
     setError("");
 
@@ -179,18 +173,15 @@ function PasswordForm() {
 
     if (newPassword !== confirmPassword) {
       setError("New passwords do not match");
-      setLoading(false);
       return;
     }
 
     try {
-      await changePassword({ data: { currentPassword, newPassword } });
+      await changePasswordMutation.mutateAsync({ currentPassword, newPassword });
       setMessage("Password changed successfully.");
       (e.target as HTMLFormElement).reset();
     } catch (err: any) {
       setError(err.message || "Failed to change password");
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -236,8 +227,8 @@ function PasswordForm() {
               minLength={8}
             />
           </div>
-          <Button type="submit" disabled={loading}>
-            {loading ? "Changing..." : "Change Password"}
+          <Button type="submit" disabled={changePasswordMutation.isPending}>
+            {changePasswordMutation.isPending ? "Changing..." : "Change Password"}
           </Button>
         </form>
       </CardContent>
@@ -246,18 +237,10 @@ function PasswordForm() {
 }
 
 function NotificationPreferencesForm() {
-  const queryClient = useQueryClient();
   const [message, setMessage] = useState("");
 
-  const { data: prefs, isLoading: prefsLoading } = useQuery({
-    queryKey: ["notification-preferences"],
-    queryFn: () => getNotificationPreferences(),
-  });
-
-  const { data: qh, isLoading: qhLoading } = useQuery({
-    queryKey: ["quiet-hours"],
-    queryFn: () => getQuietHours(),
-  });
+  const { data: prefs, isLoading: prefsLoading } = useNotificationPreferences();
+  const { data: qh, isLoading: qhLoading } = useQuietHours();
 
   const [quietHoursForm, setQuietHoursForm] = useState({
     isEnabled: false,
@@ -278,25 +261,8 @@ function NotificationPreferencesForm() {
     setQhSynced(true);
   }
 
-  const prefsMutation = useMutation({
-    mutationFn: (preferences: Array<{ notificationType: string; inAppEnabled: boolean }>) =>
-      updateNotificationPreferences({ data: { preferences: preferences as any } }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notification-preferences"] });
-      setMessage("Preferences saved.");
-      setTimeout(() => setMessage(""), 3000);
-    },
-  });
-
-  const qhMutation = useMutation({
-    mutationFn: (form: typeof quietHoursForm) =>
-      updateQuietHours({ data: form }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["quiet-hours"] });
-      setMessage("Quiet hours saved.");
-      setTimeout(() => setMessage(""), 3000);
-    },
-  });
+  const prefsMutation = useUpdateNotificationPreferences();
+  const qhMutation = useUpdateQuietHours();
 
   function isEnabled(type: string): boolean {
     const pref = prefs?.find((p) => p.notificationType === type);
@@ -304,7 +270,15 @@ function NotificationPreferencesForm() {
   }
 
   function handleToggle(type: string, enabled: boolean) {
-    prefsMutation.mutate([{ notificationType: type, inAppEnabled: enabled }]);
+    prefsMutation.mutate(
+      [{ notificationType: type, inAppEnabled: enabled }],
+      {
+        onSuccess: () => {
+          setMessage("Preferences saved.");
+          setTimeout(() => setMessage(""), 3000);
+        },
+      }
+    );
   }
 
   if (prefsLoading || qhLoading) {
@@ -433,7 +407,14 @@ function NotificationPreferencesForm() {
             )}
 
             <Button
-              onClick={() => qhMutation.mutate(quietHoursForm)}
+              onClick={() =>
+                qhMutation.mutate(quietHoursForm, {
+                  onSuccess: () => {
+                    setMessage("Quiet hours saved.");
+                    setTimeout(() => setMessage(""), 3000);
+                  },
+                })
+              }
               disabled={qhMutation.isPending}
             >
               {qhMutation.isPending ? "Saving..." : "Save Quiet Hours"}
@@ -458,26 +439,9 @@ const ROLE_DESCRIPTIONS: Record<string, string> = {
 };
 
 function RolesManager() {
-  const queryClient = useQueryClient();
-
-  const { data: roleData, isLoading } = useQuery({
-    queryKey: ["user-roles"],
-    queryFn: () => getUserRoles(),
-  });
-
-  const activateMutation = useMutation({
-    mutationFn: (role: string) => activateRole({ data: { role } }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user-roles"] });
-    },
-  });
-
-  const deactivateMutation = useMutation({
-    mutationFn: (role: string) => deactivateRole({ data: { role } }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user-roles"] });
-    },
-  });
+  const { data: roleData, isLoading } = useUserRoles();
+  const activateMutation = useActivateRole();
+  const deactivateMutation = useDeactivateRole();
 
   if (isLoading) {
     return (

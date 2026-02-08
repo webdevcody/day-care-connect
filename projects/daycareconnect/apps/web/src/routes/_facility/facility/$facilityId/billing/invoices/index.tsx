@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import {
@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@daycare-hub/ui";
-import { getFacilityInvoices, sendInvoice, voidInvoice } from "@/lib/server/admin-billing";
+import { useAdminInvoices, useSendInvoice, useVoidInvoice } from "@daycare-hub/hooks";
 
 const STATUS_TABS = ["all", "draft", "sent", "paid", "overdue", "void"] as const;
 
@@ -31,27 +31,25 @@ export const Route = createFileRoute(
   validateSearch: (search: Record<string, unknown>) => ({
     status: (search.status as string) || "all",
   }),
-  loaderDeps: ({ search }) => ({ status: search.status }),
-  loader: ({ params, deps }) =>
-    getFacilityInvoices({
-      data: { facilityId: params.facilityId, status: deps.status },
-    }),
   component: InvoiceListPage,
 });
 
 function InvoiceListPage() {
-  const invoicesList = Route.useLoaderData();
   const { facilityId } = Route.useParams();
   const { status: activeTab } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const router = useRouter();
+  const statusFilter = activeTab === "all" ? undefined : activeTab;
+  const { data: invoicesList = [], isLoading } = useAdminInvoices(facilityId, statusFilter);
+  const sendInvoice = useSendInvoice();
+  const voidInvoice = useVoidInvoice();
   const [loading, setLoading] = useState<string | null>(null);
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
 
   const handleSend = async (invoiceId: string) => {
     setLoading(invoiceId);
     try {
-      await sendInvoice({ data: { invoiceId } });
-      router.invalidate();
+      await sendInvoice.mutateAsync(invoiceId);
     } catch (err) {
       console.error("Failed to send invoice:", err);
     } finally {
@@ -63,8 +61,7 @@ function InvoiceListPage() {
     if (!confirm("Are you sure you want to void this invoice?")) return;
     setLoading(invoiceId);
     try {
-      await voidInvoice({ data: { invoiceId } });
-      router.invalidate();
+      await voidInvoice.mutateAsync(invoiceId);
     } catch (err) {
       console.error("Failed to void invoice:", err);
     } finally {

@@ -1,7 +1,11 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { getFacility } from "@/lib/server/facilities";
-import { addFacilityPhoto, deleteFacilityPhoto, reorderFacilityPhotos } from "@/lib/server/facility-photos";
+import {
+  useFacility,
+  useAddFacilityPhoto,
+  useDeleteFacilityPhoto,
+  useReorderFacilityPhotos,
+} from "@daycare-hub/hooks";
 import { FacilitySubNav } from "@/components/admin/facility-sub-nav";
 import {
   Button,
@@ -21,30 +25,33 @@ import {
 export const Route = createFileRoute(
   "/_facility/facility/$facilityId/photos"
 )({
-  loader: ({ params }) => getFacility({ data: { facilityId: params.facilityId } }),
   component: FacilityPhotosPage,
 });
 
 function FacilityPhotosPage() {
-  const facility = Route.useLoaderData();
   const { facilityId } = Route.useParams();
-  const router = useRouter();
+  const { data: facility, isLoading } = useFacility(facilityId);
+  const addFacilityPhoto = useAddFacilityPhoto();
+  const deleteFacilityPhoto = useDeleteFacilityPhoto();
+  const reorderFacilityPhotos = useReorderFacilityPhotos();
   const [error, setError] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [url, setUrl] = useState("");
   const [altText, setAltText] = useState("");
   const [adding, setAdding] = useState(false);
 
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (!facility) return null;
+
   const handleAdd = async () => {
     if (!url) return;
     setError("");
     setAdding(true);
     try {
-      await addFacilityPhoto({ data: { facilityId, url, altText } });
+      await addFacilityPhoto.mutateAsync({ facilityId, data: { url, altText } });
       setUrl("");
       setAltText("");
       setDialogOpen(false);
-      router.invalidate();
     } catch (err: any) {
       setError(err.message || "Failed to add photo");
     } finally {
@@ -55,8 +62,7 @@ function FacilityPhotosPage() {
   const handleDelete = async (photoId: string) => {
     if (!confirm("Delete this photo?")) return;
     try {
-      await deleteFacilityPhoto({ data: { facilityId, photoId } });
-      router.invalidate();
+      await deleteFacilityPhoto.mutateAsync({ facilityId, photoId });
     } catch (err: any) {
       setError(err.message || "Failed to delete photo");
     }
@@ -68,8 +74,7 @@ function FacilityPhotosPage() {
     if (target < 0 || target >= photos.length) return;
     [photos[index], photos[target]] = [photos[target], photos[index]];
     try {
-      await reorderFacilityPhotos({ data: { facilityId, photoIds: photos.map((p) => p.id) } });
-      router.invalidate();
+      await reorderFacilityPhotos.mutateAsync({ facilityId, photoIds: photos.map((p) => p.id) });
     } catch (err: any) {
       setError(err.message || "Failed to reorder");
     }

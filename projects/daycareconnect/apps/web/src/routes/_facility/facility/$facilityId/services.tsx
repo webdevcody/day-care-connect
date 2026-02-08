@@ -1,7 +1,6 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
-import { getFacility } from "@/lib/server/facilities";
-import { updateFacilityServices } from "@/lib/server/facility-services";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { useFacility, useUpdateFacilityServices } from "@daycare-hub/hooks";
 import { FacilitySubNav } from "@/components/admin/facility-sub-nav";
 import { FACILITY_SERVICES_SUGGESTIONS } from "@daycare-hub/shared";
 import {
@@ -17,20 +16,26 @@ import {
 export const Route = createFileRoute(
   "/_facility/facility/$facilityId/services"
 )({
-  loader: ({ params }) => getFacility({ data: { facilityId: params.facilityId } }),
   component: FacilityServicesPage,
 });
 
 function FacilityServicesPage() {
-  const facility = Route.useLoaderData();
   const { facilityId } = Route.useParams();
-  const router = useRouter();
-  const [services, setServices] = useState<string[]>(
-    facility.services.map((s) => s.serviceName)
-  );
+  const { data: facility, isLoading } = useFacility(facilityId);
+  const updateFacilityServices = useUpdateFacilityServices();
+  const [services, setServices] = useState<string[]>([]);
   const [custom, setCustom] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (facility) {
+      setServices(facility.services.map((s) => s.serviceName));
+    }
+  }, [facility]);
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (!facility) return null;
 
   const toggle = (name: string) => {
     setServices((prev) =>
@@ -49,8 +54,7 @@ function FacilityServicesPage() {
     setError("");
     setSaving(true);
     try {
-      await updateFacilityServices({ data: { facilityId, services } });
-      router.invalidate();
+      await updateFacilityServices.mutateAsync({ facilityId, services });
     } catch (err: any) {
       setError(err.message || "Failed to save services");
     } finally {

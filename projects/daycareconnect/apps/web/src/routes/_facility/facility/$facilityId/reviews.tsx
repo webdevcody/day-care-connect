@@ -1,15 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { RatingSummary } from "@/components/reviews/rating-summary";
 import { ReviewCard } from "@/components/reviews/review-card";
 import { ReviewResponseDialog } from "@/components/reviews/review-response-dialog";
 import {
-  getAdminFacilityReviews,
-  getReviewSummary,
-  createReviewResponse,
-  updateReviewResponse,
-} from "@/lib/server/reviews";
+  useAdminFacilityReviews,
+  useCreateReviewResponse,
+  useUpdateReviewResponse,
+} from "@daycare-hub/hooks";
 import { Card, CardContent } from "@daycare-hub/ui";
 
 export const Route = createFileRoute(
@@ -20,62 +19,29 @@ export const Route = createFileRoute(
 
 function AdminReviewsPage() {
   const { facilityId } = Route.useParams();
-  const [reviews, setReviews] = useState<Awaited<ReturnType<typeof getAdminFacilityReviews>>>([]);
-  const [summary, setSummary] = useState<Awaited<ReturnType<typeof getReviewSummary>> | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading: loading } = useAdminFacilityReviews(facilityId);
+  const createReviewResponse = useCreateReviewResponse();
+  const updateReviewResponse = useUpdateReviewResponse();
   const [respondingTo, setRespondingTo] = useState<{ reviewId: string; existingBody?: string; responseId?: string } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      getAdminFacilityReviews({ data: { facilityId } }),
-      getReviewSummary({ data: { facilityId } }),
-    ])
-      .then(([reviewData, summaryData]) => {
-        setReviews(reviewData);
-        setSummary(summaryData);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [facilityId]);
+  const reviews = data?.reviews ?? [];
+  const summary = data?.summary ?? null;
 
   async function handleSaveResponse(body: string) {
     if (!respondingTo) return;
     setIsSaving(true);
     try {
       if (respondingTo.responseId) {
-        const updated = await updateReviewResponse({
-          data: { responseId: respondingTo.responseId, body },
+        await updateReviewResponse.mutateAsync({
+          responseId: respondingTo.responseId,
+          body,
         });
-        setReviews((prev) =>
-          prev.map((r) =>
-            r.id === respondingTo.reviewId && r.response
-              ? { ...r, response: { ...r.response, body: updated.body } }
-              : r
-          )
-        );
       } else {
-        const created = await createReviewResponse({
-          data: { reviewId: respondingTo.reviewId, body },
+        await createReviewResponse.mutateAsync({
+          reviewId: respondingTo.reviewId,
+          body,
         });
-        setReviews((prev) =>
-          prev.map((r) =>
-            r.id === respondingTo.reviewId
-              ? {
-                  ...r,
-                  response: {
-                    id: created.id,
-                    body: created.body,
-                    responderName: "You",
-                    responderId: "",
-                    reviewId: respondingTo.reviewId,
-                    createdAt: created.createdAt,
-                  },
-                }
-              : r
-          )
-        );
       }
       setRespondingTo(null);
     } catch (err) {

@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ReviewCard } from "./review-card";
 import { Button } from "@daycare-hub/ui";
-import { getReviews, deleteReview, reportReview } from "@/lib/server/reviews";
+import { useReviews, useDeleteReview, useReportReview } from "@daycare-hub/hooks";
 import type { ReviewSortOption } from "@daycare-hub/shared";
 
 interface ReviewListProps {
@@ -14,47 +14,28 @@ interface ReviewListProps {
 export function ReviewList({ facilityId, currentUserId, ratingFilter, onFilterChange }: ReviewListProps) {
   const [sort, setSort] = useState<ReviewSortOption>("recent");
   const [page, setPage] = useState(1);
-  const [data, setData] = useState<Awaited<ReturnType<typeof getReviews>> | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setLoading(true);
-    getReviews({
-      data: {
-        facilityId,
-        sort,
-        rating: ratingFilter,
-        page,
-        limit: 10,
-      },
-    })
-      .then(setData)
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [facilityId, sort, ratingFilter, page]);
+  const { data, isLoading } = useReviews({
+    facilityId,
+    sort,
+    rating: ratingFilter,
+    page,
+    limit: 10,
+  });
+
+  const deleteReviewMutation = useDeleteReview();
+  const reportReviewMutation = useReportReview();
 
   function handleDelete(reviewId: string) {
     if (!confirm("Are you sure you want to delete this review?")) return;
-    deleteReview({ data: { reviewId } })
-      .then(() => {
-        setData((prev) =>
-          prev
-            ? {
-                ...prev,
-                reviews: prev.reviews.filter((r) => r.id !== reviewId),
-                totalCount: prev.totalCount - 1,
-              }
-            : prev
-        );
-      })
-      .catch(console.error);
+    deleteReviewMutation.mutateAsync(reviewId).catch(console.error);
   }
 
   function handleReport(reviewId: string) {
-    reportReview({ data: { reviewId } }).catch(console.error);
+    reportReviewMutation.mutateAsync(reviewId).catch(console.error);
   }
 
-  if (loading) {
+  if (isLoading) {
     return <p className="py-8 text-center text-muted-foreground">Loading reviews...</p>;
   }
 

@@ -1,19 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  useInfiniteQuery,
-} from "@tanstack/react-query";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useSession } from "@/lib/auth-client";
 import {
-  getConversationDetail,
-  getMessages,
-  sendMessage,
-  markConversationRead,
-  toggleMuteConversation,
-} from "@/lib/server/messaging";
+  useConversationDetail,
+  useMessages,
+  useSendMessage,
+  useMarkConversationRead,
+  useToggleMuteConversation,
+} from "@daycare-hub/hooks";
 import { MessageBubble } from "@/components/messaging/message-bubble";
 import { MessageInput } from "@/components/messaging/message-input";
 import { Button } from "@daycare-hub/ui";
@@ -26,45 +20,30 @@ export function ConversationPageContent({
   messagesBasePath: string;
 }) {
   const { data: session } = useSession();
-  const queryClient = useQueryClient();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const userId = session?.user?.id;
   const role = (session?.user as any)?.role;
 
-  const { data: conversation } = useQuery({
-    queryKey: ["conversation-detail", conversationId],
-    queryFn: () => getConversationDetail({ data: { conversationId } }),
-  });
+  const { data: conversation } = useConversationDetail(conversationId);
 
   const {
     data: messagesData,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["messages", conversationId],
-    queryFn: ({ pageParam }) =>
-      getMessages({
-        data: {
-          conversationId,
-          cursor: pageParam ?? undefined,
-          limit: 50,
-        },
-      }),
-    initialPageParam: null as string | null,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    refetchInterval: 5_000,
-  });
+  } = useMessages(conversationId);
+
+  const markReadMutation = useMarkConversationRead();
+  const sendMutation = useSendMessage();
+  const muteMutation = useToggleMuteConversation();
 
   // Mark conversation as read on mount
   useEffect(() => {
-    markConversationRead({ data: { conversationId } }).then(() => {
-      queryClient.invalidateQueries({ queryKey: ["conversations"] });
-      queryClient.invalidateQueries({ queryKey: ["unread-messages-count"] });
-    });
-  }, [conversationId, queryClient]);
+    markReadMutation.mutate(conversationId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId]);
 
   // Flatten messages (they come newest-first per page, reverse to show oldest-first)
   const allMessages =
@@ -100,26 +79,6 @@ export function ConversationPageContent({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const sendMutation = useMutation({
-    mutationFn: (content: string) =>
-      sendMessage({ data: { conversationId, content } }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
-      queryClient.invalidateQueries({ queryKey: ["conversations"] });
-    },
-  });
-
-  const muteMutation = useMutation({
-    mutationFn: (isMuted: boolean) =>
-      toggleMuteConversation({ data: { conversationId, isMuted } }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["conversation-detail", conversationId],
-      });
-      queryClient.invalidateQueries({ queryKey: ["conversations"] });
-    },
-  });
-
   const otherName = conversation
     ? role === "parent" || role === "staff"
       ? conversation.facilityName
@@ -148,7 +107,12 @@ export function ConversationPageContent({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => muteMutation.mutate(!conversation.isMuted)}
+            onClick={() =>
+              muteMutation.mutate({
+                conversationId,
+                isMuted: !conversation.isMuted,
+              })
+            }
             disabled={muteMutation.isPending}
           >
             {conversation.isMuted ? "Unmute" : "Mute"}
@@ -228,7 +192,9 @@ export function ConversationPageContent({
 
       {/* Input */}
       <MessageInput
-        onSend={(content) => sendMutation.mutate(content)}
+        onSend={(content) =>
+          sendMutation.mutate({ conversationId, content })
+        }
         disabled={sendMutation.isPending}
       />
     </div>

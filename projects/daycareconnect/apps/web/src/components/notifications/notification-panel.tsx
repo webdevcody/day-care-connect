@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, ScrollArea } from "@daycare-hub/ui";
-import { getNotifications, markAllNotificationsRead } from "@/lib/server/notifications";
+import { useNotifications, useMarkAllNotificationsRead } from "@daycare-hub/hooks";
 import { NotificationItem } from "./notification-item";
 import { useSession } from "@/lib/auth-client";
 import { ROLE_DASHBOARD_PATHS } from "@daycare-hub/shared";
@@ -12,25 +11,14 @@ interface NotificationPanelProps {
 }
 
 export function NotificationPanel({ onClose }: NotificationPanelProps) {
-  const queryClient = useQueryClient();
   const { data: session } = useSession();
   const role = ((session?.user as any)?.role || "parent") as UserRole;
   const basePath = ROLE_DASHBOARD_PATHS[role] || "/parent";
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["notifications", "panel"],
-    queryFn: () => getNotifications({ data: { limit: 20 } }),
-  });
+  const { data, isLoading } = useNotifications();
+  const markAllReadMutation = useMarkAllNotificationsRead();
 
-  const markAllReadMutation = useMutation({
-    mutationFn: () => markAllNotificationsRead(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      queryClient.invalidateQueries({ queryKey: ["unread-notifications-count"] });
-    },
-  });
-
-  const items = data?.notifications ?? [];
+  const items = data?.pages.flatMap((p) => p.notifications).slice(0, 20) ?? [];
 
   return (
     <div className="w-80 bg-background rounded-lg">
@@ -39,7 +27,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => markAllReadMutation.mutate()}
+          onClick={() => markAllReadMutation.mutate(undefined)}
           disabled={markAllReadMutation.isPending}
         >
           Mark all read

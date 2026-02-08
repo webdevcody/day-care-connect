@@ -1,9 +1,11 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useSession } from "@/lib/auth-client";
-import { getConversations, createOrGetConversation } from "@/lib/server/messaging";
-import { getMyEnrollments } from "@/lib/server/enrollments";
+import {
+  useConversations,
+  useCreateOrGetConversation,
+  useEnrollments,
+} from "@daycare-hub/hooks";
 import { ConversationItem } from "@/components/messaging/conversation-item";
 import {
   Button,
@@ -21,11 +23,7 @@ export function MessagesPage({ messagesBasePath }: { messagesBasePath: string })
   const role = (session?.user as any)?.role;
   const isParent = role === "parent";
 
-  const { data: conversations, isLoading } = useQuery({
-    queryKey: ["conversations", search],
-    queryFn: () => getConversations({ data: { search: search || undefined } }),
-    refetchInterval: 10_000,
-  });
+  const { data: conversations, isLoading } = useConversations(search || undefined);
 
   return (
     <div className="mx-auto max-w-2xl p-6">
@@ -89,26 +87,22 @@ export function MessagesPage({ messagesBasePath }: { messagesBasePath: string })
 function NewConversationDialog({ messagesBasePath }: { messagesBasePath: string }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
-  const { data: enrollments, isLoading } = useQuery({
-    queryKey: ["my-enrollments-for-messaging"],
-    queryFn: () => getMyEnrollments(),
-    enabled: open,
-  });
+  const { data: enrollments, isLoading } = useEnrollments();
+  const createMutation = useCreateOrGetConversation();
 
-  const createMutation = useMutation({
-    mutationFn: (facilityId: string) =>
-      createOrGetConversation({ data: { facilityId } }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+  async function handleCreate(facilityId: string) {
+    try {
+      const data = await createMutation.mutateAsync({ facilityId });
       setOpen(false);
       navigate({
         to: `${messagesBasePath}/$conversationId`,
         params: { conversationId: data.conversationId },
       });
-    },
-  });
+    } catch {
+      // Mutation error is handled by react-query
+    }
+  }
 
   // Deduplicate facilities from active/approved enrollments
   const facilityMap = new Map<string, string>();
@@ -147,7 +141,7 @@ function NewConversationDialog({ messagesBasePath }: { messagesBasePath: string 
             {uniqueFacilities.map(([facilityId, facilityName]) => (
               <button
                 key={facilityId}
-                onClick={() => createMutation.mutate(facilityId)}
+                onClick={() => handleCreate(facilityId)}
                 disabled={createMutation.isPending}
                 className="flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-accent"
               >

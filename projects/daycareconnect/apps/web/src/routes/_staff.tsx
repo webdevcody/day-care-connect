@@ -1,5 +1,4 @@
 import { createFileRoute, Outlet, Link } from "@tanstack/react-router";
-import { staffMiddleware } from "@/lib/middleware";
 import { useSession, signOut } from "@/lib/auth-client";
 import { APP_NAME } from "@daycare-hub/shared";
 import { Button } from "@daycare-hub/ui";
@@ -10,9 +9,6 @@ import { RoleSwitcher } from "@/components/role-switcher";
 import { Briefcase, Bell, Settings } from "lucide-react";
 
 export const Route = createFileRoute("/_staff")({
-  server: {
-    middleware: [staffMiddleware],
-  },
   component: StaffLayout,
 });
 

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { getFacilityRoster, exportRosterCsv } from "@/lib/server/admin-roster";
+import { useState, useMemo } from "react";
+import { useAdminRoster, useExportRosterCsv } from "@daycare-hub/hooks";
 import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import {
   Card,
@@ -19,38 +19,33 @@ import {
 export const Route = createFileRoute(
   "/_facility/facility/$facilityId/roster"
 )({
-  loader: ({ params }) =>
-    getFacilityRoster({ data: { facilityId: params.facilityId } }),
   component: RosterPage,
 });
 
 function RosterPage() {
-  const initialRoster = Route.useLoaderData();
   const { facilityId } = Route.useParams();
+  const { data: rosterData = [], isLoading } = useAdminRoster(facilityId);
+  const exportRosterCsv = useExportRosterCsv();
   const [search, setSearch] = useState("");
-  const [roster, setRoster] = useState(initialRoster);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
 
-  useEffect(() => {
-    if (!search.trim()) {
-      setRoster(initialRoster);
-      return;
-    }
+  const roster = useMemo(() => {
+    if (!search.trim()) return rosterData;
     const term = search.toLowerCase();
-    setRoster(
-      initialRoster.filter(
-        (r) =>
-          r.childFirstName.toLowerCase().includes(term) ||
-          r.childLastName.toLowerCase().includes(term)
-      )
+    return rosterData.filter(
+      (r) =>
+        r.childFirstName.toLowerCase().includes(term) ||
+        r.childLastName.toLowerCase().includes(term)
     );
-  }, [search, initialRoster]);
+  }, [search, rosterData]);
+
+  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
 
   const handleExport = async () => {
     setExporting(true);
     try {
-      const csv = await exportRosterCsv({ data: { facilityId } });
+      const csv = await exportRosterCsv.mutateAsync(facilityId);
       const blob = new Blob([csv], { type: "text/csv" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -145,7 +140,7 @@ function RosterPage() {
                         {child.scheduleType.replace("_", " ")}
                       </TableCell>
                       <TableCell className="text-sm">
-                        {child.startDate || "—"}
+                        {child.startDate || "\u2014"}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
@@ -167,10 +162,10 @@ function RosterPage() {
                                 Emergency Contact
                               </p>
                               <p className="text-sm">
-                                {child.childEmergencyContactName || "—"}
+                                {child.childEmergencyContactName || "\u2014"}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {child.childEmergencyContactPhone || "—"}
+                                {child.childEmergencyContactPhone || "\u2014"}
                               </p>
                             </div>
                             <div>
@@ -179,7 +174,7 @@ function RosterPage() {
                               </p>
                               <p className="text-sm">{child.parentEmail}</p>
                               <p className="text-sm text-muted-foreground">
-                                {child.parentPhone || "—"}
+                                {child.parentPhone || "\u2014"}
                               </p>
                             </div>
                             {child.childAllergies && (
