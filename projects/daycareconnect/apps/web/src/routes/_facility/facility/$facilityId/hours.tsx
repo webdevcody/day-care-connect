@@ -2,19 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useFacility, useUpdateFacilityHours } from "@daycare-hub/hooks";
 import { DAYS_OF_WEEK } from "@daycare-hub/shared";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Input,
-  Label,
-} from "@daycare-hub/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@daycare-hub/ui";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/hours"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/hours")({
   component: FacilityHoursPage,
 });
 
@@ -40,7 +30,11 @@ function FacilityHoursPage() {
         DAYS_OF_WEEK.map((_, i) => {
           const existing = facility.hours.find((h) => h.dayOfWeek === i);
           if (existing) {
-            return { closed: false, openTime: existing.openTime.slice(0, 5), closeTime: existing.closeTime.slice(0, 5) };
+            return {
+              closed: false,
+              openTime: existing.openTime.slice(0, 5),
+              closeTime: existing.closeTime.slice(0, 5),
+            };
           }
           return { closed: true, openTime: "07:00", closeTime: "18:00" };
         })
@@ -48,13 +42,16 @@ function FacilityHoursPage() {
     }
   }, [facility]);
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
   if (!facility) return null;
 
   const updateDay = (index: number, field: keyof DaySchedule, value: string | boolean) => {
-    setSchedule((prev) =>
-      prev.map((day, i) => (i === index ? { ...day, [field]: value } : day))
-    );
+    setSchedule((prev) => prev.map((day, i) => (i === index ? { ...day, [field]: value } : day)));
   };
 
   const handleSave = async () => {

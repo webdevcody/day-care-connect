@@ -1,14 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer } from "better-auth/plugins";
-import {
-  db,
-  users,
-  sessions,
-  accounts,
-  verifications,
-  userRoles,
-} from "@daycare-hub/db";
+import { db, users, sessions, accounts, verifications, userRoles } from "@daycare-hub/db";
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:4000",
@@ -48,6 +41,32 @@ export const auth = betterAuth({
         required: false,
         input: true,
       },
+      address: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      city: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      state: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      zipCode: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      onboardingCompleted: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+        input: true,
+      },
     },
   },
   databaseHooks: {
@@ -65,10 +84,7 @@ export const auth = betterAuth({
         },
         after: async (user) => {
           const role = (user as any).role || "parent";
-          await db
-            .insert(userRoles)
-            .values({ userId: user.id, role })
-            .onConflictDoNothing();
+          await db.insert(userRoles).values({ userId: user.id, role }).onConflictDoNothing();
         },
       },
     },

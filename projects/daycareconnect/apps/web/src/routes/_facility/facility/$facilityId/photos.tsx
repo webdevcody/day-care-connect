@@ -16,14 +16,13 @@ import {
   Label,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@daycare-hub/ui";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/photos"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/photos")({
   component: FacilityPhotosPage,
 });
 
@@ -39,7 +38,12 @@ function FacilityPhotosPage() {
   const [altText, setAltText] = useState("");
   const [adding, setAdding] = useState(false);
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
   if (!facility) return null;
 
   const handleAdd = async () => {
@@ -84,9 +88,7 @@ function FacilityPhotosPage() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Photos</h1>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">
-            {facility.photos.length}/20
-          </span>
+          <span className="text-sm text-muted-foreground">{facility.photos.length}/20</span>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button disabled={facility.photos.length >= 20}>Add Photo</Button>
@@ -94,15 +96,26 @@ function FacilityPhotosPage() {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Add Photo</DialogTitle>
+                <DialogDescription>Upload a new photo for your facility.</DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="photo-url">Image URL *</Label>
-                  <Input id="photo-url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://..." />
+                  <Input
+                    id="photo-url"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="https://..."
+                  />
                 </div>
                 <div>
                   <Label htmlFor="photo-alt">Alt Text</Label>
-                  <Input id="photo-alt" value={altText} onChange={(e) => setAltText(e.target.value)} placeholder="Description of the image" />
+                  <Input
+                    id="photo-alt"
+                    value={altText}
+                    onChange={(e) => setAltText(e.target.value)}
+                    placeholder="Description of the image"
+                  />
                 </div>
                 {error && <p className="text-sm text-destructive">{error}</p>}
                 <Button onClick={handleAdd} disabled={adding} className="w-full">

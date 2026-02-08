@@ -22,16 +22,15 @@ import {
   Checkbox,
 } from "@daycare-hub/ui";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/documents/send"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/documents/send")({
   component: SendDocumentPage,
 });
 
 function SendDocumentPage() {
   const { facilityId } = Route.useParams();
   const navigate = useNavigate();
-  const { data: allTemplates = [], isLoading: templatesLoading } = useAdminDocumentTemplates(facilityId);
+  const { data: allTemplates = [], isLoading: templatesLoading } =
+    useAdminDocumentTemplates(facilityId);
   const { data: parents = [], isLoading: parentsLoading } = useAdminDocumentParents(facilityId);
   const sendDocument = useSendDocument();
   const sendBulkDocument = useSendBulkDocument();
@@ -45,7 +44,12 @@ function SendDocumentPage() {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  if (templatesLoading || parentsLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (templatesLoading || parentsLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
 
   const selectedTemplate = templates.find((t) => t.id === selectedTemplateId);
 
@@ -87,8 +91,7 @@ function SendDocumentPage() {
     }
   };
 
-  const canSend =
-    selectedTemplateId && (sendToAll || selectedParentIds.size > 0);
+  const canSend = selectedTemplateId && (sendToAll || selectedParentIds.size > 0);
 
   return (
     <div>
@@ -183,11 +186,7 @@ function SendDocumentPage() {
             </CardContent>
           </Card>
 
-          <Button
-            className="w-full"
-            onClick={handleSend}
-            disabled={!canSend || loading}
-          >
+          <Button className="w-full" onClick={handleSend} disabled={!canSend || loading}>
             {loading ? "Sending..." : "Send Document"}
           </Button>
         </div>

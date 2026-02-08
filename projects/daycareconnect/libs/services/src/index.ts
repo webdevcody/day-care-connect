@@ -13,6 +13,7 @@ export * as documentsService from "./documents";
 export * as billingService from "./billing";
 export * as reviewsService from "./reviews";
 export * as userRolesService from "./user-roles";
+export * as onboardingService from "./onboarding";
 
 export * as adminDashboardService from "./admin/dashboard";
 export * as adminAttendanceService from "./admin/attendance";
@@ -26,5 +27,7 @@ export * as adminRosterService from "./admin/roster";
 export * as adminStripeService from "./admin/stripe";
 export * as adminReportTemplatesService from "./admin/report-templates";
 export * as adminInvitesService from "./admin/invites";
+export * as adminEmailsService from "./admin/emails";
+export * as adminMessagingService from "./admin/messaging";
 export * as invitesService from "./invites";
 export * as uploadsService from "./uploads";

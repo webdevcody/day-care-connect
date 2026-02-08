@@ -82,3 +82,34 @@ export async function getStaffPermissions(facilityId: string, staffId: string) {
 export async function updateStaffPermissions(facilityId: string, staffId: string, permissions: string[]) {
   return getApiClient().put<any>(`/api/facilities/${facilityId}/staff/${staffId}/permissions`, { permissions });
 }
+
+export async function createStaffAccount(facilityId: string, data: {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  staffRole: string;
+}) {
+  return getApiClient().post<any>(`/api/facilities/${facilityId}/staff/create-account`, data);
+}
+
+export async function createStaffInvite(facilityId: string, data: { staffRole: string }) {
+  return getApiClient().post<any>(`/api/facilities/${facilityId}/staff/invite`, data);
+}
+
+export async function getStaffInvites(facilityId: string) {
+  return getApiClient().get<any>(`/api/facilities/${facilityId}/staff/invites`);
+}
+
+export async function getStaffInviteInfo(token: string) {
+  return getApiClient().get<any>(`/api/staff-invite/${token}`);
+}
+
+export async function acceptStaffInvite(token: string, data: {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}) {
+  return getApiClient().post<any>(`/api/staff-invite/${token}/accept`, data);
+}

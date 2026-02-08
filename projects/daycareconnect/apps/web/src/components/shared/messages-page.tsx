@@ -1,17 +1,14 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useSession } from "@/lib/auth-client";
-import {
-  useConversations,
-  useCreateOrGetConversation,
-  useEnrollments,
-} from "@daycare-hub/hooks";
+import { useConversations, useCreateOrGetConversation, useEnrollments } from "@daycare-hub/hooks";
 import { ConversationItem } from "@/components/messaging/conversation-item";
 import {
   Button,
   Input,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -43,19 +40,13 @@ export function MessagesPage({ messagesBasePath }: { messagesBasePath: string })
       {isLoading ? (
         <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-20 animate-pulse rounded-lg border bg-muted"
-            />
+            <div key={i} className="h-20 animate-pulse rounded-lg border bg-muted" />
           ))}
         </div>
       ) : conversations && conversations.length > 0 ? (
         <div className="space-y-2">
           {conversations.map((conv) => {
-            const otherName =
-              isParent || role === "staff"
-                ? conv.facilityName
-                : conv.parentName;
+            const otherName = isParent || role === "staff" ? conv.facilityName : conv.parentName;
             return (
               <ConversationItem
                 key={conv.id}
@@ -93,7 +84,7 @@ function NewConversationDialog({ messagesBasePath }: { messagesBasePath: string 
 
   async function handleCreate(facilityId: string) {
     try {
-      const data = await createMutation.mutateAsync({ facilityId });
+      const data = await createMutation.mutateAsync(facilityId);
       setOpen(false);
       navigate({
         to: `${messagesBasePath}/$conversationId`,
@@ -108,10 +99,7 @@ function NewConversationDialog({ messagesBasePath }: { messagesBasePath: string 
   const facilityMap = new Map<string, string>();
   if (enrollments) {
     for (const e of enrollments) {
-      if (
-        (e.status === "active" || e.status === "approved") &&
-        !facilityMap.has(e.facilityId)
-      ) {
+      if ((e.status === "active" || e.status === "approved") && !facilityMap.has(e.facilityId)) {
         facilityMap.set(e.facilityId, e.facilityName);
       }
     }
@@ -127,9 +115,7 @@ function NewConversationDialog({ messagesBasePath }: { messagesBasePath: string 
         <DialogHeader>
           <DialogTitle>Start a Conversation</DialogTitle>
         </DialogHeader>
-        <p className="text-sm text-muted-foreground">
-          Select a facility to message:
-        </p>
+        <DialogDescription>Select a facility to message:</DialogDescription>
         {isLoading ? (
           <div className="space-y-2 py-4">
             {Array.from({ length: 2 }).map((_, i) => (
@@ -146,9 +132,7 @@ function NewConversationDialog({ messagesBasePath }: { messagesBasePath: string 
                 className="flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-accent"
               >
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <span className="text-sm font-semibold">
-                    {facilityName.charAt(0)}
-                  </span>
+                  <span className="text-sm font-semibold">{facilityName.charAt(0)}</span>
                 </div>
                 <span className="text-sm font-medium">{facilityName}</span>
               </button>

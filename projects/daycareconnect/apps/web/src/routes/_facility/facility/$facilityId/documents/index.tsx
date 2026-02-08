@@ -6,17 +6,11 @@ import {
   useVoidDocument,
 } from "@daycare-hub/hooks";
 import { DocumentStatusBadge } from "@/components/documents/document-status-badge";
-import {
-  Card,
-  CardContent,
-  Button,
-} from "@daycare-hub/ui";
+import { Card, CardContent, Button } from "@daycare-hub/ui";
 
 const STATUS_TABS = ["all", "pending", "viewed", "signed", "expired", "voided"] as const;
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/documents/"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/documents/")({
   validateSearch: (search: Record<string, unknown>) => ({
     status: (search.status as string) || "all",
   }),
@@ -28,12 +22,19 @@ function DocumentsPage() {
   const { status: activeTab } = Route.useSearch();
   const navigate = Route.useNavigate();
   const statusFilter = activeTab === "all" ? undefined : activeTab;
-  const { data: instances = [], isLoading } = useAdminDocumentInstances(facilityId, { status: statusFilter });
+  const { data: instances = [], isLoading } = useAdminDocumentInstances(facilityId, {
+    status: statusFilter,
+  });
   const sendDocumentReminder = useSendDocumentReminder();
   const voidDocument = useVoidDocument();
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
 
   const handleRemind = async (instanceId: string) => {
     setLoadingId(instanceId);
@@ -63,22 +64,13 @@ function DocumentsPage() {
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Documents</h1>
         <div className="flex gap-2">
-          <Link
-            to="/facility/$facilityId/documents/templates"
-            params={{ facilityId }}
-          >
+          <Link to="/facility/$facilityId/documents/templates" params={{ facilityId }}>
             <Button variant="outline">Templates</Button>
           </Link>
-          <Link
-            to="/facility/$facilityId/documents/send"
-            params={{ facilityId }}
-          >
+          <Link to="/facility/$facilityId/documents/send" params={{ facilityId }}>
             <Button variant="outline">Send Document</Button>
           </Link>
-          <Link
-            to="/facility/$facilityId/documents/compliance"
-            params={{ facilityId }}
-          >
+          <Link to="/facility/$facilityId/documents/compliance" params={{ facilityId }}>
             <Button variant="outline">Compliance</Button>
           </Link>
         </div>
@@ -120,8 +112,7 @@ function DocumentsPage() {
                     </span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Sent to: {instance.parentName} ({instance.parentEmail})
-                    {" · "}
+                    Sent to: {instance.parentName} ({instance.parentEmail}){" · "}
                     {new Date(instance.createdAt).toLocaleDateString()}
                     {instance.signedAt && (
                       <>

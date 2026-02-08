@@ -4,8 +4,9 @@ import { queryKeys } from "./query-keys";
 
 export function useNotifications(params?: { type?: string; isRead?: boolean }) {
   return useInfiniteQuery({
-    queryKey: queryKeys.notifications.all,
-    queryFn: ({ pageParam }) => notificationsService.getNotifications({ cursor: pageParam, ...params }),
+    queryKey: [...queryKeys.notifications.all, params],
+    queryFn: ({ pageParam }) =>
+      notificationsService.getNotifications({ cursor: pageParam, ...params }),
     getNextPageParam: (lastPage: any) => lastPage.nextCursor ?? undefined,
     initialPageParam: undefined as string | undefined,
   });

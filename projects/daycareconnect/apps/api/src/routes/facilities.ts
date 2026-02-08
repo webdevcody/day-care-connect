@@ -7,6 +7,7 @@ import {
   facilityServices,
   facilityStaff,
   facilityStaffPermissions,
+  staffInvites,
   users,
   enrollments,
   favorites,
@@ -14,6 +15,7 @@ import {
   and,
   sql,
   isNotNull,
+  isNull,
 } from "@daycare-hub/db";
 import {
   createFacilitySchema,
@@ -24,11 +26,13 @@ import {
 } from "@daycare-hub/shared";
 import type { StaffRole, StaffPermission } from "@daycare-hub/shared";
 import { z } from "zod";
+import { randomBytes } from "crypto";
 import {
   assertFacilityOwner,
   assertFacilityManager,
   assertFacilityPermission,
 } from "../lib/facility-auth";
+import { auth } from "../lib/auth";
 
 const app = new Hono();
 
@@ -574,6 +578,160 @@ app.get("/:facilityId/staff", async (c) => {
   }));
 
   return c.json(staffWithPermissions);
+});
+
+// POST /:facilityId/staff/create-account - create a new user account and add as staff
+app.post("/:facilityId/staff/create-account", async (c) => {
+  const userId = c.get("userId") as string;
+  const facilityId = c.req.param("facilityId");
+
+  await assertFacilityPermission(facilityId, userId, "staff:manage");
+
+  const body = await c.req.json();
+  const { email, password, firstName, lastName, staffRole } = body as {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    staffRole: StaffRole;
+  };
+
+  if (!email || !password || !firstName || !lastName || !staffRole) {
+    return c.json({ error: "All fields are required" }, 400);
+  }
+
+  if (password.length < 8) {
+    return c.json({ error: "Password must be at least 8 characters" }, 400);
+  }
+
+  // Check if user already exists
+  const [existingUser] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+
+  if (existingUser) {
+    return c.json({ error: "A user with that email already exists. Use 'Existing User' tab to add them." }, 409);
+  }
+
+  // Create user via better-auth server API
+  const signUpResult = await auth.api.signUpEmail({
+    body: {
+      email,
+      password,
+      name: `${firstName} ${lastName}`.trim(),
+      firstName,
+      lastName,
+      role: "staff",
+    },
+  });
+
+  if (!signUpResult?.user) {
+    return c.json({ error: "Failed to create user account" }, 500);
+  }
+
+  const newUserId = signUpResult.user.id;
+
+  // Check if already staff (shouldn't be, but just in case)
+  const existing = await db
+    .select({ id: facilityStaff.id })
+    .from(facilityStaff)
+    .where(
+      and(
+        eq(facilityStaff.facilityId, facilityId),
+        eq(facilityStaff.userId, newUserId)
+      )
+    )
+    .limit(1);
+
+  if (existing.length) {
+    return c.json({ error: "User is already a staff member at this facility" }, 409);
+  }
+
+  // Insert staff member and auto-assign default permissions
+  const defaultPerms = DEFAULT_ROLE_PERMISSIONS[staffRole] || [];
+
+  const [staff] = await db
+    .insert(facilityStaff)
+    .values({
+      facilityId,
+      userId: newUserId,
+      staffRole,
+    })
+    .returning();
+
+  if (defaultPerms.length > 0) {
+    await db.insert(facilityStaffPermissions).values(
+      defaultPerms.map((permission) => ({
+        facilityStaffId: staff.id,
+        permission,
+      }))
+    );
+  }
+
+  return c.json({ ...staff, permissions: defaultPerms, email }, 201);
+});
+
+// POST /:facilityId/staff/invite - create a staff invite link
+app.post("/:facilityId/staff/invite", async (c) => {
+  const userId = c.get("userId") as string;
+  const facilityId = c.req.param("facilityId");
+
+  await assertFacilityPermission(facilityId, userId, "staff:manage");
+
+  const body = await c.req.json();
+  const { staffRole } = body as { staffRole: StaffRole };
+
+  if (!staffRole) {
+    return c.json({ error: "Staff role is required" }, 400);
+  }
+
+  const token = randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+  const [invite] = await db
+    .insert(staffInvites)
+    .values({
+      facilityId,
+      token,
+      staffRole,
+      createdBy: userId,
+      expiresAt,
+    })
+    .returning();
+
+  const webUrl = process.env.WEB_URL || "http://localhost:3000";
+  const inviteUrl = `${webUrl}/staff-invite/${token}`;
+
+  return c.json({ ...invite, inviteUrl }, 201);
+});
+
+// GET /:facilityId/staff/invites - list active staff invites
+app.get("/:facilityId/staff/invites", async (c) => {
+  const userId = c.get("userId") as string;
+  const facilityId = c.req.param("facilityId");
+
+  await assertFacilityPermission(facilityId, userId, "staff:manage");
+
+  const invites = await db
+    .select()
+    .from(staffInvites)
+    .where(
+      and(
+        eq(staffInvites.facilityId, facilityId),
+        isNull(staffInvites.usedAt)
+      )
+    );
+
+  const webUrl = process.env.WEB_URL || "http://localhost:3000";
+  const invitesWithUrls = invites.map((invite) => ({
+    ...invite,
+    inviteUrl: `${webUrl}/staff-invite/${invite.token}`,
+    isExpired: invite.expiresAt ? new Date(invite.expiresAt) < new Date() : false,
+  }));
+
+  return c.json(invitesWithUrls);
 });
 
 // POST /:facilityId/staff - add a staff member by email (auto-assigns default permissions)

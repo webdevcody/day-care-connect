@@ -7,16 +7,9 @@ import {
   useArchiveDocumentTemplate,
 } from "@daycare-hub/hooks";
 import { TemplateFormDialog } from "@/components/documents/template-form-dialog";
-import {
-  Card,
-  CardContent,
-  Button,
-  Badge,
-} from "@daycare-hub/ui";
+import { Card, CardContent, Button, Badge } from "@daycare-hub/ui";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/documents/templates"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/documents/templates")({
   component: TemplatesPage,
 });
 
@@ -31,7 +24,12 @@ function TemplatesPage() {
   const [editTemplate, setEditTemplate] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
 
   const handleCreate = async (data: any) => {
     setLoading(true);
@@ -77,9 +75,7 @@ function TemplatesPage() {
       {templates.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">
-              No templates yet. Create one to get started.
-            </p>
+            <p className="text-muted-foreground">No templates yet. Create one to get started.</p>
           </CardContent>
         </Card>
       ) : (
@@ -93,12 +89,8 @@ function TemplatesPage() {
                     <Badge variant="outline" className="capitalize">
                       {template.category}
                     </Badge>
-                    {template.isRequired && (
-                      <Badge variant="secondary">Required</Badge>
-                    )}
-                    {template.isArchived && (
-                      <Badge variant="destructive">Archived</Badge>
-                    )}
+                    {template.isRequired && <Badge variant="secondary">Required</Badge>}
+                    {template.isArchived && <Badge variant="destructive">Archived</Badge>}
                     <span className="text-xs text-muted-foreground">v{template.version}</span>
                   </div>
                   {template.description && (
@@ -107,11 +99,7 @@ function TemplatesPage() {
                 </div>
                 {!template.isArchived && (
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditTemplate(template)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => setEditTemplate(template)}>
                       Edit
                     </Button>
                     <Button

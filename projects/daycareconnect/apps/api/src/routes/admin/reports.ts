@@ -161,12 +161,7 @@ app.get("/revenue", async (c) => {
   const activeCount = await db
     .select({ count: count() })
     .from(enrollments)
-    .where(
-      and(
-        eq(enrollments.facilityId, facilityId),
-        eq(enrollments.status, "active")
-      )
-    );
+    .where(and(eq(enrollments.facilityId, facilityId), eq(enrollments.status, "active")));
 
   const numActive = activeCount[0]?.count ?? 0;
   const monthlyRate = parseFloat(facility?.monthlyRate || "0");
@@ -175,9 +170,7 @@ app.get("/revenue", async (c) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
   const months =
-    (end.getFullYear() - start.getFullYear()) * 12 +
-    (end.getMonth() - start.getMonth()) +
-    1;
+    (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + 1;
 
   // Build monthly estimates
   const monthlyData = [];
@@ -198,6 +191,98 @@ app.get("/revenue", async (c) => {
     monthlyRate,
     totalEstimate: numActive * monthlyRate * months,
     monthlyData,
+  });
+});
+
+// GET /enrollment-analytics - Daily enrollments for a given month + monthly overview
+// Query params: facilityId (required), month (optional, YYYY-MM, defaults to current month)
+app.get("/enrollment-analytics", async (c) => {
+  const userId = c.get("userId") as string;
+  const facilityId = c.req.query("facilityId");
+  const monthParam = c.req.query("month"); // e.g. "2026-02"
+
+  if (!facilityId) throw new Error("facilityId is required");
+
+  await assertFacilityPermission(facilityId, userId, "reports:view");
+
+  // Determine the target month for the daily view
+  const now = new Date();
+  let targetYear = now.getFullYear();
+  let targetMonth = now.getMonth(); // 0-indexed
+  if (monthParam) {
+    const [y, m] = monthParam.split("-").map(Number);
+    if (y && m) {
+      targetYear = y;
+      targetMonth = m - 1;
+    }
+  }
+
+  const monthStart = new Date(targetYear, targetMonth, 1);
+  const monthEnd = new Date(targetYear, targetMonth + 1, 0); // last day of month
+
+  // Daily enrollments for the target month
+  const dailyEnrollments = await db
+    .select({
+      date: sql<string>`to_char(${enrollments.createdAt}::date, 'YYYY-MM-DD')`,
+      count: count(),
+    })
+    .from(enrollments)
+    .where(
+      and(
+        eq(enrollments.facilityId, facilityId),
+        gte(enrollments.createdAt, monthStart),
+        lte(enrollments.createdAt, new Date(targetYear, targetMonth + 1, 0, 23, 59, 59))
+      )
+    )
+    .groupBy(sql`${enrollments.createdAt}::date`)
+    .orderBy(sql`${enrollments.createdAt}::date`);
+
+  // Fill in every day of the month with zero counts where missing
+  const dailyMap = new Map(dailyEnrollments.map((d) => [d.date, d.count]));
+  const daily: Array<{ date: string; count: number }> = [];
+  const daysInMonth = monthEnd.getDate();
+  for (let day = 1; day <= daysInMonth; day++) {
+    const key = `${targetYear}-${String(targetMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    daily.push({ date: key, count: dailyMap.get(key) ?? 0 });
+  }
+
+  // Monthly enrollments for the last 12 months (always relative to today)
+  const twelveMonthsAgo = new Date();
+  twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 11);
+  twelveMonthsAgo.setDate(1);
+
+  const monthlyEnrollments = await db
+    .select({
+      month: sql<string>`to_char(date_trunc('month', ${enrollments.createdAt}), 'YYYY-MM')`,
+      count: count(),
+    })
+    .from(enrollments)
+    .where(and(eq(enrollments.facilityId, facilityId), gte(enrollments.createdAt, twelveMonthsAgo)))
+    .groupBy(sql`date_trunc('month', ${enrollments.createdAt})`)
+    .orderBy(sql`date_trunc('month', ${enrollments.createdAt})`);
+
+  // Fill in missing months with zero counts
+  const monthlyMap = new Map(monthlyEnrollments.map((m) => [m.month, m.count]));
+  const monthly: Array<{ month: string; count: number }> = [];
+  const monthCursor = new Date(twelveMonthsAgo);
+  for (let i = 0; i < 12; i++) {
+    const key = `${monthCursor.getFullYear()}-${String(monthCursor.getMonth() + 1).padStart(2, "0")}`;
+    monthly.push({ month: key, count: monthlyMap.get(key) ?? 0 });
+    monthCursor.setMonth(monthCursor.getMonth() + 1);
+  }
+
+  // Summary stats
+  const totalSelectedMonth = daily.reduce((sum, d) => sum + d.count, 0);
+  const totalLast12Months = monthly.reduce((sum, m) => sum + m.count, 0);
+
+  const selectedMonth = `${targetYear}-${String(targetMonth + 1).padStart(2, "0")}`;
+
+  return c.json({
+    daily,
+    monthly,
+    selectedMonth,
+    totalSelectedMonth,
+    totalLast12Months,
   });
 });
 

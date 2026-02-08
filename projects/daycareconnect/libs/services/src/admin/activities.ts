@@ -1,15 +1,20 @@
 import { getApiClient } from "../client";
 
-export async function getActivityEntries(facilityId: string, params?: { childId?: string; date?: string }) {
+export async function getActivityEntries(
+  facilityId: string,
+  params?: { childId?: string; date?: string }
+) {
+  const date = params?.date || new Date().toISOString().split("T")[0];
   const searchParams = new URLSearchParams();
-  searchParams.set("facilityId", facilityId);
   if (params?.childId) searchParams.set("childId", params.childId);
-  if (params?.date) searchParams.set("date", params.date);
-  return getApiClient().get<any>(`/api/admin/activities?${searchParams}`);
+  const query = searchParams.toString();
+  return getApiClient().get<any>(
+    `/api/admin/activities/${facilityId}/${date}${query ? `?${query}` : ""}`
+  );
 }
 
 export async function getEnrolledChildren(facilityId: string) {
-  return getApiClient().get<any>(`/api/admin/activities/enrolled-children/${facilityId}`);
+  return getApiClient().get<any>(`/api/admin/activities/${facilityId}/children`);
 }
 
 export async function createActivityEntry(data: any) {

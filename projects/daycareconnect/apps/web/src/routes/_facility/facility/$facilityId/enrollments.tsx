@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useAdminEnrollments,
   useAdminEnrollmentDetail,
@@ -9,27 +9,21 @@ import {
 } from "@daycare-hub/hooks";
 import { EnrollmentReviewDialog } from "@/components/admin/enrollment-review-dialog";
 import { EnrollmentStatusBadge } from "@/components/admin/status-badge";
-import {
-  Card,
-  CardContent,
-  Button,
-  Checkbox,
-} from "@daycare-hub/ui";
+import { Card, CardContent, Button, Checkbox } from "@daycare-hub/ui";
 
 const STATUS_TABS = ["all", "pending", "approved", "active", "withdrawn", "rejected"] as const;
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/enrollments"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/enrollments")({
   validateSearch: (search: Record<string, unknown>) => ({
     status: (search.status as string) || "all",
+    review: (search.review as string) || undefined,
   }),
   component: EnrollmentsPage,
 });
 
 function EnrollmentsPage() {
   const { facilityId } = Route.useParams();
-  const { status: activeTab } = Route.useSearch();
+  const { status: activeTab, review: reviewFromUrl } = Route.useSearch();
   const navigate = Route.useNavigate();
   const statusFilter = activeTab === "all" ? undefined : activeTab;
   const { data: enrollments = [], isLoading } = useAdminEnrollments(facilityId, statusFilter);
@@ -42,12 +36,30 @@ function EnrollmentsPage() {
   const [loading, setLoading] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
   const [reviewEnrollmentId, setReviewEnrollmentId] = useState<string | null>(null);
-  const { data: reviewEnrollment = null } = useAdminEnrollmentDetail(facilityId, reviewEnrollmentId ?? "");
+  const { data: reviewEnrollment = null, isLoading: isDetailLoading } = useAdminEnrollmentDetail(
+    facilityId,
+    reviewEnrollmentId ?? ""
+  );
+
+  // Auto-open review dialog when navigated with a review param (e.g. from dashboard)
+  useEffect(() => {
+    if (reviewFromUrl) {
+      setReviewEnrollmentId(reviewFromUrl);
+      setReviewOpen(true);
+      // Clear the review param from the URL so refreshing doesn't re-open
+      navigate({ search: { status: activeTab }, replace: true });
+    }
+  }, [reviewFromUrl]);
 
   const pendingEnrollments = enrollments.filter((e) => e.status === "pending");
   const canBulkSelect = activeTab === "pending" || activeTab === "all";
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -155,7 +167,9 @@ function EnrollmentsPage() {
       {canBulkSelect && pendingEnrollments.length > 0 && (
         <div className="mb-3 flex items-center gap-2">
           <Checkbox
-            checked={selectedIds.size === pendingEnrollments.length && pendingEnrollments.length > 0}
+            checked={
+              selectedIds.size === pendingEnrollments.length && pendingEnrollments.length > 0
+            }
             onCheckedChange={toggleSelectAll}
           />
           <span className="text-sm text-muted-foreground">
@@ -166,14 +180,8 @@ function EnrollmentsPage() {
 
       {selectedIds.size > 0 && (
         <div className="mb-4 flex items-center gap-3 rounded-lg border bg-muted/50 p-3">
-          <span className="text-sm font-medium">
-            {selectedIds.size} selected
-          </span>
-          <Button
-            size="sm"
-            onClick={() => handleBulkAction("approve")}
-            disabled={bulkLoading}
-          >
+          <span className="text-sm font-medium">{selectedIds.size} selected</span>
+          <Button size="sm" onClick={() => handleBulkAction("approve")} disabled={bulkLoading}>
             {bulkLoading ? "Processing..." : "Approve All"}
           </Button>
           <Button
@@ -190,9 +198,7 @@ function EnrollmentsPage() {
       {enrollments.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">
-              No enrollments found for this filter.
-            </p>
+            <p className="text-muted-foreground">No enrollments found for this filter.</p>
           </CardContent>
         </Card>
       ) : (
@@ -219,11 +225,7 @@ function EnrollmentsPage() {
                     {new Date(enrollment.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => openReview(enrollment.id)}
-                >
+                <Button variant="outline" size="sm" onClick={() => openReview(enrollment.id)}>
                   Review
                 </Button>
               </CardContent>
@@ -238,13 +240,13 @@ function EnrollmentsPage() {
         onOpenChange={(open) => {
           setReviewOpen(open);
           if (!open) {
-      
             setReviewEnrollmentId(null);
           }
         }}
         onApprove={handleApprove}
         onReject={handleReject}
         loading={loading}
+        isDetailLoading={isDetailLoading}
       />
     </div>
   );

@@ -19,14 +19,13 @@ import {
   Badge,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@daycare-hub/ui";
 import { Plus, ChevronDown, ChevronUp, Settings } from "lucide-react";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/invites"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/invites")({
   component: InvitesPage,
 });
 
@@ -85,10 +84,7 @@ function InvitesPage() {
         <h1 className="text-2xl font-bold">Invite Links</h1>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
-            <Link
-              to="/facility/$facilityId/invites/forms"
-              params={{ facilityId }}
-            >
+            <Link to="/facility/$facilityId/invites/forms" params={{ facilityId }}>
               <Settings className="mr-1 h-4 w-4" />
               Enrollment Forms
             </Link>
@@ -122,7 +118,8 @@ function InvitesPage() {
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Code: {invite.code} &middot; {invite.submissionCount} submission{invite.submissionCount !== 1 ? "s" : ""}
+                      Code: {invite.code} &middot; {invite.submissionCount} submission
+                      {invite.submissionCount !== 1 ? "s" : ""}
                       {invite.expiresAt && (
                         <> &middot; Expires {new Date(invite.expiresAt).toLocaleDateString()}</>
                       )}
@@ -153,10 +150,7 @@ function InvitesPage() {
                 {expandedId === invite.id && (
                   <div className="mt-4 border-t pt-4">
                     <div className="flex gap-6">
-                      <QrCodeDisplay
-                        url={`${webUrl}/invite/${invite.code}`}
-                        size={150}
-                      />
+                      <QrCodeDisplay url={`${webUrl}/invite/${invite.code}`} size={150} />
                       <div className="flex-1">
                         <InviteSubmissionsList inviteId={invite.id} />
                       </div>
@@ -173,6 +167,7 @@ function InvitesPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create Invite Link</DialogTitle>
+            <DialogDescription>Generate a new invite link for enrollment.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -225,13 +220,14 @@ function InviteSubmissionsList({ inviteId }: { inviteId: string }) {
             <p className="text-muted-foreground">
               {sub.userEmail}
               {sub.childFirstName && (
-                <> &middot; Child: {sub.childFirstName} {sub.childLastName}</>
+                <>
+                  {" "}
+                  &middot; Child: {sub.childFirstName} {sub.childLastName}
+                </>
               )}
             </p>
           </div>
-          <Badge variant={sub.status === "completed" ? "default" : "secondary"}>
-            {sub.status}
-          </Badge>
+          <Badge variant={sub.status === "completed" ? "default" : "secondary"}>{sub.status}</Badge>
         </div>
       ))}
     </div>

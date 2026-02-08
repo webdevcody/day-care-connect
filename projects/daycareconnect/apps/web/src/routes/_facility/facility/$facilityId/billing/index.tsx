@@ -8,9 +8,7 @@ import {
   useAdminBillingOverview,
 } from "@daycare-hub/hooks";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/billing/"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/billing/")({
   component: BillingDashboard,
 });
 
@@ -22,7 +20,12 @@ function BillingDashboard() {
   const getStripeDashboardLink = useGetStripeDashboardLink();
   const [connecting, setConnecting] = useState(false);
 
-  if (stripeLoading || overviewLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (stripeLoading || overviewLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
   if (!stripeStatus || !overview) return null;
 
   const handleConnectStripe = async () => {
@@ -92,9 +95,7 @@ function BillingDashboard() {
         <Card>
           <CardContent className="py-6">
             <p className="text-sm text-muted-foreground">Total Revenue</p>
-            <p className="text-2xl font-bold">
-              ${parseFloat(overview.totalRevenue).toFixed(2)}
-            </p>
+            <p className="text-2xl font-bold">${parseFloat(overview.totalRevenue).toFixed(2)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -123,16 +124,10 @@ function BillingDashboard() {
 
       {/* Quick Actions */}
       <div className="flex gap-3">
-        <Link
-          to="/facility/$facilityId/billing/invoices"
-          params={{ facilityId }}
-        >
+        <Link to="/facility/$facilityId/billing/invoices" params={{ facilityId }}>
           <Button variant="outline">View All Invoices</Button>
         </Link>
-        <Link
-          to="/facility/$facilityId/billing/invoices/new"
-          params={{ facilityId }}
-        >
+        <Link to="/facility/$facilityId/billing/invoices/new" params={{ facilityId }}>
           <Button>Create Invoice</Button>
         </Link>
       </div>

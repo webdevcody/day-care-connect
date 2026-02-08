@@ -1,17 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAdminDashboard } from "@daycare-hub/hooks";
 import { EnrollmentStatusBadge } from "@/components/admin/status-badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Button,
-} from "@daycare-hub/ui";
+import { Card, CardContent, CardHeader, CardTitle, Button } from "@daycare-hub/ui";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/")({
   component: AdminDashboardPage,
 });
 
@@ -19,8 +11,18 @@ function AdminDashboardPage() {
   const { facilityId } = Route.useParams();
   const { data, isLoading } = useAdminDashboard(facilityId);
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
-  if (!data) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">No data available</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  if (!data)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">No data available</div>
+      </div>
+    );
 
   const { facility, enrollmentCounts, attendanceCounts, pendingEnrollments } = data;
 
@@ -79,9 +81,7 @@ function AdminDashboardPage() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Capacity
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Capacity</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -131,7 +131,7 @@ function AdminDashboardPage() {
                     <Link
                       to="/facility/$facilityId/enrollments"
                       params={{ facilityId }}
-                      search={{ status: "pending" }}
+                      search={{ status: "pending", review: enrollment.id }}
                     >
                       <Button variant="outline" size="sm">
                         Review

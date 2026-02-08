@@ -20,6 +20,8 @@ export const queryKeys = {
     staff: (id: string) => ["facilities", id, "staff"] as const,
     staffPermissions: (facilityId: string, staffId: string) =>
       ["facilities", facilityId, "staff", staffId, "permissions"] as const,
+    staffInvites: (facilityId: string) =>
+      ["facilities", facilityId, "staff-invites"] as const,
   },
   favorites: {
     all: ["favorites"] as const,
@@ -27,7 +29,8 @@ export const queryKeys = {
   activities: {
     children: (childId: string) => ["activities", "children", childId] as const,
     dailyReports: (childId: string) => ["activities", "daily-reports", childId] as const,
-    dailyReport: (childId: string, date: string) => ["activities", "daily-report", childId, date] as const,
+    dailyReport: (childId: string, date: string) =>
+      ["activities", "daily-report", childId, date] as const,
     photos: (childId: string) => ["activities", "photos", childId] as const,
   },
   notifications: {
@@ -68,15 +71,21 @@ export const queryKeys = {
   },
   admin: {
     dashboard: (facilityId: string) => ["admin", "dashboard", facilityId] as const,
-    attendance: (facilityId: string, date: string) => ["admin", "attendance", facilityId, date] as const,
-    activities: (facilityId: string, params?: any) => ["admin", "activities", facilityId, params] as const,
+    attendance: (facilityId: string, date: string) =>
+      ["admin", "attendance", facilityId, date] as const,
+    activities: (facilityId: string, params?: any) =>
+      ["admin", "activities", facilityId, params] as const,
     enrolledChildren: (facilityId: string) => ["admin", "enrolled-children", facilityId] as const,
-    dailyReports: (facilityId: string, params?: any) => ["admin", "daily-reports", facilityId, params] as const,
-    enrollments: (facilityId: string, status?: string) => ["admin", "enrollments", facilityId, status] as const,
-    enrollmentDetail: (facilityId: string, enrollmentId: string) => ["admin", "enrollment-detail", facilityId, enrollmentId] as const,
+    dailyReports: (facilityId: string, params?: any) =>
+      ["admin", "daily-reports", facilityId, params] as const,
+    enrollments: (facilityId: string, status?: string) =>
+      ["admin", "enrollments", facilityId, status] as const,
+    enrollmentDetail: (facilityId: string, enrollmentId: string) =>
+      ["admin", "enrollment-detail", facilityId, enrollmentId] as const,
     billingOverview: (facilityId: string) => ["admin", "billing-overview", facilityId] as const,
     billingInvoices: (facilityId: string) => ["admin", "billing-invoices", facilityId] as const,
-    billingInvoiceDetail: (facilityId: string, invoiceId: string) => ["admin", "billing-invoice-detail", facilityId, invoiceId] as const,
+    billingInvoiceDetail: (facilityId: string, invoiceId: string) =>
+      ["admin", "billing-invoice-detail", facilityId, invoiceId] as const,
     billingParents: (facilityId: string) => ["admin", "billing-parents", facilityId] as const,
     billingPlan: (enrollmentId: string) => ["admin", "billing-plan", enrollmentId] as const,
     documentTemplates: (facilityId: string) => ["admin", "document-templates", facilityId] as const,
@@ -84,15 +93,22 @@ export const queryKeys = {
     compliance: (facilityId: string) => ["admin", "compliance", facilityId] as const,
     documentParents: (facilityId: string) => ["admin", "document-parents", facilityId] as const,
     enrollmentReport: (facilityId: string) => ["admin", "enrollment-report", facilityId] as const,
+    enrollmentAnalytics: (facilityId: string, month?: string) =>
+      ["admin", "enrollment-analytics", facilityId, month] as const,
     attendanceReport: (facilityId: string) => ["admin", "attendance-report", facilityId] as const,
     revenueEstimate: (facilityId: string) => ["admin", "revenue-estimate", facilityId] as const,
     roster: (facilityId: string) => ["admin", "roster", facilityId] as const,
     stripeStatus: (facilityId: string) => ["admin", "stripe-status", facilityId] as const,
     reportTemplates: (facilityId: string) => ["admin", "report-templates", facilityId] as const,
-    attendanceActivityLog: (facilityId: string) => ["admin", "attendance-activity-log", facilityId] as const,
-    childAttendanceHistory: (facilityId: string, childId: string) => ["admin", "child-attendance-history", facilityId, childId] as const,
+    attendanceActivityLog: (facilityId: string) =>
+      ["admin", "attendance-activity-log", facilityId] as const,
+    childAttendanceHistory: (facilityId: string, childId: string) =>
+      ["admin", "child-attendance-history", facilityId, childId] as const,
     invites: (facilityId: string) => ["admin", "invites", facilityId] as const,
     inviteSubmissions: (inviteId: string) => ["admin", "invite-submissions", inviteId] as const,
+    enrolledParents: (facilityId: string) => ["admin", "enrolled-parents", facilityId] as const,
+    facilityConversations: (facilityId: string, search?: string) =>
+      ["admin", "facility-conversations", facilityId, search] as const,
   },
   invites: {
     info: (code: string) => ["invites", code] as const,

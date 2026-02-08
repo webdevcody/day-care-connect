@@ -10,9 +10,7 @@ import {
 } from "@daycare-hub/hooks";
 import { Card, CardContent } from "@daycare-hub/ui";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/reviews"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/reviews")({
   component: AdminReviewsPage,
 });
 
@@ -21,7 +19,11 @@ function AdminReviewsPage() {
   const { data, isLoading: loading } = useAdminFacilityReviews(facilityId);
   const createReviewResponse = useCreateReviewResponse();
   const updateReviewResponse = useUpdateReviewResponse();
-  const [respondingTo, setRespondingTo] = useState<{ reviewId: string; existingBody?: string; responseId?: string } | null>(null);
+  const [respondingTo, setRespondingTo] = useState<{
+    reviewId: string;
+    existingBody?: string;
+    responseId?: string;
+  } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   const reviews = data?.reviews ?? [];
@@ -77,9 +79,7 @@ function AdminReviewsPage() {
                   key={review.id}
                   review={review}
                   isAdmin
-                  onRespond={() =>
-                    setRespondingTo({ reviewId: review.id })
-                  }
+                  onRespond={() => setRespondingTo({ reviewId: review.id })}
                   onEditResponse={() =>
                     setRespondingTo({
                       reviewId: review.id,

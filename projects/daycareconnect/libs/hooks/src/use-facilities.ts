@@ -178,3 +178,50 @@ export function useUpdateStaffPermissions() {
     },
   });
 }
+
+export function useCreateStaffAccount() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      facilityId,
+      data,
+    }: {
+      facilityId: string;
+      data: {
+        email: string;
+        password: string;
+        firstName: string;
+        lastName: string;
+        staffRole: string;
+      };
+    }) => facilitiesService.createStaffAccount(facilityId, data),
+    onSuccess: (_, { facilityId }) => {
+      qc.invalidateQueries({ queryKey: queryKeys.facilities.staff(facilityId) });
+      qc.invalidateQueries({ queryKey: queryKeys.facilities.detail(facilityId) });
+    },
+  });
+}
+
+export function useCreateStaffInvite() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      facilityId,
+      data,
+    }: {
+      facilityId: string;
+      data: { staffRole: string };
+    }) => facilitiesService.createStaffInvite(facilityId, data),
+    onSuccess: (_, { facilityId }) => {
+      qc.invalidateQueries({ queryKey: queryKeys.facilities.staffInvites(facilityId) });
+    },
+  });
+}
+
+export function useStaffInvites(facilityId: string) {
+  return useQuery({
+    queryKey: queryKeys.facilities.staffInvites(facilityId),
+    queryFn: () => facilitiesService.getStaffInvites(facilityId),
+    enabled: !!facilityId,
+  });
+}

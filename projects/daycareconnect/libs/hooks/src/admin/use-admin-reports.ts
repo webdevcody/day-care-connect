@@ -25,3 +25,11 @@ export function useRevenueEstimate(facilityId: string, startDate: string, endDat
     enabled: !!facilityId && !!startDate && !!endDate,
   });
 }
+
+export function useEnrollmentAnalytics(facilityId: string, month?: string) {
+  return useQuery({
+    queryKey: queryKeys.admin.enrollmentAnalytics(facilityId, month),
+    queryFn: () => adminReportsService.getEnrollmentAnalytics(facilityId, month),
+    enabled: !!facilityId,
+  });
+}

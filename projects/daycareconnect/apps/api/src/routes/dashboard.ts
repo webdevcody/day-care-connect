@@ -7,6 +7,7 @@ import {
   favorites,
   activityEntries,
   dailyReports,
+  users,
   eq,
   and,
   sql,
@@ -19,8 +20,13 @@ const app = new Hono();
 app.get("/", async (c) => {
   const userId = c.get("userId") as string;
 
-  const [childrenResult, activeEnrollments, pendingEnrollments, favoritesResult] =
+  const [user, childrenResult, activeEnrollments, pendingEnrollments, favoritesResult] =
     await Promise.all([
+      db
+        .select({ onboardingCompleted: users.onboardingCompleted })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1),
       db
         .select({
           id: children.id,
@@ -48,10 +54,7 @@ app.get("/", async (c) => {
         .innerJoin(children, eq(enrollments.childId, children.id))
         .innerJoin(facilities, eq(enrollments.facilityId, facilities.id))
         .where(
-          and(
-            eq(children.parentId, userId),
-            sql`${enrollments.status} IN ('active', 'approved')`
-          )
+          and(eq(children.parentId, userId), sql`${enrollments.status} IN ('active', 'approved')`)
         ),
 
       db
@@ -68,9 +71,7 @@ app.get("/", async (c) => {
         .from(enrollments)
         .innerJoin(children, eq(enrollments.childId, children.id))
         .innerJoin(facilities, eq(enrollments.facilityId, facilities.id))
-        .where(
-          and(eq(children.parentId, userId), eq(enrollments.status, "pending"))
-        ),
+        .where(and(eq(children.parentId, userId), eq(enrollments.status, "pending"))),
 
       db
         .select({ count: sql<number>`count(*)::int` })
@@ -118,18 +119,14 @@ app.get("/", async (c) => {
         .from(dailyReports)
         .innerJoin(children, eq(dailyReports.childId, children.id))
         .innerJoin(facilities, eq(dailyReports.facilityId, facilities.id))
-        .where(
-          and(
-            inArray(dailyReports.childId, childIds),
-            eq(dailyReports.status, "published")
-          )
-        )
+        .where(and(inArray(dailyReports.childId, childIds), eq(dailyReports.status, "published")))
         .orderBy(desc(dailyReports.date))
         .limit(5),
     ]);
   }
 
   return c.json({
+    onboardingCompleted: user[0]?.onboardingCompleted ?? false,
     children: childrenResult,
     activeEnrollments,
     pendingEnrollments,

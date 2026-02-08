@@ -22,14 +22,13 @@ import {
   Badge,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@daycare-hub/ui";
 import { ArrowUp, ArrowDown, Plus, FileText, FileUp, FormInput } from "lucide-react";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/invites/forms"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/invites/forms")({
   component: EnrollmentFormsPage,
 });
 
@@ -155,7 +154,9 @@ function EnrollmentFormsPage() {
         <div>
           <h2 className="mb-2 text-lg font-semibold">Available Templates</h2>
           {otherTemplates.length === 0 ? (
-            <p className="text-sm text-muted-foreground">All templates are marked for enrollment.</p>
+            <p className="text-sm text-muted-foreground">
+              All templates are marked for enrollment.
+            </p>
           ) : (
             <div className="space-y-2">
               {otherTemplates.map((template: any) => (
@@ -185,11 +186,7 @@ function EnrollmentFormsPage() {
         </div>
       </div>
 
-      <CreateFormDialog
-        facilityId={facilityId}
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-      />
+      <CreateFormDialog facilityId={facilityId} open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   );
 }
@@ -242,9 +239,7 @@ function CreateFormDialog({
   }
 
   function updateField(index: number, updates: Partial<FormFieldDefinition>) {
-    setFields((prev) =>
-      prev.map((f, i) => (i === index ? { ...f, ...updates } : f))
-    );
+    setFields((prev) => prev.map((f, i) => (i === index ? { ...f, ...updates } : f)));
   }
 
   function removeField(index: number) {
@@ -296,12 +291,11 @@ function CreateFormDialog({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create Enrollment Form</DialogTitle>
+          <DialogDescription>Create a new enrollment form for your facility.</DialogDescription>
         </DialogHeader>
 
         {error && (
-          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-            {error}
-          </div>
+          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</div>
         )}
 
         <div className="space-y-4">
@@ -356,7 +350,11 @@ function CreateFormDialog({
                   {type === "markdown" && <FileText className="h-4 w-4" />}
                   {type === "pdf" && <FileUp className="h-4 w-4" />}
                   {type === "custom_form" && <FormInput className="h-4 w-4" />}
-                  {type === "custom_form" ? "Custom Form" : type === "pdf" ? "PDF Upload" : "Markdown"}
+                  {type === "custom_form"
+                    ? "Custom Form"
+                    : type === "pdf"
+                      ? "PDF Upload"
+                      : "Markdown"}
                 </button>
               ))}
             </div>
@@ -382,11 +380,7 @@ function CreateFormDialog({
                 accept="application/pdf"
                 onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
               />
-              {pdfFile && (
-                <p className="text-sm text-muted-foreground">
-                  Selected: {pdfFile.name}
-                </p>
-              )}
+              {pdfFile && <p className="text-sm text-muted-foreground">Selected: {pdfFile.name}</p>}
             </div>
           )}
 
@@ -429,9 +423,7 @@ function CreateFormDialog({
                     <div className="flex items-center gap-2">
                       <Checkbox
                         checked={field.required}
-                        onCheckedChange={(checked) =>
-                          updateField(index, { required: !!checked })
-                        }
+                        onCheckedChange={(checked) => updateField(index, { required: !!checked })}
                       />
                       <span className="text-sm">Required</span>
                     </div>
@@ -450,7 +442,10 @@ function CreateFormDialog({
                         value={field.options?.join(", ") || ""}
                         onChange={(e) =>
                           updateField(index, {
-                            options: e.target.value.split(",").map((s) => s.trim()).filter(Boolean),
+                            options: e.target.value
+                              .split(",")
+                              .map((s) => s.trim())
+                              .filter(Boolean),
                           })
                         }
                       />

@@ -17,9 +17,7 @@ import {
   Textarea,
 } from "@daycare-hub/ui";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/daily-reports"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/daily-reports")({
   component: DailyReportsPage,
 });
 
@@ -85,13 +83,8 @@ function DailyReportsPage() {
         <h1 className="text-2xl font-bold">Daily Reports</h1>
         <div className="flex items-center gap-3">
           {draftCount > 0 && (
-            <Button
-              onClick={handlePublishAll}
-              disabled={actionLoading === "bulk"}
-            >
-              {actionLoading === "bulk"
-                ? "Publishing..."
-                : `Publish All (${draftCount})`}
+            <Button onClick={handlePublishAll} disabled={actionLoading === "bulk"}>
+              {actionLoading === "bulk" ? "Publishing..." : `Publish All (${draftCount})`}
             </Button>
           )}
           <Input
@@ -113,17 +106,13 @@ function DailyReportsPage() {
         </Card>
         <Card>
           <CardContent className="py-4 text-center">
-            <div className="text-2xl font-bold text-amber-600">
-              {draftCount}
-            </div>
+            <div className="text-2xl font-bold text-amber-600">{draftCount}</div>
             <p className="text-sm text-muted-foreground">Drafts</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="py-4 text-center">
-            <div className="text-2xl font-bold text-green-600">
-              {publishedCount}
-            </div>
+            <div className="text-2xl font-bold text-green-600">{publishedCount}</div>
             <p className="text-sm text-muted-foreground">Published</p>
           </CardContent>
         </Card>
@@ -156,11 +145,7 @@ function DailyReportsPage() {
                     <Badge variant="secondary">
                       {report.entryCount} {report.entryCount === 1 ? "entry" : "entries"}
                     </Badge>
-                    <Badge
-                      variant={
-                        report.status === "published" ? "default" : "outline"
-                      }
-                    >
+                    <Badge variant={report.status === "published" ? "default" : "outline"}>
                       {report.status}
                     </Badge>
                   </div>
@@ -183,11 +168,7 @@ function DailyReportsPage() {
                       >
                         {actionLoading === report.id ? "Saving..." : "Save"}
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setEditingSummary(null)}
-                      >
+                      <Button size="sm" variant="outline" onClick={() => setEditingSummary(null)}>
                         Cancel
                       </Button>
                     </div>
@@ -197,9 +178,7 @@ function DailyReportsPage() {
                     {report.summary ? (
                       <p className="text-sm">{report.summary}</p>
                     ) : (
-                      <p className="text-sm italic text-muted-foreground">
-                        No summary yet
-                      </p>
+                      <p className="text-sm italic text-muted-foreground">No summary yet</p>
                     )}
                   </div>
                 )}
@@ -223,15 +202,12 @@ function DailyReportsPage() {
                       onClick={() => handlePublish(report.id)}
                       disabled={actionLoading === report.id}
                     >
-                      {actionLoading === report.id
-                        ? "Publishing..."
-                        : "Publish"}
+                      {actionLoading === report.id ? "Publishing..." : "Publish"}
                     </Button>
                   )}
                   {report.status === "published" && report.publishedAt && (
                     <p className="flex items-center text-xs text-muted-foreground">
-                      Published{" "}
-                      {new Date(report.publishedAt).toLocaleString()}
+                      Published {new Date(report.publishedAt).toLocaleString()}
                     </p>
                   )}
                 </div>

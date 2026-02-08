@@ -2,19 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useFacility, useUpdateFacilityServices } from "@daycare-hub/hooks";
 import { FACILITY_SERVICES_SUGGESTIONS } from "@daycare-hub/shared";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Input,
-  Badge,
-} from "@daycare-hub/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Badge } from "@daycare-hub/ui";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/services"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/services")({
   component: FacilityServicesPage,
 });
 
@@ -33,13 +23,16 @@ function FacilityServicesPage() {
     }
   }, [facility]);
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
   if (!facility) return null;
 
   const toggle = (name: string) => {
-    setServices((prev) =>
-      prev.includes(name) ? prev.filter((s) => s !== name) : [...prev, name]
-    );
+    setServices((prev) => (prev.includes(name) ? prev.filter((s) => s !== name) : [...prev, name]));
   };
 
   const addCustom = () => {
@@ -77,7 +70,12 @@ function FacilityServicesPage() {
           ) : (
             <div className="flex flex-wrap gap-2">
               {services.map((s) => (
-                <Badge key={s} variant="default" className="cursor-pointer gap-1" onClick={() => toggle(s)}>
+                <Badge
+                  key={s}
+                  variant="default"
+                  className="cursor-pointer gap-1"
+                  onClick={() => toggle(s)}
+                >
                   {s} &times;
                 </Badge>
               ))}

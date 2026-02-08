@@ -22,11 +22,11 @@ const statusColors: Record<string, string> = {
   void: "bg-gray-100 text-gray-500",
 };
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/billing/invoices/$invoiceId"
-)({
-  component: InvoiceDetailPage,
-});
+export const Route = createFileRoute("/_facility/facility/$facilityId/billing/invoices/$invoiceId")(
+  {
+    component: InvoiceDetailPage,
+  }
+);
 
 function InvoiceDetailPage() {
   const { facilityId, invoiceId } = Route.useParams();
@@ -35,7 +35,12 @@ function InvoiceDetailPage() {
   const voidInvoice = useVoidInvoice();
   const [loading, setLoading] = useState(false);
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
   if (!invoice) return null;
 
   const handleSend = async () => {
@@ -72,25 +77,17 @@ function InvoiceDetailPage() {
           >
             &larr; Back to Invoices
           </Link>
-          <h1 className="mt-1 text-2xl font-bold">
-            Invoice {invoice.invoiceNumber}
-          </h1>
+          <h1 className="mt-1 text-2xl font-bold">Invoice {invoice.invoiceNumber}</h1>
         </div>
         <div className="flex items-center gap-3">
-          <Badge className={statusColors[invoice.status] || ""}>
-            {invoice.status}
-          </Badge>
+          <Badge className={statusColors[invoice.status] || ""}>{invoice.status}</Badge>
           {invoice.status === "draft" && (
             <Button onClick={handleSend} disabled={loading}>
               {loading ? "Sending..." : "Send Invoice"}
             </Button>
           )}
           {invoice.status !== "paid" && invoice.status !== "void" && (
-            <Button
-              variant="destructive"
-              onClick={handleVoid}
-              disabled={loading}
-            >
+            <Button variant="destructive" onClick={handleVoid} disabled={loading}>
               Void
             </Button>
           )}
@@ -101,9 +98,7 @@ function InvoiceDetailPage() {
       <div className="mb-6 grid gap-6 md:grid-cols-2">
         <Card>
           <CardContent className="py-6">
-            <h3 className="mb-3 text-sm font-semibold text-muted-foreground uppercase">
-              Bill To
-            </h3>
+            <h3 className="mb-3 text-sm font-semibold text-muted-foreground uppercase">Bill To</h3>
             <p className="font-medium">{invoice.parentName}</p>
             <p className="text-sm text-muted-foreground">{invoice.parentEmail}</p>
           </CardContent>
@@ -111,15 +106,11 @@ function InvoiceDetailPage() {
 
         <Card>
           <CardContent className="py-6">
-            <h3 className="mb-3 text-sm font-semibold text-muted-foreground uppercase">
-              Details
-            </h3>
+            <h3 className="mb-3 text-sm font-semibold text-muted-foreground uppercase">Details</h3>
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Due Date</span>
-                <span>
-                  {new Date(invoice.dueDate + "T00:00:00").toLocaleDateString()}
-                </span>
+                <span>{new Date(invoice.dueDate + "T00:00:00").toLocaleDateString()}</span>
               </div>
               {invoice.billingPeriodStart && invoice.billingPeriodEnd && (
                 <div className="flex justify-between">
@@ -164,9 +155,7 @@ function InvoiceDetailPage() {
                 <TableCell className="text-right">
                   ${parseFloat(item.unitPrice).toFixed(2)}
                 </TableCell>
-                <TableCell className="text-right">
-                  ${parseFloat(item.total).toFixed(2)}
-                </TableCell>
+                <TableCell className="text-right">${parseFloat(item.total).toFixed(2)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -196,9 +185,7 @@ function InvoiceDetailPage() {
       {invoice.notes && (
         <Card className="mb-6">
           <CardContent className="py-6">
-            <h3 className="mb-2 text-sm font-semibold text-muted-foreground uppercase">
-              Notes
-            </h3>
+            <h3 className="mb-2 text-sm font-semibold text-muted-foreground uppercase">Notes</h3>
             <p className="text-sm whitespace-pre-wrap">{invoice.notes}</p>
           </CardContent>
         </Card>
@@ -218,9 +205,7 @@ function InvoiceDetailPage() {
                   className="flex items-center justify-between rounded-md border p-3"
                 >
                   <div>
-                    <p className="text-sm font-medium">
-                      ${parseFloat(payment.amount).toFixed(2)}
-                    </p>
+                    <p className="text-sm font-medium">${parseFloat(payment.amount).toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(payment.createdAt).toLocaleString()}
                     </p>

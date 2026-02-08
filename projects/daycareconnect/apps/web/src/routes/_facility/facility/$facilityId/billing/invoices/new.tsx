@@ -21,9 +21,7 @@ interface LineItem {
   unitPrice: string;
 }
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/billing/invoices/new"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/billing/invoices/new")({
   component: CreateInvoicePage,
 });
 
@@ -45,7 +43,12 @@ function CreateInvoicePage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
 
   const addLineItem = () => {
     setLineItems([...lineItems, { description: "", quantity: 1, unitPrice: "" }]);
@@ -173,9 +176,7 @@ function CreateInvoicePage() {
                     <Input
                       placeholder="e.g., Monthly tuition"
                       value={item.description}
-                      onChange={(e) =>
-                        updateLineItem(index, "description", e.target.value)
-                      }
+                      onChange={(e) => updateLineItem(index, "description", e.target.value)}
                       required
                     />
                   </div>
@@ -199,16 +200,14 @@ function CreateInvoicePage() {
                       min="0"
                       placeholder="0.00"
                       value={item.unitPrice}
-                      onChange={(e) =>
-                        updateLineItem(index, "unitPrice", e.target.value)
-                      }
+                      onChange={(e) => updateLineItem(index, "unitPrice", e.target.value)}
                       required
                     />
                   </div>
                   <div className="w-28 text-right">
                     {index === 0 && <Label className="invisible">Total</Label>}
                     <p className="py-2 text-sm font-medium">
-                      ${((item.quantity * (parseFloat(item.unitPrice) || 0)).toFixed(2))}
+                      ${(item.quantity * (parseFloat(item.unitPrice) || 0)).toFixed(2)}
                     </p>
                   </div>
                   <Button
@@ -224,12 +223,7 @@ function CreateInvoicePage() {
               ))}
             </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              className="mt-3"
-              onClick={addLineItem}
-            >
+            <Button type="button" variant="outline" className="mt-3" onClick={addLineItem}>
               Add Line Item
             </Button>
 

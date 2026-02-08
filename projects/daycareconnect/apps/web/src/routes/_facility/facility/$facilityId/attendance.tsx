@@ -34,13 +34,12 @@ import {
   TabsTrigger,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@daycare-hub/ui";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/attendance"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/attendance")({
   component: AttendancePage,
 });
 
@@ -65,8 +64,7 @@ function AttendancePage() {
     const q = searchQuery.toLowerCase();
     return records.filter(
       (r: any) =>
-        r.childFirstName.toLowerCase().includes(q) ||
-        r.childLastName.toLowerCase().includes(q)
+        r.childFirstName.toLowerCase().includes(q) || r.childLastName.toLowerCase().includes(q)
     );
   }, [records, searchQuery]);
 
@@ -148,25 +146,19 @@ function AttendancePage() {
           <div className="mb-6 grid grid-cols-3 gap-4">
             <Card>
               <CardContent className="py-4 text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {presentCount}
-                </div>
+                <div className="text-2xl font-bold text-green-600">{presentCount}</div>
                 <p className="text-sm text-muted-foreground">Checked In</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="py-4 text-center">
-                <div className="text-2xl font-bold text-red-600">
-                  {absentCount}
-                </div>
+                <div className="text-2xl font-bold text-red-600">{absentCount}</div>
                 <p className="text-sm text-muted-foreground">Absent</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="py-4 text-center">
-                <div className="text-2xl font-bold text-amber-600">
-                  {expectedCount}
-                </div>
+                <div className="text-2xl font-bold text-amber-600">{expectedCount}</div>
                 <p className="text-sm text-muted-foreground">Expected</p>
               </CardContent>
             </Card>
@@ -220,20 +212,14 @@ function AttendancePage() {
                             <p className="font-medium">
                               {record.childFirstName} {record.childLastName}
                             </p>
-                            <p className="text-xs text-muted-foreground">
-                              {record.parentName}
-                            </p>
+                            <p className="text-xs text-muted-foreground">{record.parentName}</p>
                           </button>
                         </TableCell>
                         <TableCell className="capitalize text-sm">
                           {record.scheduleType.replace("_", " ")}
                         </TableCell>
-                        <TableCell className="text-sm">
-                          {formatTime(record.checkInTime)}
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          {formatTime(record.checkOutTime)}
-                        </TableCell>
+                        <TableCell className="text-sm">{formatTime(record.checkInTime)}</TableCell>
+                        <TableCell className="text-sm">{formatTime(record.checkOutTime)}</TableCell>
                         <TableCell>
                           <AttendanceStatusBadge status={record.status} />
                           {record.absenceReason && (
@@ -244,8 +230,7 @@ function AttendancePage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
-                            {(record.status === "expected" ||
-                              record.status === "late") &&
+                            {(record.status === "expected" || record.status === "late") &&
                               !record.checkInTime && (
                                 <Button
                                   size="sm"
@@ -269,9 +254,7 @@ function AttendancePage() {
                               )}
                             {record.status === "expected" && (
                               <Select
-                                onValueChange={(reason) =>
-                                  handleMarkAbsent(record.id, reason)
-                                }
+                                onValueChange={(reason) => handleMarkAbsent(record.id, reason)}
                               >
                                 <SelectTrigger className="h-8 w-[130px]">
                                   <SelectValue placeholder="Mark Absent" />
@@ -279,8 +262,7 @@ function AttendancePage() {
                                 <SelectContent>
                                   {ABSENCE_REASONS.map((reason) => (
                                     <SelectItem key={reason} value={reason}>
-                                      {reason.charAt(0).toUpperCase() +
-                                        reason.slice(1)}
+                                      {reason.charAt(0).toUpperCase() + reason.slice(1)}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -302,10 +284,7 @@ function AttendancePage() {
         </TabsContent>
       </Tabs>
 
-      <Dialog
-        open={!!selectedChild}
-        onOpenChange={(open) => !open && setSelectedChild(null)}
-      >
+      <Dialog open={!!selectedChild} onOpenChange={(open) => !open && setSelectedChild(null)}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>
@@ -313,6 +292,7 @@ function AttendancePage() {
                 ? `${selectedChild.firstName} ${selectedChild.lastName} - Attendance History`
                 : "Attendance History"}
             </DialogTitle>
+            <DialogDescription>View attendance history for this child.</DialogDescription>
           </DialogHeader>
           {selectedChild && (
             <ChildHistoryContent
@@ -356,9 +336,7 @@ function ActivityLogSection({ facilityId }: { facilityId: string }) {
     return (
       <Card>
         <CardContent className="py-12 text-center">
-          <p className="text-muted-foreground">
-            No check-in/out activity yet.
-          </p>
+          <p className="text-muted-foreground">No check-in/out activity yet.</p>
         </CardContent>
       </Card>
     );
@@ -385,9 +363,7 @@ function ActivityLogSection({ facilityId }: { facilityId: string }) {
                   </p>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {formatEventTime(eventTime)}
-              </p>
+              <p className="text-sm text-muted-foreground">{formatEventTime(eventTime)}</p>
             </CardContent>
           </Card>
         );
@@ -395,11 +371,7 @@ function ActivityLogSection({ facilityId }: { facilityId: string }) {
 
       {hasNextPage && (
         <div className="text-center pt-2">
-          <Button
-            variant="outline"
-            onClick={() => fetchNextPage()}
-            disabled={isFetchingNextPage}
-          >
+          <Button variant="outline" onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
             {isFetchingNextPage ? "Loading..." : "Load More"}
           </Button>
         </div>
@@ -452,12 +424,8 @@ function ChildHistoryContent({
           {items.map((item: any) => (
             <TableRow key={item.id}>
               <TableCell className="text-sm">{item.date}</TableCell>
-              <TableCell className="text-sm">
-                {formatTime(item.checkInTime)}
-              </TableCell>
-              <TableCell className="text-sm">
-                {formatTime(item.checkOutTime)}
-              </TableCell>
+              <TableCell className="text-sm">{formatTime(item.checkInTime)}</TableCell>
+              <TableCell className="text-sm">{formatTime(item.checkOutTime)}</TableCell>
               <TableCell>
                 <AttendanceStatusBadge status={item.status} />
                 {item.absenceReason && (

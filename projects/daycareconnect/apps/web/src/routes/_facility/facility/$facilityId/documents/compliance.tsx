@@ -16,9 +16,7 @@ import {
   TableRow,
 } from "@daycare-hub/ui";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/documents/compliance"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/documents/compliance")({
   component: CompliancePage,
 });
 
@@ -28,7 +26,12 @@ function CompliancePage() {
   const sendDocument = useSendDocument();
   const [loading, setLoading] = useState(false);
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
   if (!data) return null;
 
   const { requiredTemplates, compliance } = data;
@@ -50,12 +53,7 @@ function CompliancePage() {
   const handleExportCsv = () => {
     if (requiredTemplates.length === 0 || compliance.length === 0) return;
 
-    const headers = [
-      "Parent Name",
-      "Email",
-      "Children",
-      ...requiredTemplates.map((t) => t.title),
-    ];
+    const headers = ["Parent Name", "Email", "Children", ...requiredTemplates.map((t) => t.title)];
     const rows = compliance.map((family) => [
       family.parentName,
       family.parentEmail,
@@ -63,7 +61,9 @@ function CompliancePage() {
       ...family.documents.map((d) => d.status),
     ]);
 
-    const csv = [headers, ...rows].map((row) => row.map((cell) => `"${cell}"`).join(",")).join("\n");
+    const csv = [headers, ...rows]
+      .map((row) => row.map((cell) => `"${cell}"`).join(","))
+      .join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -93,9 +93,7 @@ function CompliancePage() {
       ) : compliance.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">
-              No active enrollments to track.
-            </p>
+            <p className="text-muted-foreground">No active enrollments to track.</p>
           </CardContent>
         </Card>
       ) : (
@@ -132,9 +130,7 @@ function CompliancePage() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() =>
-                                  handleSendMissing(family.parentId, doc.templateId)
-                                }
+                                onClick={() => handleSendMissing(family.parentId, doc.templateId)}
                                 disabled={loading}
                               >
                                 Send

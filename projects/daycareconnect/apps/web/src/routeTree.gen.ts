@@ -17,6 +17,7 @@ import { Route as FacilityRouteImport } from './routes/_facility'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FacilitiesIndexRouteImport } from './routes/facilities/index'
+import { Route as StaffInviteTokenRouteImport } from './routes/staff-invite/$token'
 import { Route as InviteCodeRouteImport } from './routes/invite/$code'
 import { Route as AuthVerifyEmailRouteImport } from './routes/_auth/verify-email'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
@@ -33,6 +34,7 @@ import { Route as StaffStaffSettingsRouteImport } from './routes/_staff/staff/se
 import { Route as StaffStaffNotificationsRouteImport } from './routes/_staff/staff/notifications'
 import { Route as ParentParentSettingsRouteImport } from './routes/_parent/parent/settings'
 import { Route as ParentParentReviewsRouteImport } from './routes/_parent/parent/reviews'
+import { Route as ParentParentOnboardingRouteImport } from './routes/_parent/parent/onboarding'
 import { Route as ParentParentNotificationsRouteImport } from './routes/_parent/parent/notifications'
 import { Route as FacilityFacilitySettingsRouteImport } from './routes/_facility/facility/settings'
 import { Route as FacilityFacilityNotificationsRouteImport } from './routes/_facility/facility/notifications'
@@ -63,16 +65,20 @@ import { Route as FacilityFacilityFacilityIdPhotosRouteImport } from './routes/_
 import { Route as FacilityFacilityFacilityIdInvitesRouteImport } from './routes/_facility/facility/$facilityId/invites'
 import { Route as FacilityFacilityFacilityIdHoursRouteImport } from './routes/_facility/facility/$facilityId/hours'
 import { Route as FacilityFacilityFacilityIdEnrollmentsRouteImport } from './routes/_facility/facility/$facilityId/enrollments'
+import { Route as FacilityFacilityFacilityIdEnrollmentAnalyticsRouteImport } from './routes/_facility/facility/$facilityId/enrollment-analytics'
+import { Route as FacilityFacilityFacilityIdEmailsRouteImport } from './routes/_facility/facility/$facilityId/emails'
 import { Route as FacilityFacilityFacilityIdEditRouteImport } from './routes/_facility/facility/$facilityId/edit'
 import { Route as FacilityFacilityFacilityIdDailyReportsRouteImport } from './routes/_facility/facility/$facilityId/daily-reports'
 import { Route as FacilityFacilityFacilityIdAttendanceRouteImport } from './routes/_facility/facility/$facilityId/attendance'
 import { Route as FacilityFacilityFacilityIdActivitiesRouteImport } from './routes/_facility/facility/$facilityId/activities'
+import { Route as FacilityFacilityFacilityIdMessagesIndexRouteImport } from './routes/_facility/facility/$facilityId/messages/index'
 import { Route as FacilityFacilityFacilityIdDocumentsIndexRouteImport } from './routes/_facility/facility/$facilityId/documents/index'
 import { Route as FacilityFacilityFacilityIdBillingIndexRouteImport } from './routes/_facility/facility/$facilityId/billing/index'
 import { Route as ParentParentChildrenChildIdPhotosRouteImport } from './routes/_parent/parent/children/$childId/photos'
 import { Route as ParentParentChildrenChildIdEditRouteImport } from './routes/_parent/parent/children/$childId/edit'
 import { Route as ParentParentChildrenChildIdActivitiesRouteImport } from './routes/_parent/parent/children/$childId/activities'
 import { Route as ParentParentBillingInvoicesInvoiceIdRouteImport } from './routes/_parent/parent/billing/invoices/$invoiceId'
+import { Route as FacilityFacilityFacilityIdMessagesConversationIdRouteImport } from './routes/_facility/facility/$facilityId/messages/$conversationId'
 import { Route as FacilityFacilityFacilityIdInvitesFormsRouteImport } from './routes/_facility/facility/$facilityId/invites/forms'
 import { Route as FacilityFacilityFacilityIdDocumentsTemplatesRouteImport } from './routes/_facility/facility/$facilityId/documents/templates'
 import { Route as FacilityFacilityFacilityIdDocumentsSendRouteImport } from './routes/_facility/facility/$facilityId/documents/send'
@@ -116,6 +122,11 @@ const IndexRoute = IndexRouteImport.update({
 const FacilitiesIndexRoute = FacilitiesIndexRouteImport.update({
   id: '/facilities/',
   path: '/facilities/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffInviteTokenRoute = StaffInviteTokenRouteImport.update({
+  id: '/staff-invite/$token',
+  path: '/staff-invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InviteCodeRoute = InviteCodeRouteImport.update({
@@ -199,6 +210,11 @@ const ParentParentSettingsRoute = ParentParentSettingsRouteImport.update({
 const ParentParentReviewsRoute = ParentParentReviewsRouteImport.update({
   id: '/parent/reviews',
   path: '/parent/reviews',
+  getParentRoute: () => ParentRoute,
+} as any)
+const ParentParentOnboardingRoute = ParentParentOnboardingRouteImport.update({
+  id: '/parent/onboarding',
+  path: '/parent/onboarding',
   getParentRoute: () => ParentRoute,
 } as any)
 const ParentParentNotificationsRoute =
@@ -378,6 +394,18 @@ const FacilityFacilityFacilityIdEnrollmentsRoute =
     path: '/enrollments',
     getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
+const FacilityFacilityFacilityIdEnrollmentAnalyticsRoute =
+  FacilityFacilityFacilityIdEnrollmentAnalyticsRouteImport.update({
+    id: '/enrollment-analytics',
+    path: '/enrollment-analytics',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
+  } as any)
+const FacilityFacilityFacilityIdEmailsRoute =
+  FacilityFacilityFacilityIdEmailsRouteImport.update({
+    id: '/emails',
+    path: '/emails',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
+  } as any)
 const FacilityFacilityFacilityIdEditRoute =
   FacilityFacilityFacilityIdEditRouteImport.update({
     id: '/edit',
@@ -400,6 +428,12 @@ const FacilityFacilityFacilityIdActivitiesRoute =
   FacilityFacilityFacilityIdActivitiesRouteImport.update({
     id: '/activities',
     path: '/activities',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
+  } as any)
+const FacilityFacilityFacilityIdMessagesIndexRoute =
+  FacilityFacilityFacilityIdMessagesIndexRouteImport.update({
+    id: '/messages/',
+    path: '/messages/',
     getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdDocumentsIndexRoute =
@@ -437,6 +471,12 @@ const ParentParentBillingInvoicesInvoiceIdRoute =
     id: '/parent/billing/invoices/$invoiceId',
     path: '/parent/billing/invoices/$invoiceId',
     getParentRoute: () => ParentRoute,
+  } as any)
+const FacilityFacilityFacilityIdMessagesConversationIdRoute =
+  FacilityFacilityFacilityIdMessagesConversationIdRouteImport.update({
+    id: '/messages/$conversationId',
+    path: '/messages/$conversationId',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdInvitesFormsRoute =
   FacilityFacilityFacilityIdInvitesFormsRouteImport.update({
@@ -497,12 +537,14 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof AuthResetPasswordRoute
   '/verify-email': typeof AuthVerifyEmailRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/staff-invite/$token': typeof StaffInviteTokenRoute
   '/facilities/': typeof FacilitiesIndexRoute
   '/facility/$facilityId': typeof FacilityFacilityFacilityIdRouteWithChildren
   '/facility/new': typeof FacilityFacilityNewRoute
   '/facility/notifications': typeof FacilityFacilityNotificationsRoute
   '/facility/settings': typeof FacilityFacilitySettingsRoute
   '/parent/notifications': typeof ParentParentNotificationsRoute
+  '/parent/onboarding': typeof ParentParentOnboardingRoute
   '/parent/reviews': typeof ParentParentReviewsRoute
   '/parent/settings': typeof ParentParentSettingsRoute
   '/staff/notifications': typeof StaffStaffNotificationsRoute
@@ -517,6 +559,8 @@ export interface FileRoutesByFullPath {
   '/facility/$facilityId/attendance': typeof FacilityFacilityFacilityIdAttendanceRoute
   '/facility/$facilityId/daily-reports': typeof FacilityFacilityFacilityIdDailyReportsRoute
   '/facility/$facilityId/edit': typeof FacilityFacilityFacilityIdEditRoute
+  '/facility/$facilityId/emails': typeof FacilityFacilityFacilityIdEmailsRoute
+  '/facility/$facilityId/enrollment-analytics': typeof FacilityFacilityFacilityIdEnrollmentAnalyticsRoute
   '/facility/$facilityId/enrollments': typeof FacilityFacilityFacilityIdEnrollmentsRoute
   '/facility/$facilityId/hours': typeof FacilityFacilityFacilityIdHoursRoute
   '/facility/$facilityId/invites': typeof FacilityFacilityFacilityIdInvitesRouteWithChildren
@@ -546,12 +590,14 @@ export interface FileRoutesByFullPath {
   '/facility/$facilityId/documents/send': typeof FacilityFacilityFacilityIdDocumentsSendRoute
   '/facility/$facilityId/documents/templates': typeof FacilityFacilityFacilityIdDocumentsTemplatesRoute
   '/facility/$facilityId/invites/forms': typeof FacilityFacilityFacilityIdInvitesFormsRoute
+  '/facility/$facilityId/messages/$conversationId': typeof FacilityFacilityFacilityIdMessagesConversationIdRoute
   '/parent/billing/invoices/$invoiceId': typeof ParentParentBillingInvoicesInvoiceIdRoute
   '/parent/children/$childId/activities': typeof ParentParentChildrenChildIdActivitiesRoute
   '/parent/children/$childId/edit': typeof ParentParentChildrenChildIdEditRoute
   '/parent/children/$childId/photos': typeof ParentParentChildrenChildIdPhotosRoute
   '/facility/$facilityId/billing/': typeof FacilityFacilityFacilityIdBillingIndexRoute
   '/facility/$facilityId/documents/': typeof FacilityFacilityFacilityIdDocumentsIndexRoute
+  '/facility/$facilityId/messages/': typeof FacilityFacilityFacilityIdMessagesIndexRoute
   '/facility/$facilityId/billing/invoices/$invoiceId': typeof FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute
   '/facility/$facilityId/billing/invoices/new': typeof FacilityFacilityFacilityIdBillingInvoicesNewRoute
   '/parent/children/$childId/daily-report/$date': typeof ParentParentChildrenChildIdDailyReportDateRoute
@@ -567,11 +613,13 @@ export interface FileRoutesByTo {
   '/reset-password': typeof AuthResetPasswordRoute
   '/verify-email': typeof AuthVerifyEmailRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/staff-invite/$token': typeof StaffInviteTokenRoute
   '/facilities': typeof FacilitiesIndexRoute
   '/facility/new': typeof FacilityFacilityNewRoute
   '/facility/notifications': typeof FacilityFacilityNotificationsRoute
   '/facility/settings': typeof FacilityFacilitySettingsRoute
   '/parent/notifications': typeof ParentParentNotificationsRoute
+  '/parent/onboarding': typeof ParentParentOnboardingRoute
   '/parent/reviews': typeof ParentParentReviewsRoute
   '/parent/settings': typeof ParentParentSettingsRoute
   '/staff/notifications': typeof StaffStaffNotificationsRoute
@@ -586,6 +634,8 @@ export interface FileRoutesByTo {
   '/facility/$facilityId/attendance': typeof FacilityFacilityFacilityIdAttendanceRoute
   '/facility/$facilityId/daily-reports': typeof FacilityFacilityFacilityIdDailyReportsRoute
   '/facility/$facilityId/edit': typeof FacilityFacilityFacilityIdEditRoute
+  '/facility/$facilityId/emails': typeof FacilityFacilityFacilityIdEmailsRoute
+  '/facility/$facilityId/enrollment-analytics': typeof FacilityFacilityFacilityIdEnrollmentAnalyticsRoute
   '/facility/$facilityId/enrollments': typeof FacilityFacilityFacilityIdEnrollmentsRoute
   '/facility/$facilityId/hours': typeof FacilityFacilityFacilityIdHoursRoute
   '/facility/$facilityId/invites': typeof FacilityFacilityFacilityIdInvitesRouteWithChildren
@@ -615,12 +665,14 @@ export interface FileRoutesByTo {
   '/facility/$facilityId/documents/send': typeof FacilityFacilityFacilityIdDocumentsSendRoute
   '/facility/$facilityId/documents/templates': typeof FacilityFacilityFacilityIdDocumentsTemplatesRoute
   '/facility/$facilityId/invites/forms': typeof FacilityFacilityFacilityIdInvitesFormsRoute
+  '/facility/$facilityId/messages/$conversationId': typeof FacilityFacilityFacilityIdMessagesConversationIdRoute
   '/parent/billing/invoices/$invoiceId': typeof ParentParentBillingInvoicesInvoiceIdRoute
   '/parent/children/$childId/activities': typeof ParentParentChildrenChildIdActivitiesRoute
   '/parent/children/$childId/edit': typeof ParentParentChildrenChildIdEditRoute
   '/parent/children/$childId/photos': typeof ParentParentChildrenChildIdPhotosRoute
   '/facility/$facilityId/billing': typeof FacilityFacilityFacilityIdBillingIndexRoute
   '/facility/$facilityId/documents': typeof FacilityFacilityFacilityIdDocumentsIndexRoute
+  '/facility/$facilityId/messages': typeof FacilityFacilityFacilityIdMessagesIndexRoute
   '/facility/$facilityId/billing/invoices/$invoiceId': typeof FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute
   '/facility/$facilityId/billing/invoices/new': typeof FacilityFacilityFacilityIdBillingInvoicesNewRoute
   '/parent/children/$childId/daily-report/$date': typeof ParentParentChildrenChildIdDailyReportDateRoute
@@ -641,12 +693,14 @@ export interface FileRoutesById {
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/verify-email': typeof AuthVerifyEmailRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/staff-invite/$token': typeof StaffInviteTokenRoute
   '/facilities/': typeof FacilitiesIndexRoute
   '/_facility/facility/$facilityId': typeof FacilityFacilityFacilityIdRouteWithChildren
   '/_facility/facility/new': typeof FacilityFacilityNewRoute
   '/_facility/facility/notifications': typeof FacilityFacilityNotificationsRoute
   '/_facility/facility/settings': typeof FacilityFacilitySettingsRoute
   '/_parent/parent/notifications': typeof ParentParentNotificationsRoute
+  '/_parent/parent/onboarding': typeof ParentParentOnboardingRoute
   '/_parent/parent/reviews': typeof ParentParentReviewsRoute
   '/_parent/parent/settings': typeof ParentParentSettingsRoute
   '/_staff/staff/notifications': typeof StaffStaffNotificationsRoute
@@ -661,6 +715,8 @@ export interface FileRoutesById {
   '/_facility/facility/$facilityId/attendance': typeof FacilityFacilityFacilityIdAttendanceRoute
   '/_facility/facility/$facilityId/daily-reports': typeof FacilityFacilityFacilityIdDailyReportsRoute
   '/_facility/facility/$facilityId/edit': typeof FacilityFacilityFacilityIdEditRoute
+  '/_facility/facility/$facilityId/emails': typeof FacilityFacilityFacilityIdEmailsRoute
+  '/_facility/facility/$facilityId/enrollment-analytics': typeof FacilityFacilityFacilityIdEnrollmentAnalyticsRoute
   '/_facility/facility/$facilityId/enrollments': typeof FacilityFacilityFacilityIdEnrollmentsRoute
   '/_facility/facility/$facilityId/hours': typeof FacilityFacilityFacilityIdHoursRoute
   '/_facility/facility/$facilityId/invites': typeof FacilityFacilityFacilityIdInvitesRouteWithChildren
@@ -690,12 +746,14 @@ export interface FileRoutesById {
   '/_facility/facility/$facilityId/documents/send': typeof FacilityFacilityFacilityIdDocumentsSendRoute
   '/_facility/facility/$facilityId/documents/templates': typeof FacilityFacilityFacilityIdDocumentsTemplatesRoute
   '/_facility/facility/$facilityId/invites/forms': typeof FacilityFacilityFacilityIdInvitesFormsRoute
+  '/_facility/facility/$facilityId/messages/$conversationId': typeof FacilityFacilityFacilityIdMessagesConversationIdRoute
   '/_parent/parent/billing/invoices/$invoiceId': typeof ParentParentBillingInvoicesInvoiceIdRoute
   '/_parent/parent/children/$childId/activities': typeof ParentParentChildrenChildIdActivitiesRoute
   '/_parent/parent/children/$childId/edit': typeof ParentParentChildrenChildIdEditRoute
   '/_parent/parent/children/$childId/photos': typeof ParentParentChildrenChildIdPhotosRoute
   '/_facility/facility/$facilityId/billing/': typeof FacilityFacilityFacilityIdBillingIndexRoute
   '/_facility/facility/$facilityId/documents/': typeof FacilityFacilityFacilityIdDocumentsIndexRoute
+  '/_facility/facility/$facilityId/messages/': typeof FacilityFacilityFacilityIdMessagesIndexRoute
   '/_facility/facility/$facilityId/billing/invoices/$invoiceId': typeof FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute
   '/_facility/facility/$facilityId/billing/invoices/new': typeof FacilityFacilityFacilityIdBillingInvoicesNewRoute
   '/_parent/parent/children/$childId/daily-report/$date': typeof ParentParentChildrenChildIdDailyReportDateRoute
@@ -713,12 +771,14 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/verify-email'
     | '/invite/$code'
+    | '/staff-invite/$token'
     | '/facilities/'
     | '/facility/$facilityId'
     | '/facility/new'
     | '/facility/notifications'
     | '/facility/settings'
     | '/parent/notifications'
+    | '/parent/onboarding'
     | '/parent/reviews'
     | '/parent/settings'
     | '/staff/notifications'
@@ -733,6 +793,8 @@ export interface FileRouteTypes {
     | '/facility/$facilityId/attendance'
     | '/facility/$facilityId/daily-reports'
     | '/facility/$facilityId/edit'
+    | '/facility/$facilityId/emails'
+    | '/facility/$facilityId/enrollment-analytics'
     | '/facility/$facilityId/enrollments'
     | '/facility/$facilityId/hours'
     | '/facility/$facilityId/invites'
@@ -762,12 +824,14 @@ export interface FileRouteTypes {
     | '/facility/$facilityId/documents/send'
     | '/facility/$facilityId/documents/templates'
     | '/facility/$facilityId/invites/forms'
+    | '/facility/$facilityId/messages/$conversationId'
     | '/parent/billing/invoices/$invoiceId'
     | '/parent/children/$childId/activities'
     | '/parent/children/$childId/edit'
     | '/parent/children/$childId/photos'
     | '/facility/$facilityId/billing/'
     | '/facility/$facilityId/documents/'
+    | '/facility/$facilityId/messages/'
     | '/facility/$facilityId/billing/invoices/$invoiceId'
     | '/facility/$facilityId/billing/invoices/new'
     | '/parent/children/$childId/daily-report/$date'
@@ -783,11 +847,13 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/verify-email'
     | '/invite/$code'
+    | '/staff-invite/$token'
     | '/facilities'
     | '/facility/new'
     | '/facility/notifications'
     | '/facility/settings'
     | '/parent/notifications'
+    | '/parent/onboarding'
     | '/parent/reviews'
     | '/parent/settings'
     | '/staff/notifications'
@@ -802,6 +868,8 @@ export interface FileRouteTypes {
     | '/facility/$facilityId/attendance'
     | '/facility/$facilityId/daily-reports'
     | '/facility/$facilityId/edit'
+    | '/facility/$facilityId/emails'
+    | '/facility/$facilityId/enrollment-analytics'
     | '/facility/$facilityId/enrollments'
     | '/facility/$facilityId/hours'
     | '/facility/$facilityId/invites'
@@ -831,12 +899,14 @@ export interface FileRouteTypes {
     | '/facility/$facilityId/documents/send'
     | '/facility/$facilityId/documents/templates'
     | '/facility/$facilityId/invites/forms'
+    | '/facility/$facilityId/messages/$conversationId'
     | '/parent/billing/invoices/$invoiceId'
     | '/parent/children/$childId/activities'
     | '/parent/children/$childId/edit'
     | '/parent/children/$childId/photos'
     | '/facility/$facilityId/billing'
     | '/facility/$facilityId/documents'
+    | '/facility/$facilityId/messages'
     | '/facility/$facilityId/billing/invoices/$invoiceId'
     | '/facility/$facilityId/billing/invoices/new'
     | '/parent/children/$childId/daily-report/$date'
@@ -856,12 +926,14 @@ export interface FileRouteTypes {
     | '/_auth/reset-password'
     | '/_auth/verify-email'
     | '/invite/$code'
+    | '/staff-invite/$token'
     | '/facilities/'
     | '/_facility/facility/$facilityId'
     | '/_facility/facility/new'
     | '/_facility/facility/notifications'
     | '/_facility/facility/settings'
     | '/_parent/parent/notifications'
+    | '/_parent/parent/onboarding'
     | '/_parent/parent/reviews'
     | '/_parent/parent/settings'
     | '/_staff/staff/notifications'
@@ -876,6 +948,8 @@ export interface FileRouteTypes {
     | '/_facility/facility/$facilityId/attendance'
     | '/_facility/facility/$facilityId/daily-reports'
     | '/_facility/facility/$facilityId/edit'
+    | '/_facility/facility/$facilityId/emails'
+    | '/_facility/facility/$facilityId/enrollment-analytics'
     | '/_facility/facility/$facilityId/enrollments'
     | '/_facility/facility/$facilityId/hours'
     | '/_facility/facility/$facilityId/invites'
@@ -905,12 +979,14 @@ export interface FileRouteTypes {
     | '/_facility/facility/$facilityId/documents/send'
     | '/_facility/facility/$facilityId/documents/templates'
     | '/_facility/facility/$facilityId/invites/forms'
+    | '/_facility/facility/$facilityId/messages/$conversationId'
     | '/_parent/parent/billing/invoices/$invoiceId'
     | '/_parent/parent/children/$childId/activities'
     | '/_parent/parent/children/$childId/edit'
     | '/_parent/parent/children/$childId/photos'
     | '/_facility/facility/$facilityId/billing/'
     | '/_facility/facility/$facilityId/documents/'
+    | '/_facility/facility/$facilityId/messages/'
     | '/_facility/facility/$facilityId/billing/invoices/$invoiceId'
     | '/_facility/facility/$facilityId/billing/invoices/new'
     | '/_parent/parent/children/$childId/daily-report/$date'
@@ -926,6 +1002,7 @@ export interface RootRouteChildren {
   DiscoverRoute: typeof DiscoverRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
   InviteCodeRoute: typeof InviteCodeRoute
+  StaffInviteTokenRoute: typeof StaffInviteTokenRoute
   FacilitiesIndexRoute: typeof FacilitiesIndexRoute
   FacilitiesFacilityIdEnrollRoute: typeof FacilitiesFacilityIdEnrollRoute
   FacilitiesFacilityIdReviewRoute: typeof FacilitiesFacilityIdReviewRoute
@@ -988,6 +1065,13 @@ declare module '@tanstack/react-router' {
       path: '/facilities'
       fullPath: '/facilities/'
       preLoaderRoute: typeof FacilitiesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff-invite/$token': {
+      id: '/staff-invite/$token'
+      path: '/staff-invite/$token'
+      fullPath: '/staff-invite/$token'
+      preLoaderRoute: typeof StaffInviteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invite/$code': {
@@ -1100,6 +1184,13 @@ declare module '@tanstack/react-router' {
       path: '/parent/reviews'
       fullPath: '/parent/reviews'
       preLoaderRoute: typeof ParentParentReviewsRouteImport
+      parentRoute: typeof ParentRoute
+    }
+    '/_parent/parent/onboarding': {
+      id: '/_parent/parent/onboarding'
+      path: '/parent/onboarding'
+      fullPath: '/parent/onboarding'
+      preLoaderRoute: typeof ParentParentOnboardingRouteImport
       parentRoute: typeof ParentRoute
     }
     '/_parent/parent/notifications': {
@@ -1312,6 +1403,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FacilityFacilityFacilityIdEnrollmentsRouteImport
       parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
+    '/_facility/facility/$facilityId/enrollment-analytics': {
+      id: '/_facility/facility/$facilityId/enrollment-analytics'
+      path: '/enrollment-analytics'
+      fullPath: '/facility/$facilityId/enrollment-analytics'
+      preLoaderRoute: typeof FacilityFacilityFacilityIdEnrollmentAnalyticsRouteImport
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
+    }
+    '/_facility/facility/$facilityId/emails': {
+      id: '/_facility/facility/$facilityId/emails'
+      path: '/emails'
+      fullPath: '/facility/$facilityId/emails'
+      preLoaderRoute: typeof FacilityFacilityFacilityIdEmailsRouteImport
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
+    }
     '/_facility/facility/$facilityId/edit': {
       id: '/_facility/facility/$facilityId/edit'
       path: '/edit'
@@ -1338,6 +1443,13 @@ declare module '@tanstack/react-router' {
       path: '/activities'
       fullPath: '/facility/$facilityId/activities'
       preLoaderRoute: typeof FacilityFacilityFacilityIdActivitiesRouteImport
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
+    }
+    '/_facility/facility/$facilityId/messages/': {
+      id: '/_facility/facility/$facilityId/messages/'
+      path: '/messages'
+      fullPath: '/facility/$facilityId/messages/'
+      preLoaderRoute: typeof FacilityFacilityFacilityIdMessagesIndexRouteImport
       parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/documents/': {
@@ -1381,6 +1493,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/parent/billing/invoices/$invoiceId'
       preLoaderRoute: typeof ParentParentBillingInvoicesInvoiceIdRouteImport
       parentRoute: typeof ParentRoute
+    }
+    '/_facility/facility/$facilityId/messages/$conversationId': {
+      id: '/_facility/facility/$facilityId/messages/$conversationId'
+      path: '/messages/$conversationId'
+      fullPath: '/facility/$facilityId/messages/$conversationId'
+      preLoaderRoute: typeof FacilityFacilityFacilityIdMessagesConversationIdRouteImport
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/invites/forms': {
       id: '/_facility/facility/$facilityId/invites/forms'
@@ -1479,6 +1598,8 @@ interface FacilityFacilityFacilityIdRouteChildren {
   FacilityFacilityFacilityIdAttendanceRoute: typeof FacilityFacilityFacilityIdAttendanceRoute
   FacilityFacilityFacilityIdDailyReportsRoute: typeof FacilityFacilityFacilityIdDailyReportsRoute
   FacilityFacilityFacilityIdEditRoute: typeof FacilityFacilityFacilityIdEditRoute
+  FacilityFacilityFacilityIdEmailsRoute: typeof FacilityFacilityFacilityIdEmailsRoute
+  FacilityFacilityFacilityIdEnrollmentAnalyticsRoute: typeof FacilityFacilityFacilityIdEnrollmentAnalyticsRoute
   FacilityFacilityFacilityIdEnrollmentsRoute: typeof FacilityFacilityFacilityIdEnrollmentsRoute
   FacilityFacilityFacilityIdHoursRoute: typeof FacilityFacilityFacilityIdHoursRoute
   FacilityFacilityFacilityIdInvitesRoute: typeof FacilityFacilityFacilityIdInvitesRouteWithChildren
@@ -1492,8 +1613,10 @@ interface FacilityFacilityFacilityIdRouteChildren {
   FacilityFacilityFacilityIdDocumentsComplianceRoute: typeof FacilityFacilityFacilityIdDocumentsComplianceRoute
   FacilityFacilityFacilityIdDocumentsSendRoute: typeof FacilityFacilityFacilityIdDocumentsSendRoute
   FacilityFacilityFacilityIdDocumentsTemplatesRoute: typeof FacilityFacilityFacilityIdDocumentsTemplatesRoute
+  FacilityFacilityFacilityIdMessagesConversationIdRoute: typeof FacilityFacilityFacilityIdMessagesConversationIdRoute
   FacilityFacilityFacilityIdBillingIndexRoute: typeof FacilityFacilityFacilityIdBillingIndexRoute
   FacilityFacilityFacilityIdDocumentsIndexRoute: typeof FacilityFacilityFacilityIdDocumentsIndexRoute
+  FacilityFacilityFacilityIdMessagesIndexRoute: typeof FacilityFacilityFacilityIdMessagesIndexRoute
   FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute: typeof FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute
   FacilityFacilityFacilityIdBillingInvoicesNewRoute: typeof FacilityFacilityFacilityIdBillingInvoicesNewRoute
   FacilityFacilityFacilityIdBillingInvoicesIndexRoute: typeof FacilityFacilityFacilityIdBillingInvoicesIndexRoute
@@ -1508,6 +1631,10 @@ const FacilityFacilityFacilityIdRouteChildren: FacilityFacilityFacilityIdRouteCh
     FacilityFacilityFacilityIdDailyReportsRoute:
       FacilityFacilityFacilityIdDailyReportsRoute,
     FacilityFacilityFacilityIdEditRoute: FacilityFacilityFacilityIdEditRoute,
+    FacilityFacilityFacilityIdEmailsRoute:
+      FacilityFacilityFacilityIdEmailsRoute,
+    FacilityFacilityFacilityIdEnrollmentAnalyticsRoute:
+      FacilityFacilityFacilityIdEnrollmentAnalyticsRoute,
     FacilityFacilityFacilityIdEnrollmentsRoute:
       FacilityFacilityFacilityIdEnrollmentsRoute,
     FacilityFacilityFacilityIdHoursRoute: FacilityFacilityFacilityIdHoursRoute,
@@ -1531,10 +1658,14 @@ const FacilityFacilityFacilityIdRouteChildren: FacilityFacilityFacilityIdRouteCh
       FacilityFacilityFacilityIdDocumentsSendRoute,
     FacilityFacilityFacilityIdDocumentsTemplatesRoute:
       FacilityFacilityFacilityIdDocumentsTemplatesRoute,
+    FacilityFacilityFacilityIdMessagesConversationIdRoute:
+      FacilityFacilityFacilityIdMessagesConversationIdRoute,
     FacilityFacilityFacilityIdBillingIndexRoute:
       FacilityFacilityFacilityIdBillingIndexRoute,
     FacilityFacilityFacilityIdDocumentsIndexRoute:
       FacilityFacilityFacilityIdDocumentsIndexRoute,
+    FacilityFacilityFacilityIdMessagesIndexRoute:
+      FacilityFacilityFacilityIdMessagesIndexRoute,
     FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute:
       FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute,
     FacilityFacilityFacilityIdBillingInvoicesNewRoute:
@@ -1598,6 +1729,7 @@ const ParentParentChildrenChildIdRouteWithChildren =
 
 interface ParentRouteChildren {
   ParentParentNotificationsRoute: typeof ParentParentNotificationsRoute
+  ParentParentOnboardingRoute: typeof ParentParentOnboardingRoute
   ParentParentReviewsRoute: typeof ParentParentReviewsRoute
   ParentParentSettingsRoute: typeof ParentParentSettingsRoute
   ParentParentIndexRoute: typeof ParentParentIndexRoute
@@ -1617,6 +1749,7 @@ interface ParentRouteChildren {
 
 const ParentRouteChildren: ParentRouteChildren = {
   ParentParentNotificationsRoute: ParentParentNotificationsRoute,
+  ParentParentOnboardingRoute: ParentParentOnboardingRoute,
   ParentParentReviewsRoute: ParentParentReviewsRoute,
   ParentParentSettingsRoute: ParentParentSettingsRoute,
   ParentParentIndexRoute: ParentParentIndexRoute,
@@ -1669,6 +1802,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiscoverRoute: DiscoverRoute,
   UnauthorizedRoute: UnauthorizedRoute,
   InviteCodeRoute: InviteCodeRoute,
+  StaffInviteTokenRoute: StaffInviteTokenRoute,
   FacilitiesIndexRoute: FacilitiesIndexRoute,
   FacilitiesFacilityIdEnrollRoute: FacilitiesFacilityIdEnrollRoute,
   FacilitiesFacilityIdReviewRoute: FacilitiesFacilityIdReviewRoute,

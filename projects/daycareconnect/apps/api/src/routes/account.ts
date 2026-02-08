@@ -7,7 +7,7 @@ const app = new Hono();
 app.put("/profile", async (c) => {
   const userId = c.get("userId") as string;
   const body = await c.req.json();
-  const { firstName, lastName, phone } = body;
+  const { firstName, lastName, phone, address, city, state, zipCode } = body;
 
   const [updated] = await db
     .update(users)
@@ -16,6 +16,10 @@ app.put("/profile", async (c) => {
       lastName,
       name: `${firstName} ${lastName}`.trim(),
       phone,
+      address,
+      city,
+      state,
+      zipCode,
       updatedAt: new Date(),
     })
     .where(eq(users.id, userId))

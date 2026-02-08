@@ -77,3 +77,4 @@ export * from "./validations/document";
 export * from "./validations/billing";
 export * from "./validations/review";
 export * from "./validations/invite";
+export * from "./validations/onboarding";

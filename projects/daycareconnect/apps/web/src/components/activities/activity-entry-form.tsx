@@ -13,6 +13,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   Button,
@@ -121,6 +122,7 @@ export function ActivityEntryForm({
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Log Activity</DialogTitle>
+          <DialogDescription>Record a new activity entry for this child.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">

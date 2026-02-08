@@ -18,29 +18,24 @@ export function NotificationsPageContent() {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [readFilter, setReadFilter] = useState<string>("all");
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useNotifications({
-      type: typeFilter !== "all" ? typeFilter : undefined,
-      isRead:
-        readFilter === "read"
-          ? true
-          : readFilter === "unread"
-            ? false
-            : undefined,
-    });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useNotifications({
+    type: typeFilter !== "all" ? typeFilter : undefined,
+    isRead: readFilter === "read" ? true : readFilter === "unread" ? false : undefined,
+  });
 
   const markAllReadMutation = useMarkAllNotificationsRead();
 
-  const allNotifications = data?.pages.flatMap((p) => p.notifications) ?? [];
+  const allNotifications =
+    data?.pages
+      .flatMap((p) => p?.notifications ?? [])
+      .filter((n): n is NonNullable<typeof n> => n != null && n.id != null) ?? [];
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Notifications</h1>
-          <p className="mt-1 text-muted-foreground">
-            Stay updated on your activity.
-          </p>
+          <p className="mt-1 text-muted-foreground">Stay updated on your activity.</p>
         </div>
         <Button
           variant="outline"
@@ -81,22 +76,14 @@ export function NotificationsPageContent() {
       <Card>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="py-12 text-center text-muted-foreground">
-              Loading notifications...
-            </div>
+            <div className="py-12 text-center text-muted-foreground">Loading notifications...</div>
           ) : allNotifications.length === 0 ? (
-            <div className="py-12 text-center text-muted-foreground">
-              No notifications found.
-            </div>
+            <div className="py-12 text-center text-muted-foreground">No notifications found.</div>
           ) : (
             <>
               <div className="divide-y">
                 {allNotifications.map((n) => (
-                  <NotificationItem
-                    key={n.id}
-                    notification={n}
-                    truncate={false}
-                  />
+                  <NotificationItem key={n.id} notification={n} truncate={false} />
                 ))}
               </div>
               {hasNextPage && (

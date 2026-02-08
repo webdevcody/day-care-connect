@@ -32,7 +32,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap",
       },
     ],
   }),
@@ -75,7 +75,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="font-sans antialiased" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <body className="font-sans antialiased" style={{ fontFamily: "'Nunito', sans-serif" }}>
         {children}
         {import.meta.env.DEV && <DevUserSwitcher />}
         <Scripts />

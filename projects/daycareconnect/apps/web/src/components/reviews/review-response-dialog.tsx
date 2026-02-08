@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -32,6 +33,9 @@ export function ReviewResponseDialog({
           <DialogTitle>
             {initialBody ? "Edit Response" : "Respond to Review"}
           </DialogTitle>
+          <DialogDescription>
+            {initialBody ? "Edit your existing response." : "Write a response to this review."}
+          </DialogDescription>
         </DialogHeader>
         <div>
           <Textarea

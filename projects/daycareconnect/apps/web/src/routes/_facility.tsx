@@ -5,6 +5,8 @@ import { Button } from "@daycare-hub/ui";
 import { MessagesNavLink } from "@/components/messaging/unread-badge";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useMyFacilities } from "@daycare-hub/hooks";
+import { OnboardingWizard } from "@/components/facility/onboarding-wizard";
 
 import { Building2, PlusCircle, Bell, Settings } from "lucide-react";
 
@@ -28,6 +30,22 @@ function isOnFacilityDetailPage(pathname: string): boolean {
 function FacilityLayout() {
   const { data: session } = useSession();
   const location = useLocation();
+  const { data, isLoading } = useMyFacilities();
+  const facilities = Array.isArray(data) ? data : (data?.facilities ?? []);
+
+  // If still loading, show a loading spinner
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  // If no facilities, show the onboarding wizard (full-screen, no sidebar)
+  if (facilities.length === 0) {
+    return <OnboardingWizard />;
+  }
 
   // When inside a specific facility, the $facilityId.tsx layout handles
   // its own sidebar + header, so we just pass through.
@@ -85,9 +103,7 @@ function FacilityLayout() {
           <h2 className="text-lg font-semibold">Facility Admin</h2>
           <div className="flex items-center gap-4">
             <NotificationBell />
-            <span className="text-sm text-muted-foreground">
-              {session?.user?.name}
-            </span>
+            <span className="text-sm text-muted-foreground">{session?.user?.name}</span>
             <Button
               variant="outline"
               size="sm"

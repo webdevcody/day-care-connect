@@ -1,15 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
-import {
-  useEnrollmentReport,
-  useAttendanceReport,
-  useRevenueEstimate,
-} from "@daycare-hub/hooks";
+import { useEnrollmentReport, useAttendanceReport, useRevenueEstimate } from "@daycare-hub/hooks";
 import { EnrollmentChart } from "@/components/admin/charts/enrollment-chart";
-import {
-  AttendanceBarChart,
-  AbsencePieChart,
-} from "@/components/admin/charts/attendance-chart";
+import { AttendanceBarChart, AbsencePieChart } from "@/components/admin/charts/attendance-chart";
 import { RevenueChart } from "@/components/admin/charts/revenue-chart";
 import {
   Card,
@@ -39,9 +32,7 @@ function getDateRange(days: number) {
   };
 }
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/reports"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/reports")({
   component: ReportsPage,
 });
 
@@ -108,18 +99,16 @@ function ReportsPage() {
             {enrollmentData && (
               <>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                  {Object.entries(
-                    enrollmentData.statusCounts as Record<string, number>
-                  ).map(([status, cnt]) => (
-                    <Card key={status}>
-                      <CardContent className="py-4 text-center">
-                        <div className="text-2xl font-bold">{cnt}</div>
-                        <p className="text-sm capitalize text-muted-foreground">
-                          {status}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  ))}
+                  {Object.entries(enrollmentData.statusCounts as Record<string, number>).map(
+                    ([status, cnt]) => (
+                      <Card key={status}>
+                        <CardContent className="py-4 text-center">
+                          <div className="text-2xl font-bold">{cnt}</div>
+                          <p className="text-sm capitalize text-muted-foreground">{status}</p>
+                        </CardContent>
+                      </Card>
+                    )
+                  )}
                 </div>
                 <Card>
                   <CardHeader>
@@ -150,9 +139,7 @@ function ReportsPage() {
                       <CardTitle>Absence Reasons</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <AbsencePieChart
-                        data={attendanceData.absenceBreakdown}
-                      />
+                      <AbsencePieChart data={attendanceData.absenceBreakdown} />
                     </CardContent>
                   </Card>
                 </div>
@@ -166,12 +153,8 @@ function ReportsPage() {
                 <div className="grid grid-cols-3 gap-4">
                   <Card>
                     <CardContent className="py-4 text-center">
-                      <div className="text-2xl font-bold">
-                        {revenueData.activeEnrollments}
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Active Enrollments
-                      </p>
+                      <div className="text-2xl font-bold">{revenueData.activeEnrollments}</div>
+                      <p className="text-sm text-muted-foreground">Active Enrollments</p>
                     </CardContent>
                   </Card>
                   <Card>
@@ -179,9 +162,7 @@ function ReportsPage() {
                       <div className="text-2xl font-bold">
                         ${revenueData.monthlyRate.toLocaleString()}
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        Monthly Rate
-                      </p>
+                      <p className="text-sm text-muted-foreground">Monthly Rate</p>
                     </CardContent>
                   </Card>
                   <Card>
@@ -192,9 +173,7 @@ function ReportsPage() {
                           minimumFractionDigits: 2,
                         })}
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        Period Estimate
-                      </p>
+                      <p className="text-sm text-muted-foreground">Period Estimate</p>
                     </CardContent>
                   </Card>
                 </div>

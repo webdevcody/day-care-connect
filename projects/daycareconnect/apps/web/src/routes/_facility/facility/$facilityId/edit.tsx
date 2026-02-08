@@ -13,9 +13,7 @@ import {
   Badge,
 } from "@daycare-hub/ui";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/edit"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/edit")({
   component: EditFacilityPage,
 });
 
@@ -74,7 +72,12 @@ function EditFacilityPage() {
     }
   }, [facility]);
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
   if (!facility) return null;
 
   const update = (field: string, value: string | number) =>
@@ -127,21 +130,40 @@ function EditFacilityPage() {
           </div>
           <div>
             <Label htmlFor="description">Description</Label>
-            <Textarea id="description" rows={4} value={form.description} onChange={(e) => update("description", e.target.value)} />
+            <Textarea
+              id="description"
+              rows={4}
+              value={form.description}
+              onChange={(e) => update("description", e.target.value)}
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" value={form.phone} onChange={(e) => update("phone", e.target.value)} />
+              <Input
+                id="phone"
+                value={form.phone}
+                onChange={(e) => update("phone", e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} />
+              <Input
+                id="email"
+                type="email"
+                value={form.email}
+                onChange={(e) => update("email", e.target.value)}
+              />
             </div>
           </div>
           <div>
             <Label htmlFor="website">Website</Label>
-            <Input id="website" type="url" value={form.website} onChange={(e) => update("website", e.target.value)} />
+            <Input
+              id="website"
+              type="url"
+              value={form.website}
+              onChange={(e) => update("website", e.target.value)}
+            />
           </div>
         </CardContent>
       </Card>
@@ -153,7 +175,11 @@ function EditFacilityPage() {
         <CardContent className="space-y-4">
           <div>
             <Label htmlFor="address">Street Address</Label>
-            <Input id="address" value={form.address} onChange={(e) => update("address", e.target.value)} />
+            <Input
+              id="address"
+              value={form.address}
+              onChange={(e) => update("address", e.target.value)}
+            />
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div>
@@ -162,11 +188,20 @@ function EditFacilityPage() {
             </div>
             <div>
               <Label htmlFor="state">State</Label>
-              <Input id="state" value={form.state} onChange={(e) => update("state", e.target.value.toUpperCase().slice(0, 2))} maxLength={2} />
+              <Input
+                id="state"
+                value={form.state}
+                onChange={(e) => update("state", e.target.value.toUpperCase().slice(0, 2))}
+                maxLength={2}
+              />
             </div>
             <div>
               <Label htmlFor="zipCode">Zip Code</Label>
-              <Input id="zipCode" value={form.zipCode} onChange={(e) => update("zipCode", e.target.value)} />
+              <Input
+                id="zipCode"
+                value={form.zipCode}
+                onChange={(e) => update("zipCode", e.target.value)}
+              />
             </div>
           </div>
         </CardContent>
@@ -180,33 +215,67 @@ function EditFacilityPage() {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <Label htmlFor="capacity">Capacity</Label>
-              <Input id="capacity" type="number" min={1} value={form.capacity} onChange={(e) => update("capacity", parseInt(e.target.value) || 0)} />
+              <Input
+                id="capacity"
+                type="number"
+                min={1}
+                value={form.capacity}
+                onChange={(e) => update("capacity", parseInt(e.target.value) || 0)}
+              />
             </div>
             <div>
               <Label htmlFor="ageRangeMin">Min Age</Label>
-              <Input id="ageRangeMin" type="number" min={0} value={form.ageRangeMin} onChange={(e) => update("ageRangeMin", parseInt(e.target.value) || 0)} />
+              <Input
+                id="ageRangeMin"
+                type="number"
+                min={0}
+                value={form.ageRangeMin}
+                onChange={(e) => update("ageRangeMin", parseInt(e.target.value) || 0)}
+              />
             </div>
             <div>
               <Label htmlFor="ageRangeMax">Max Age</Label>
-              <Input id="ageRangeMax" type="number" min={0} value={form.ageRangeMax} onChange={(e) => update("ageRangeMax", parseInt(e.target.value) || 0)} />
+              <Input
+                id="ageRangeMax"
+                type="number"
+                min={0}
+                value={form.ageRangeMax}
+                onChange={(e) => update("ageRangeMax", parseInt(e.target.value) || 0)}
+              />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="hourlyRate">Hourly Rate ($)</Label>
-              <Input id="hourlyRate" value={form.hourlyRate} onChange={(e) => update("hourlyRate", e.target.value)} />
+              <Input
+                id="hourlyRate"
+                value={form.hourlyRate}
+                onChange={(e) => update("hourlyRate", e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="dailyRate">Daily Rate ($)</Label>
-              <Input id="dailyRate" value={form.dailyRate} onChange={(e) => update("dailyRate", e.target.value)} />
+              <Input
+                id="dailyRate"
+                value={form.dailyRate}
+                onChange={(e) => update("dailyRate", e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="weeklyRate">Weekly Rate ($)</Label>
-              <Input id="weeklyRate" value={form.weeklyRate} onChange={(e) => update("weeklyRate", e.target.value)} />
+              <Input
+                id="weeklyRate"
+                value={form.weeklyRate}
+                onChange={(e) => update("weeklyRate", e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="monthlyRate">Monthly Rate ($)</Label>
-              <Input id="monthlyRate" value={form.monthlyRate} onChange={(e) => update("monthlyRate", e.target.value)} />
+              <Input
+                id="monthlyRate"
+                value={form.monthlyRate}
+                onChange={(e) => update("monthlyRate", e.target.value)}
+              />
             </div>
           </div>
         </CardContent>
@@ -220,15 +289,28 @@ function EditFacilityPage() {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <Label htmlFor="licenseNumber">License Number</Label>
-              <Input id="licenseNumber" value={form.licenseNumber} onChange={(e) => update("licenseNumber", e.target.value)} />
+              <Input
+                id="licenseNumber"
+                value={form.licenseNumber}
+                onChange={(e) => update("licenseNumber", e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="licenseExpiry">Expiry Date</Label>
-              <Input id="licenseExpiry" type="date" value={form.licenseExpiry} onChange={(e) => update("licenseExpiry", e.target.value)} />
+              <Input
+                id="licenseExpiry"
+                type="date"
+                value={form.licenseExpiry}
+                onChange={(e) => update("licenseExpiry", e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="licensingAuthority">Authority</Label>
-              <Input id="licensingAuthority" value={form.licensingAuthority} onChange={(e) => update("licensingAuthority", e.target.value)} />
+              <Input
+                id="licensingAuthority"
+                value={form.licensingAuthority}
+                onChange={(e) => update("licensingAuthority", e.target.value)}
+              />
             </div>
           </div>
         </CardContent>

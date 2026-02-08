@@ -23,9 +23,7 @@ import {
   SelectValue,
 } from "@daycare-hub/ui";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/activities"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/activities")({
   component: ActivitiesPage,
 });
 
@@ -87,24 +85,14 @@ function ActivitiesPage() {
     }
   };
 
-  const quickButtons: ActivityType[] = [
-    "meal",
-    "nap",
-    "activity",
-    "bathroom",
-    "photo",
-    "note",
-  ];
+  const quickButtons: ActivityType[] = ["meal", "nap", "activity", "bathroom", "photo", "note"];
 
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Activities</h1>
         <div className="flex items-center gap-3">
-          <Select
-            value={childFilter}
-            onValueChange={setChildFilter}
-          >
+          <Select value={childFilter} onValueChange={setChildFilter}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="All children" />
             </SelectTrigger>

@@ -30,9 +30,7 @@ export function SettingsPageContent() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="mt-1 text-muted-foreground">
-          Manage your account settings.
-        </p>
+        <p className="mt-1 text-muted-foreground">Manage your account settings.</p>
       </div>
 
       <Tabs defaultValue="profile">
@@ -53,7 +51,6 @@ export function SettingsPageContent() {
         <TabsContent value="notifications" className="mt-6">
           <NotificationPreferencesForm />
         </TabsContent>
-
       </Tabs>
     </div>
   );
@@ -78,6 +75,10 @@ function ProfileForm() {
         firstName: formData.get("firstName") as string,
         lastName: formData.get("lastName") as string,
         phone: (formData.get("phone") as string) || "",
+        address: (formData.get("address") as string) || "",
+        city: (formData.get("city") as string) || "",
+        state: (formData.get("state") as string) || "",
+        zipCode: (formData.get("zipCode") as string) || "",
       });
       setMessage("Profile updated successfully.");
     } catch (err: any) {
@@ -92,50 +93,42 @@ function ProfileForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="max-w-md space-y-4">
-          {message && (
-            <p className="text-sm text-green-600">{message}</p>
-          )}
-          {error && (
-            <p className="text-sm text-destructive">{error}</p>
-          )}
+          {message && <p className="text-sm text-green-600">{message}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="space-y-2">
             <Label htmlFor="firstName">First Name</Label>
-            <Input
-              id="firstName"
-              name="firstName"
-              required
-              defaultValue={user?.firstName || ""}
-            />
+            <Input id="firstName" name="firstName" required defaultValue={user?.firstName || ""} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="lastName">Last Name</Label>
-            <Input
-              id="lastName"
-              name="lastName"
-              required
-              defaultValue={user?.lastName || ""}
-            />
+            <Input id="lastName" name="lastName" required defaultValue={user?.lastName || ""} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="phone">Phone</Label>
-            <Input
-              id="phone"
-              name="phone"
-              type="tel"
-              defaultValue={user?.phone || ""}
-            />
+            <Input id="phone" name="phone" type="tel" defaultValue={user?.phone || ""} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="address">Street Address</Label>
+            <Input id="address" name="address" defaultValue={user?.address || ""} />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="city">City</Label>
+              <Input id="city" name="city" defaultValue={user?.city || ""} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="state">State</Label>
+              <Input id="state" name="state" defaultValue={user?.state || ""} maxLength={2} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="zipCode">Zip Code</Label>
+            <Input id="zipCode" name="zipCode" defaultValue={user?.zipCode || ""} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              value={user?.email || ""}
-              disabled
-              className="bg-muted"
-            />
-            <p className="text-xs text-muted-foreground">
-              Email cannot be changed.
-            </p>
+            <Input id="email" value={user?.email || ""} disabled className="bg-muted" />
+            <p className="text-xs text-muted-foreground">Email cannot be changed.</p>
           </div>
           <Button type="submit" disabled={updateProfileMutation.isPending}>
             {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
@@ -183,30 +176,15 @@ function PasswordForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="max-w-md space-y-4">
-          {message && (
-            <p className="text-sm text-green-600">{message}</p>
-          )}
-          {error && (
-            <p className="text-sm text-destructive">{error}</p>
-          )}
+          {message && <p className="text-sm text-green-600">{message}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="space-y-2">
             <Label htmlFor="currentPassword">Current Password</Label>
-            <Input
-              id="currentPassword"
-              name="currentPassword"
-              type="password"
-              required
-            />
+            <Input id="currentPassword" name="currentPassword" type="password" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="newPassword">New Password</Label>
-            <Input
-              id="newPassword"
-              name="newPassword"
-              type="password"
-              required
-              minLength={8}
-            />
+            <Input id="newPassword" name="newPassword" type="password" required minLength={8} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm New Password</Label>
@@ -261,15 +239,12 @@ function NotificationPreferencesForm() {
   }
 
   function handleToggle(type: string, enabled: boolean) {
-    prefsMutation.mutate(
-      [{ notificationType: type, inAppEnabled: enabled }],
-      {
-        onSuccess: () => {
-          setMessage("Preferences saved.");
-          setTimeout(() => setMessage(""), 3000);
-        },
-      }
-    );
+    prefsMutation.mutate([{ notificationType: type, inAppEnabled: enabled }], {
+      onSuccess: () => {
+        setMessage("Preferences saved.");
+        setTimeout(() => setMessage(""), 3000);
+      },
+    });
   }
 
   if (prefsLoading || qhLoading) {
@@ -298,14 +273,9 @@ function NotificationPreferencesForm() {
               <span className="text-center">Push</span>
             </div>
             {NOTIFICATION_TYPES.map((type) => (
-              <div
-                key={type}
-                className="grid grid-cols-[1fr_80px_80px] items-center gap-4"
-              >
+              <div key={type} className="grid grid-cols-[1fr_80px_80px] items-center gap-4">
                 <div>
-                  <p className="text-sm font-medium">
-                    {NOTIFICATION_TYPE_LABELS[type].label}
-                  </p>
+                  <p className="text-sm font-medium">{NOTIFICATION_TYPE_LABELS[type].label}</p>
                   <p className="text-xs text-muted-foreground">
                     {NOTIFICATION_TYPE_LABELS[type].description}
                   </p>
@@ -318,9 +288,7 @@ function NotificationPreferencesForm() {
                 </div>
                 <div className="flex flex-col items-center gap-1">
                   <Switch disabled checked={false} />
-                  <span className="text-[10px] text-muted-foreground">
-                    Coming soon
-                  </span>
+                  <span className="text-[10px] text-muted-foreground">Coming soon</span>
                 </div>
               </div>
             ))}
@@ -416,4 +384,3 @@ function NotificationPreferencesForm() {
     </div>
   );
 }
-

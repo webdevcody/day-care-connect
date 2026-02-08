@@ -24,9 +24,7 @@ const statusColors: Record<string, string> = {
   void: "bg-gray-100 text-gray-500",
 };
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/billing/invoices/"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/billing/invoices/")({
   validateSearch: (search: Record<string, unknown>) => ({
     status: (search.status as string) || "all",
   }),
@@ -43,7 +41,12 @@ function InvoiceListPage() {
   const voidInvoice = useVoidInvoice();
   const [loading, setLoading] = useState<string | null>(null);
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
 
   const handleSend = async (invoiceId: string) => {
     setLoading(invoiceId);
@@ -72,10 +75,7 @@ function InvoiceListPage() {
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Invoices</h1>
-        <Link
-          to="/facility/$facilityId/billing/invoices/new"
-          params={{ facilityId }}
-        >
+        <Link to="/facility/$facilityId/billing/invoices/new" params={{ facilityId }}>
           <Button>Create Invoice</Button>
         </Link>
       </div>
@@ -129,18 +129,12 @@ function InvoiceListPage() {
                   </TableCell>
                   <TableCell>
                     <div>{inv.parentName}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {inv.parentEmail}
-                    </div>
+                    <div className="text-xs text-muted-foreground">{inv.parentEmail}</div>
                   </TableCell>
                   <TableCell>${parseFloat(inv.total).toFixed(2)}</TableCell>
+                  <TableCell>{new Date(inv.dueDate + "T00:00:00").toLocaleDateString()}</TableCell>
                   <TableCell>
-                    {new Date(inv.dueDate + "T00:00:00").toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={statusColors[inv.status] || ""}>
-                      {inv.status}
-                    </Badge>
+                    <Badge className={statusColors[inv.status] || ""}>{inv.status}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">

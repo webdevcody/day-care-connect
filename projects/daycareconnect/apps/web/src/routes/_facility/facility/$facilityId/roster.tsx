@@ -15,9 +15,7 @@ import {
   TableRow,
 } from "@daycare-hub/ui";
 
-export const Route = createFileRoute(
-  "/_facility/facility/$facilityId/roster"
-)({
+export const Route = createFileRoute("/_facility/facility/$facilityId/roster")({
   component: RosterPage,
 });
 
@@ -39,7 +37,12 @@ function RosterPage() {
     );
   }, [search, rosterData]);
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
 
   const handleExport = async () => {
     setExporting(true);
@@ -77,11 +80,7 @@ function RosterPage() {
             onChange={(e) => setSearch(e.target.value)}
             className="w-64"
           />
-          <Button
-            variant="outline"
-            onClick={handleExport}
-            disabled={exporting}
-          >
+          <Button variant="outline" onClick={handleExport} disabled={exporting}>
             {exporting ? "Exporting..." : "Export CSV"}
           </Button>
         </div>
@@ -91,9 +90,7 @@ function RosterPage() {
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">
-              {search
-                ? "No children match your search."
-                : "No active enrollments found."}
+              {search ? "No children match your search." : "No active enrollments found."}
             </p>
           </CardContent>
         </Card>
@@ -118,9 +115,7 @@ function RosterPage() {
                       key={child.childId}
                       className="cursor-pointer hover:bg-muted/50"
                       onClick={() =>
-                        setExpandedId(
-                          expandedId === child.childId ? null : child.childId
-                        )
+                        setExpandedId(expandedId === child.childId ? null : child.childId)
                       }
                     >
                       <TableCell className="font-medium">
@@ -136,17 +131,11 @@ function RosterPage() {
                       <TableCell className="capitalize text-sm">
                         {child.scheduleType.replace("_", " ")}
                       </TableCell>
-                      <TableCell className="text-sm">
-                        {child.startDate || "\u2014"}
-                      </TableCell>
+                      <TableCell className="text-sm">{child.startDate || "\u2014"}</TableCell>
                       <TableCell>
                         <div className="flex gap-1">
-                          {child.childAllergies && (
-                            <Badge variant="destructive">Allergies</Badge>
-                          )}
-                          {child.childMedicalNotes && (
-                            <Badge variant="secondary">Medical</Badge>
-                          )}
+                          {child.childAllergies && <Badge variant="destructive">Allergies</Badge>}
+                          {child.childMedicalNotes && <Badge variant="secondary">Medical</Badge>}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -155,9 +144,7 @@ function RosterPage() {
                         <TableCell colSpan={6} className="bg-muted/30">
                           <div className="grid grid-cols-2 gap-4 p-2">
                             <div>
-                              <p className="text-sm font-medium">
-                                Emergency Contact
-                              </p>
+                              <p className="text-sm font-medium">Emergency Contact</p>
                               <p className="text-sm">
                                 {child.childEmergencyContactName || "\u2014"}
                               </p>
@@ -166,9 +153,7 @@ function RosterPage() {
                               </p>
                             </div>
                             <div>
-                              <p className="text-sm font-medium">
-                                Parent Contact
-                              </p>
+                              <p className="text-sm font-medium">Parent Contact</p>
                               <p className="text-sm">{child.parentEmail}</p>
                               <p className="text-sm text-muted-foreground">
                                 {child.parentPhone || "\u2014"}
@@ -176,22 +161,14 @@ function RosterPage() {
                             </div>
                             {child.childAllergies && (
                               <div>
-                                <p className="text-sm font-medium text-destructive">
-                                  Allergies
-                                </p>
-                                <p className="text-sm">
-                                  {child.childAllergies}
-                                </p>
+                                <p className="text-sm font-medium text-destructive">Allergies</p>
+                                <p className="text-sm">{child.childAllergies}</p>
                               </div>
                             )}
                             {child.childMedicalNotes && (
                               <div>
-                                <p className="text-sm font-medium">
-                                  Medical Notes
-                                </p>
-                                <p className="text-sm">
-                                  {child.childMedicalNotes}
-                                </p>
+                                <p className="text-sm font-medium">Medical Notes</p>
+                                <p className="text-sm">{child.childMedicalNotes}</p>
                               </div>
                             )}
                           </div>

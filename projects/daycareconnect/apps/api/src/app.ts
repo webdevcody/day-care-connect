@@ -11,6 +11,7 @@ import { inviteRoutes } from "./routes/invites";
 import { uploadRoutes } from "./routes/uploads";
 import { accountRoutes } from "./routes/account";
 import { dashboardRoutes } from "./routes/dashboard";
+import { onboardingRoutes } from "./routes/onboarding";
 import { childrenRoutes } from "./routes/children";
 import { enrollmentsRoutes } from "./routes/enrollments";
 import { facilitiesRoutes } from "./routes/facilities";
@@ -34,7 +35,10 @@ import { adminRosterRoutes } from "./routes/admin/roster";
 import { adminStripeRoutes } from "./routes/admin/stripe";
 import { adminReportTemplatesRoutes } from "./routes/admin/report-templates";
 import { adminInvitesRoutes } from "./routes/admin/invites";
+import { adminEmailsRoutes } from "./routes/admin/emails";
+import { adminMessagingRoutes } from "./routes/admin/messaging";
 import { staffRoutes } from "./routes/staff/index";
+import { staffInviteRoutes } from "./routes/staff-invites";
 import { stripeWebhookRoutes } from "./routes/webhooks/stripe";
 
 const app = new Hono();
@@ -65,6 +69,9 @@ app.route("/api/webhooks", stripeWebhookRoutes);
 // Public invite info route (no auth middleware - public access)
 app.route("/api/invites", inviteRoutes);
 
+// Public staff invite routes (no auth middleware - public access)
+app.route("/api/staff-invite", staffInviteRoutes);
+
 // Static file serving for uploads
 app.use("/uploads/*", serveStatic({ root: "./" }));
 
@@ -73,6 +80,7 @@ app.use("/api/*", authMiddleware);
 app.route("/api/uploads", uploadRoutes);
 app.route("/api/account", accountRoutes);
 app.route("/api/dashboard", dashboardRoutes);
+app.route("/api/onboarding", onboardingRoutes);
 app.route("/api/children", childrenRoutes);
 app.route("/api/enrollments", enrollmentsRoutes);
 app.route("/api/facilities", facilitiesRoutes);
@@ -96,6 +104,8 @@ app.route("/api/admin/roster", adminRosterRoutes);
 app.route("/api/admin/stripe", adminStripeRoutes);
 app.route("/api/admin/report-templates", adminReportTemplatesRoutes);
 app.route("/api/admin/invites", adminInvitesRoutes);
+app.route("/api/admin/emails", adminEmailsRoutes);
+app.route("/api/admin/messaging", adminMessagingRoutes);
 app.route("/api/staff", staffRoutes);
 
 export { app };

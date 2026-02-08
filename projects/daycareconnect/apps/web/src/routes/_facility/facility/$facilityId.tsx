@@ -18,8 +18,11 @@ import {
   FolderOpen,
   LinkIcon,
   BarChart3,
+  Mail,
   Star,
   Settings,
+  TrendingUp,
+  MessageSquare,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_facility/facility/$facilityId")({
@@ -50,6 +53,11 @@ const navGroups = [
         to: "/facility/$facilityId/enrollments" as const,
         label: "Enrollments",
         icon: ListChecks,
+      },
+      {
+        to: "/facility/$facilityId/enrollment-analytics" as const,
+        label: "Enrollment Analytics",
+        icon: TrendingUp,
       },
       {
         to: "/facility/$facilityId/attendance" as const,
@@ -96,6 +104,16 @@ const navGroups = [
         label: "Invites",
         icon: LinkIcon,
       },
+      {
+        to: "/facility/$facilityId/emails" as const,
+        label: "Email Parents",
+        icon: Mail,
+      },
+      {
+        to: "/facility/$facilityId/messages" as const,
+        label: "Messages",
+        icon: MessageSquare,
+      },
     ],
   },
   {
@@ -140,10 +158,7 @@ function FacilityDetailLayout() {
           <a href="/" className="text-lg font-bold text-primary">
             {APP_NAME}
           </a>
-          <p
-            className="mt-1 truncate text-sm font-medium"
-            title={facility?.name}
-          >
+          <p className="mt-1 truncate text-sm font-medium" title={facility?.name}>
             {facility?.name ?? "Loading..."}
           </p>
         </div>
@@ -185,9 +200,7 @@ function FacilityDetailLayout() {
           <div />
           <div className="flex items-center gap-4">
             <NotificationBell />
-            <span className="text-sm text-muted-foreground">
-              {session?.user?.name}
-            </span>
+            <span className="text-sm text-muted-foreground">{session?.user?.name}</span>
             <Button
               variant="outline"
               size="sm"
