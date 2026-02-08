@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useFacility, useUpdateFacilityServices } from "@daycare-hub/hooks";
-import { FacilitySubNav } from "@/components/admin/facility-sub-nav";
 import { FACILITY_SERVICES_SUGGESTIONS } from "@daycare-hub/shared";
 import {
   Button,
@@ -64,7 +63,6 @@ function FacilityServicesPage() {
 
   return (
     <div>
-      <FacilitySubNav facilityId={facilityId} />
       <h1 className="mb-6 text-2xl font-bold">Services</h1>
 
       {error && <p className="mb-4 text-sm text-destructive">{error}</p>}

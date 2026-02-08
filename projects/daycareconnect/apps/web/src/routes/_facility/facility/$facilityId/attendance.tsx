@@ -8,7 +8,6 @@ import {
   useAttendanceActivityLog,
   useChildAttendanceHistory,
 } from "@daycare-hub/hooks";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { AttendanceStatusBadge } from "@/components/admin/status-badge";
 import { ABSENCE_REASONS } from "@daycare-hub/shared";
 import {
@@ -120,8 +119,6 @@ function AttendancePage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Attendance</h1>
         <Input

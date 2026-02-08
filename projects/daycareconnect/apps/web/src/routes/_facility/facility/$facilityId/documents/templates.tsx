@@ -6,7 +6,6 @@ import {
   useUpdateDocumentTemplate,
   useArchiveDocumentTemplate,
 } from "@daycare-hub/hooks";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { TemplateFormDialog } from "@/components/documents/template-form-dialog";
 import {
   Card,
@@ -70,8 +69,6 @@ function TemplatesPage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Document Templates</h1>
         <Button onClick={() => setCreateOpen(true)}>Create Template</Button>

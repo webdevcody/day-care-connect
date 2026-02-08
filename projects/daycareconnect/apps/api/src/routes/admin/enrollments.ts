@@ -10,7 +10,7 @@ import {
   and,
   inArray,
 } from "@daycare-hub/db";
-import { assertFacilityManager } from "../../lib/facility-auth";
+import { assertFacilityPermission } from "../../lib/facility-auth";
 import { sendNotification } from "../../lib/notification-service";
 
 const app = new Hono();
@@ -21,7 +21,7 @@ app.get("/:facilityId", async (c) => {
   const facilityId = c.req.param("facilityId");
   const status = c.req.query("status");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "enrollments:manage");
 
   const conditions = [eq(enrollments.facilityId, facilityId)];
   if (status && status !== "all") {
@@ -61,7 +61,7 @@ app.get("/detail/:enrollmentId", async (c) => {
   const facilityId = c.req.query("facilityId");
 
   if (!facilityId) throw new Error("facilityId is required");
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "enrollments:manage");
 
   const [enrollment] = await db
     .select({
@@ -123,7 +123,7 @@ app.post("/:enrollmentId/approve", async (c) => {
     .limit(1);
 
   if (!enrollment) throw new Error("Enrollment not found");
-  await assertFacilityManager(enrollment.facilityId, userId);
+  await assertFacilityPermission(enrollment.facilityId, userId, "enrollments:manage");
 
   if (enrollment.status !== "pending") {
     throw new Error("Can only approve pending enrollments");
@@ -193,7 +193,7 @@ app.post("/:enrollmentId/reject", async (c) => {
     .limit(1);
 
   if (!enrollment) throw new Error("Enrollment not found");
-  await assertFacilityManager(enrollment.facilityId, userId);
+  await assertFacilityPermission(enrollment.facilityId, userId, "enrollments:manage");
 
   if (enrollment.status !== "pending") {
     throw new Error("Can only reject pending enrollments");
@@ -265,7 +265,7 @@ app.post("/bulk", async (c) => {
 
   // Verify manager access for the facility
   const facilityId = targetEnrollments[0].facilityId;
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "enrollments:manage");
 
   const pendingOnly = targetEnrollments.filter((e) => e.status === "pending");
   if (!pendingOnly.length) {

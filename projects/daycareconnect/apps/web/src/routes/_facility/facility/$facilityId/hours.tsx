@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useFacility, useUpdateFacilityHours } from "@daycare-hub/hooks";
-import { FacilitySubNav } from "@/components/admin/facility-sub-nav";
 import { DAYS_OF_WEEK } from "@daycare-hub/shared";
 import {
   Button,
@@ -78,7 +77,6 @@ function FacilityHoursPage() {
 
   return (
     <div>
-      <FacilitySubNav facilityId={facilityId} />
       <h1 className="mb-6 text-2xl font-bold">Operating Hours</h1>
 
       {error && <p className="mb-4 text-sm text-destructive">{error}</p>}

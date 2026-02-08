@@ -13,7 +13,7 @@ import {
   desc,
   asc,
 } from "@daycare-hub/db";
-import { assertFacilityManager } from "../lib/facility-auth";
+import { assertFacilityPermission } from "../lib/facility-auth";
 import { sendNotification } from "../lib/notification-service";
 
 const app = new Hono();
@@ -388,7 +388,7 @@ app.post("/:reviewId/response", async (c) => {
     return c.json({ error: "Review not found" }, 404);
   }
 
-  await assertFacilityManager(review.facilityId, userId);
+  await assertFacilityPermission(review.facilityId, userId, "reviews:manage");
 
   const [response] = await db
     .insert(reviewResponses)
@@ -448,7 +448,7 @@ app.put("/responses/:responseId", async (c) => {
     return c.json({ error: "Review not found" }, 404);
   }
 
-  await assertFacilityManager(review.facilityId, userId);
+  await assertFacilityPermission(review.facilityId, userId, "reviews:manage");
 
   const [updated] = await db
     .update(reviewResponses)
@@ -524,7 +524,7 @@ app.get("/admin/:facilityId", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "reviews:manage");
 
   const facilityReviews = await db
     .select({

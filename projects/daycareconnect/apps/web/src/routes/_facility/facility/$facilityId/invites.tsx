@@ -7,7 +7,6 @@ import {
   useDeactivateFacilityInvite,
   useInviteSubmissions,
 } from "@daycare-hub/hooks";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { QrCodeDisplay } from "@/components/invite/qr-code-display";
 import {
   Card,
@@ -73,7 +72,6 @@ function InvitesPage() {
   if (isLoading) {
     return (
       <div>
-        <AdminFacilityNav facilityId={facilityId} />
         <div className="flex items-center justify-center py-12">
           <div className="text-muted-foreground">Loading...</div>
         </div>
@@ -83,8 +81,6 @@ function InvitesPage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">Invite Links</h1>
         <div className="flex gap-2">

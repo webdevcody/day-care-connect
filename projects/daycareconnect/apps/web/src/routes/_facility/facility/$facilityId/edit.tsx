@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useFacility, useUpdateFacility, useToggleFacilityStatus } from "@daycare-hub/hooks";
-import { FacilitySubNav } from "@/components/admin/facility-sub-nav";
 import {
   Button,
   Card,
@@ -103,8 +102,6 @@ function EditFacilityPage() {
 
   return (
     <div>
-      <FacilitySubNav facilityId={facilityId} />
-
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">{facility.name}</h1>
         <div className="flex items-center gap-3">

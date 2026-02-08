@@ -11,7 +11,7 @@ import {
   gte,
   lte,
 } from "@daycare-hub/db";
-import { assertFacilityManager } from "../../lib/facility-auth";
+import { assertFacilityPermission } from "../../lib/facility-auth";
 
 const app = new Hono();
 
@@ -26,7 +26,7 @@ app.get("/enrollment", async (c) => {
   if (!startDate) throw new Error("startDate is required");
   if (!endDate) throw new Error("endDate is required");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "reports:view");
 
   // Total counts by status
   const statusCounts = await db
@@ -72,7 +72,7 @@ app.get("/attendance", async (c) => {
   if (!startDate) throw new Error("startDate is required");
   if (!endDate) throw new Error("endDate is required");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "reports:view");
 
   // Daily attendance rates
   const dailyRates = await db
@@ -146,7 +146,7 @@ app.get("/revenue", async (c) => {
   if (!startDate) throw new Error("startDate is required");
   if (!endDate) throw new Error("endDate is required");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "reports:view");
 
   const [facility] = await db
     .select({

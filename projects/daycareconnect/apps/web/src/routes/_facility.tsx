@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, Link } from "@tanstack/react-router";
+import { createFileRoute, Outlet, Link, useLocation } from "@tanstack/react-router";
 import { useSession, signOut } from "@/lib/auth-client";
 import { APP_NAME } from "@daycare-hub/shared";
 import { Button } from "@daycare-hub/ui";
@@ -12,8 +12,28 @@ export const Route = createFileRoute("/_facility")({
   component: FacilityLayout,
 });
 
+/**
+ * Check if we're inside a facility detail page (e.g. /facility/:uuid/...).
+ * Facility detail pages have their own layout provided by $facilityId.tsx,
+ * so this wrapper should just render <Outlet /> without its own sidebar.
+ */
+function isOnFacilityDetailPage(pathname: string): boolean {
+  // Match /facility/{uuid} or /facility/{uuid}/...
+  // UUID format: 8-4-4-4-12 hex chars
+  return /^\/facility\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(\/|$)/i.test(
+    pathname
+  );
+}
+
 function FacilityLayout() {
   const { data: session } = useSession();
+  const location = useLocation();
+
+  // When inside a specific facility, the $facilityId.tsx layout handles
+  // its own sidebar + header, so we just pass through.
+  if (isOnFacilityDetailPage(location.pathname)) {
+    return <Outlet />;
+  }
 
   return (
     <div className="flex min-h-screen">

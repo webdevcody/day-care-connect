@@ -12,7 +12,7 @@ import {
   desc,
   asc,
 } from "@daycare-hub/db";
-import { assertFacilityManager } from "../../lib/facility-auth";
+import { assertFacilityPermission } from "../../lib/facility-auth";
 
 const app = new Hono();
 
@@ -25,7 +25,7 @@ app.get("/:facilityId", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "invites:manage");
 
   const invites = await db
     .select()
@@ -57,7 +57,7 @@ app.post("/:facilityId", async (c) => {
   const facilityId = c.req.param("facilityId");
   const body = await c.req.json();
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "invites:manage");
 
   const [invite] = await db
     .insert(facilityInvites)
@@ -85,7 +85,7 @@ app.put("/:inviteId", async (c) => {
     .limit(1);
 
   if (!invite) return c.json({ error: "Invite not found" }, 404);
-  await assertFacilityManager(invite.facilityId, userId);
+  await assertFacilityPermission(invite.facilityId, userId, "invites:manage");
 
   const [updated] = await db
     .update(facilityInvites)
@@ -112,7 +112,7 @@ app.delete("/:inviteId", async (c) => {
     .limit(1);
 
   if (!invite) return c.json({ error: "Invite not found" }, 404);
-  await assertFacilityManager(invite.facilityId, userId);
+  await assertFacilityPermission(invite.facilityId, userId, "invites:manage");
 
   const [updated] = await db
     .update(facilityInvites)
@@ -135,7 +135,7 @@ app.get("/:inviteId/submissions", async (c) => {
     .limit(1);
 
   if (!invite) return c.json({ error: "Invite not found" }, 404);
-  await assertFacilityManager(invite.facilityId, userId);
+  await assertFacilityPermission(invite.facilityId, userId, "invites:manage");
 
   const submissions = await db
     .select({

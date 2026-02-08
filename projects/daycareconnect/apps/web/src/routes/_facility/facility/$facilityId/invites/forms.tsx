@@ -9,7 +9,6 @@ import {
 import { uploadsService } from "@daycare-hub/services";
 import { DOCUMENT_CATEGORIES, FORM_TYPES } from "@daycare-hub/shared";
 import type { FormFieldDefinition } from "@daycare-hub/shared";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import {
   Card,
   CardContent,
@@ -74,7 +73,6 @@ function EnrollmentFormsPage() {
   if (isLoading) {
     return (
       <div>
-        <AdminFacilityNav facilityId={facilityId} />
         <div className="flex items-center justify-center py-12">
           <div className="text-muted-foreground">Loading...</div>
         </div>
@@ -84,8 +82,6 @@ function EnrollmentFormsPage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold">Enrollment Forms</h1>

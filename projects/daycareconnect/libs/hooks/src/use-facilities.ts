@@ -151,3 +151,30 @@ export function useRemoveStaffMember() {
     },
   });
 }
+
+export function useStaffPermissions(facilityId: string, staffId: string) {
+  return useQuery({
+    queryKey: queryKeys.facilities.staffPermissions(facilityId, staffId),
+    queryFn: () => facilitiesService.getStaffPermissions(facilityId, staffId),
+    enabled: !!facilityId && !!staffId,
+  });
+}
+
+export function useUpdateStaffPermissions() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      facilityId,
+      staffId,
+      permissions,
+    }: {
+      facilityId: string;
+      staffId: string;
+      permissions: string[];
+    }) => facilitiesService.updateStaffPermissions(facilityId, staffId, permissions),
+    onSuccess: (_, { facilityId, staffId }) => {
+      qc.invalidateQueries({ queryKey: queryKeys.facilities.staffPermissions(facilityId, staffId) });
+      qc.invalidateQueries({ queryKey: queryKeys.facilities.staff(facilityId) });
+    },
+  });
+}

@@ -5,7 +5,6 @@ import {
   useAttendanceReport,
   useRevenueEstimate,
 } from "@daycare-hub/hooks";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { EnrollmentChart } from "@/components/admin/charts/enrollment-chart";
 import {
   AttendanceBarChart,
@@ -72,8 +71,6 @@ function ReportsPage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Reports</h1>
         <div className="flex gap-1 rounded-lg bg-muted p-1">

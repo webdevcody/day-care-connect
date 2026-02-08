@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import {
   Card,
   CardContent,
@@ -105,8 +104,6 @@ function CreateInvoicePage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <h1 className="mb-6 text-2xl font-bold">Create Invoice</h1>
 
       <form onSubmit={handleSubmit}>

@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAdminDashboard } from "@daycare-hub/hooks";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { EnrollmentStatusBadge } from "@/components/admin/status-badge";
 import {
   Card,
@@ -21,8 +20,9 @@ function AdminDashboardPage() {
   const { data, isLoading } = useAdminDashboard(facilityId);
 
   if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (!data) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">No data available</div></div>;
 
-  const { facility, enrollmentCounts, attendanceCounts, pendingEnrollments } = data!;
+  const { facility, enrollmentCounts, attendanceCounts, pendingEnrollments } = data;
 
   const activeEnrollments = enrollmentCounts["active"] ?? 0;
   const pendingCount = enrollmentCounts["pending"] ?? 0;
@@ -34,8 +34,6 @@ function AdminDashboardPage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <h1 className="mb-6 text-2xl font-bold">{facility.name} — Dashboard</h1>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

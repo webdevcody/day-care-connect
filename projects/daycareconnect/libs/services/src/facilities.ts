@@ -74,3 +74,11 @@ export async function removeStaffMember(facilityId: string, staffId: string) {
 export async function getStaffAssignments() {
   return getApiClient().get<any>("/api/staff/assignments");
 }
+
+export async function getStaffPermissions(facilityId: string, staffId: string) {
+  return getApiClient().get<any>(`/api/facilities/${facilityId}/staff/${staffId}/permissions`);
+}
+
+export async function updateStaffPermissions(facilityId: string, staffId: string, permissions: string[]) {
+  return getApiClient().put<any>(`/api/facilities/${facilityId}/staff/${staffId}/permissions`, { permissions });
+}

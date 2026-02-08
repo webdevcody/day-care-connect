@@ -13,7 +13,7 @@ import {
   desc,
   asc,
 } from "@daycare-hub/db";
-import { assertFacilityManager } from "../../lib/facility-auth";
+import { assertFacilityPermission } from "../../lib/facility-auth";
 import { sendNotification } from "../../lib/notification-service";
 
 const app = new Hono();
@@ -23,7 +23,7 @@ app.get("/templates/:facilityId", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "documents:manage");
 
   const results = await db
     .select()
@@ -40,7 +40,7 @@ app.post("/templates", async (c) => {
   const body = await c.req.json();
   const { facilityId, ...templateData } = body;
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "documents:manage");
 
   const [template] = await db
     .insert(documentTemplates)
@@ -66,7 +66,7 @@ app.put("/templates/:templateId", async (c) => {
     .limit(1);
 
   if (!existing) throw new Error("Template not found");
-  await assertFacilityManager(existing.facilityId, userId);
+  await assertFacilityPermission(existing.facilityId, userId, "documents:manage");
 
   const [updated] = await db
     .update(documentTemplates)
@@ -93,7 +93,7 @@ app.post("/templates/:templateId/archive", async (c) => {
     .limit(1);
 
   if (!existing) throw new Error("Template not found");
-  await assertFacilityManager(existing.facilityId, userId);
+  await assertFacilityPermission(existing.facilityId, userId, "documents:manage");
 
   const [updated] = await db
     .update(documentTemplates)
@@ -118,7 +118,7 @@ app.post("/send", async (c) => {
 
   if (!template) throw new Error("Template not found");
   if (template.isArchived) throw new Error("Template is archived");
-  await assertFacilityManager(template.facilityId, userId);
+  await assertFacilityPermission(template.facilityId, userId, "documents:manage");
 
   const [facility] = await db
     .select({ name: facilities.name })
@@ -165,7 +165,7 @@ app.post("/send-bulk", async (c) => {
   const body = await c.req.json();
   const { facilityId, templateId, childId, expiresAt } = body;
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "documents:manage");
 
   const [template] = await db
     .select()
@@ -238,7 +238,7 @@ app.get("/instances/:facilityId", async (c) => {
   const status = c.req.query("status");
   const templateId = c.req.query("templateId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "documents:manage");
 
   const conditions = [eq(documentInstances.facilityId, facilityId)];
 
@@ -280,7 +280,7 @@ app.get("/compliance/:facilityId", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "documents:manage");
 
   // Get required templates
   const requiredTemplates = await db
@@ -397,7 +397,7 @@ app.post("/remind/:instanceId", async (c) => {
     .limit(1);
 
   if (!instance) throw new Error("Document not found");
-  await assertFacilityManager(instance.facilityId, userId);
+  await assertFacilityPermission(instance.facilityId, userId, "documents:manage");
 
   if (instance.status !== "pending" && instance.status !== "viewed") {
     throw new Error("Can only remind for pending or viewed documents");
@@ -440,7 +440,7 @@ app.post("/void/:instanceId", async (c) => {
     .limit(1);
 
   if (!instance) throw new Error("Document not found");
-  await assertFacilityManager(instance.facilityId, userId);
+  await assertFacilityPermission(instance.facilityId, userId, "documents:manage");
 
   const [updated] = await db
     .update(documentInstances)
@@ -456,7 +456,7 @@ app.get("/parents/:facilityId", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "documents:manage");
 
   const result = await db
     .select({
@@ -494,7 +494,7 @@ app.post("/templates/reorder", async (c) => {
   const body = await c.req.json();
   const { facilityId, items } = body;
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "documents:manage");
 
   await Promise.all(
     items.map(async (item: { id: string; sortOrder: number }) => {

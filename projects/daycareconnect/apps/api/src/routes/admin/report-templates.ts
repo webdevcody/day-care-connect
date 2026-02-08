@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { db, reportTemplates, eq } from "@daycare-hub/db";
-import { assertFacilityManager } from "../../lib/facility-auth";
+import { assertFacilityPermission } from "../../lib/facility-auth";
 
 const app = new Hono();
 
@@ -24,7 +24,7 @@ app.post("/", async (c) => {
   const body = await c.req.json();
   const { facilityId, name, entries } = body;
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "daily_reports:manage");
 
   const [template] = await db
     .insert(reportTemplates)

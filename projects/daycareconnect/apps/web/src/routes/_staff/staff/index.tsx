@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useStaffAssignments } from "@daycare-hub/hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@daycare-hub/ui";
-import { Building2, MapPin } from "lucide-react";
+import { Building2, MapPin, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/_staff/staff/")({
   component: StaffDashboard,
@@ -33,34 +33,45 @@ function StaffDashboard() {
       ) : assignments && assignments.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {assignments.map((assignment) => (
-            <Card key={assignment.id}>
-              <CardHeader className="flex flex-row items-center gap-3 pb-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Building2 className="h-5 w-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <CardTitle className="truncate text-base">
-                    {assignment.facilityName}
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 shrink-0" />
-                    <span className="truncate">
-                      {assignment.facilityAddress}, {assignment.facilityCity},{" "}
-                      {assignment.facilityState}
-                    </span>
+            <Link
+              key={assignment.id}
+              to="/facility/$facilityId/attendance"
+              params={{ facilityId: assignment.facilityId }}
+              className="block"
+            >
+              <Card className="transition-shadow hover:shadow-md cursor-pointer">
+                <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Building2 className="h-5 w-5" />
                   </div>
-                  <div>
-                    <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                      {assignment.staffRole.replace(/_/g, " ")}
-                    </span>
+                  <div className="min-w-0 flex-1">
+                    <CardTitle className="truncate text-base">
+                      {assignment.facilityName}
+                    </CardTitle>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 shrink-0" />
+                      <span className="truncate">
+                        {assignment.facilityAddress}, {assignment.facilityCity},{" "}
+                        {assignment.facilityState}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                        {assignment.staffRole.replace(/_/g, " ")}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 pt-2 text-primary font-medium">
+                      <span className="text-xs">View Facility & Check In</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       ) : (

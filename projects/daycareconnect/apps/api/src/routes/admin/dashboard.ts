@@ -11,7 +11,7 @@ import {
   sql,
   count,
 } from "@daycare-hub/db";
-import { assertFacilityManager } from "../../lib/facility-auth";
+import { assertFacilityPermission } from "../../lib/facility-auth";
 
 const app = new Hono();
 
@@ -20,7 +20,7 @@ app.get("/:facilityId", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "reports:view");
 
   const [facility] = await db
     .select({ name: facilities.name, capacity: facilities.capacity })

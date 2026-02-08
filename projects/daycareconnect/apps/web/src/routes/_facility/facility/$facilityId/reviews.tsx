@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { RatingSummary } from "@/components/reviews/rating-summary";
 import { ReviewCard } from "@/components/reviews/review-card";
 import { ReviewResponseDialog } from "@/components/reviews/review-response-dialog";
@@ -53,7 +52,6 @@ function AdminReviewsPage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
       <h1 className="mb-6 text-2xl font-bold">Reviews</h1>
 
       {loading ? (

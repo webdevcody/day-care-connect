@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { Card, CardContent, Button, Badge } from "@daycare-hub/ui";
 import {
   useStripeAccountStatus,
@@ -53,8 +52,6 @@ function BillingDashboard() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <h1 className="mb-6 text-2xl font-bold">Billing</h1>
 
       {/* Stripe Connection Status */}

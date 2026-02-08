@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import {
   Card,
   CardContent,
@@ -71,8 +70,6 @@ function InvoiceListPage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Invoices</h1>
         <Link

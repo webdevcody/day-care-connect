@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useAdminComplianceReport, useSendDocument } from "@daycare-hub/hooks";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { DocumentStatusBadge } from "@/components/documents/document-status-badge";
 import {
   Card,
@@ -76,8 +75,6 @@ function CompliancePage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Compliance Dashboard</h1>
         <Button variant="outline" onClick={handleExportCsv} disabled={compliance.length === 0}>

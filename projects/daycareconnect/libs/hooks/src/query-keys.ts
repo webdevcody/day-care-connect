@@ -18,6 +18,8 @@ export const queryKeys = {
     search: (params: Record<string, any>) => ["facilities", "search", params] as const,
     active: ["facilities", "active"] as const,
     staff: (id: string) => ["facilities", id, "staff"] as const,
+    staffPermissions: (facilityId: string, staffId: string) =>
+      ["facilities", facilityId, "staff", staffId, "permissions"] as const,
   },
   favorites: {
     all: ["favorites"] as const,

@@ -14,7 +14,7 @@ import {
   desc,
   sql,
 } from "@daycare-hub/db";
-import { assertFacilityManager } from "../../lib/facility-auth";
+import { assertFacilityPermission } from "../../lib/facility-auth";
 import { sendNotification } from "../../lib/notification-service";
 
 const app = new Hono();
@@ -56,7 +56,7 @@ app.post("/plans", async (c) => {
     .limit(1);
 
   if (!enrollment) throw new Error("Enrollment not found");
-  await assertFacilityManager(enrollment.facilityId, userId);
+  await assertFacilityPermission(enrollment.facilityId, userId, "billing:manage");
 
   const [plan] = await db
     .insert(billingPlans)
@@ -96,7 +96,7 @@ app.put("/plans/:planId", async (c) => {
     .limit(1);
 
   if (!enrollment) throw new Error("Enrollment not found");
-  await assertFacilityManager(enrollment.facilityId, userId);
+  await assertFacilityPermission(enrollment.facilityId, userId, "billing:manage");
 
   const [updated] = await db
     .update(billingPlans)
@@ -114,7 +114,7 @@ app.get("/plans/:enrollmentId", async (c) => {
   const facilityId = c.req.query("facilityId");
 
   if (!facilityId) throw new Error("facilityId is required");
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "billing:manage");
 
   const [plan] = await db
     .select()
@@ -130,7 +130,7 @@ app.get("/overview/:facilityId", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "billing:manage");
 
   const [totalRevenue] = await db
     .select({
@@ -186,7 +186,7 @@ app.get("/invoices/:facilityId", async (c) => {
   const facilityId = c.req.param("facilityId");
   const status = c.req.query("status");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "billing:manage");
 
   const conditions = [eq(invoices.facilityId, facilityId)];
   if (status && status !== "all") {
@@ -229,7 +229,7 @@ app.post("/invoices", async (c) => {
     notes,
   } = body;
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "billing:manage");
 
   const invoiceNumber = await generateInvoiceNumber(facilityId);
 
@@ -297,7 +297,7 @@ app.put("/invoices/:invoiceId", async (c) => {
   if (!invoice) throw new Error("Invoice not found");
   if (invoice.status !== "draft") throw new Error("Can only edit draft invoices");
 
-  await assertFacilityManager(invoice.facilityId, userId);
+  await assertFacilityPermission(invoice.facilityId, userId, "billing:manage");
 
   if (lineItems) {
     // Delete existing and re-insert
@@ -366,7 +366,7 @@ app.post("/invoices/:invoiceId/send", async (c) => {
   if (!invoice) throw new Error("Invoice not found");
   if (invoice.status !== "draft") throw new Error("Can only send draft invoices");
 
-  await assertFacilityManager(invoice.facilityId, userId);
+  await assertFacilityPermission(invoice.facilityId, userId, "billing:manage");
 
   const [updated] = await db
     .update(invoices)
@@ -410,7 +410,7 @@ app.post("/invoices/:invoiceId/void", async (c) => {
   if (!invoice) throw new Error("Invoice not found");
   if (invoice.status === "paid") throw new Error("Cannot void a paid invoice");
 
-  await assertFacilityManager(invoice.facilityId, userId);
+  await assertFacilityPermission(invoice.facilityId, userId, "billing:manage");
 
   const [updated] = await db
     .update(invoices)
@@ -428,7 +428,7 @@ app.get("/invoices/:invoiceId/detail", async (c) => {
   const facilityId = c.req.query("facilityId");
 
   if (!facilityId) throw new Error("facilityId is required");
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "billing:manage");
 
   const [invoice] = await db
     .select({
@@ -477,7 +477,7 @@ app.get("/parents/:facilityId", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "billing:manage");
 
   // Get parents who have children enrolled at this facility
   const results = await db

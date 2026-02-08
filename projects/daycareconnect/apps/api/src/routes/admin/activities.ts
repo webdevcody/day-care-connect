@@ -12,7 +12,7 @@ import {
   gte,
   lte,
 } from "@daycare-hub/db";
-import { assertFacilityStaffOrOwner } from "../../lib/facility-auth";
+import { assertFacilityPermission } from "../../lib/facility-auth";
 import { sendNotification } from "../../lib/notification-service";
 
 const app = new Hono();
@@ -24,7 +24,7 @@ app.get("/:facilityId/:date", async (c) => {
   const date = c.req.param("date");
   const childId = c.req.query("childId");
 
-  await assertFacilityStaffOrOwner(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "activities:manage");
 
   const conditions = [eq(activityEntries.facilityId, facilityId)];
 
@@ -66,7 +66,7 @@ app.get("/:facilityId/children", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityStaffOrOwner(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "activities:manage");
 
   const results = await db
     .select({
@@ -93,7 +93,7 @@ app.post("/", async (c) => {
   const body = await c.req.json();
   const { facilityId, childId, type, data, photoUrl, occurredAt } = body;
 
-  await assertFacilityStaffOrOwner(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "activities:manage");
 
   // Verify child is enrolled
   const [enrollment] = await db
@@ -176,7 +176,7 @@ app.post("/bulk", async (c) => {
   const body = await c.req.json();
   const { facilityId, childIds, type, data, photoUrl, occurredAt } = body;
 
-  await assertFacilityStaffOrOwner(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "activities:manage");
 
   // Verify all children are enrolled
   const activeEnrollments = await db
@@ -245,7 +245,7 @@ app.put("/:activityId", async (c) => {
     .limit(1);
 
   if (!entry) throw new Error("Activity entry not found");
-  await assertFacilityStaffOrOwner(entry.facilityId, userId);
+  await assertFacilityPermission(entry.facilityId, userId, "activities:manage");
 
   const updateData: Record<string, unknown> = { updatedAt: new Date() };
   if (body.data !== undefined) updateData.data = body.data;
@@ -276,7 +276,7 @@ app.delete("/:activityId", async (c) => {
     .limit(1);
 
   if (!entry) throw new Error("Activity entry not found");
-  await assertFacilityStaffOrOwner(entry.facilityId, userId);
+  await assertFacilityPermission(entry.facilityId, userId, "activities:manage");
 
   await db
     .delete(activityEntries)

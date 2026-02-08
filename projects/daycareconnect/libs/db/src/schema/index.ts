@@ -10,6 +10,7 @@ export * from "./children";
 export * from "./enrollments";
 export * from "./enrollment-status-history";
 export * from "./facility-staff";
+export * from "./facility-staff-permissions";
 export * from "./facility-services";
 export * from "./favorites";
 export * from "./attendance";

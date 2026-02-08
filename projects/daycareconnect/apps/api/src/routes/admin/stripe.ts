@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { db, stripeAccounts, facilities, eq } from "@daycare-hub/db";
-import { assertFacilityManager } from "../../lib/facility-auth";
+import { assertFacilityPermission } from "../../lib/facility-auth";
 import { getStripe } from "../../lib/stripe";
 
 const app = new Hono();
@@ -10,7 +10,7 @@ app.get("/:facilityId/status", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "billing:manage");
 
   const [account] = await db
     .select()
@@ -34,7 +34,7 @@ app.post("/:facilityId/connect", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "billing:manage");
 
   const stripe = getStripe();
 
@@ -85,7 +85,7 @@ app.post("/:facilityId/dashboard", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "billing:manage");
 
   const [account] = await db
     .select()

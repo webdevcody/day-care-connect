@@ -10,7 +10,7 @@ import {
   and,
   sql,
 } from "@daycare-hub/db";
-import { assertFacilityStaffOrOwner } from "../../lib/facility-auth";
+import { assertFacilityPermission } from "../../lib/facility-auth";
 import { sendNotification } from "../../lib/notification-service";
 
 const app = new Hono();
@@ -22,7 +22,7 @@ app.get("/:facilityId/:date", async (c) => {
   const date = c.req.param("date");
   const status = c.req.query("status");
 
-  await assertFacilityStaffOrOwner(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "daily_reports:manage");
 
   const dateFilter = date || new Date().toISOString().split("T")[0];
 
@@ -91,7 +91,7 @@ app.post("/", async (c) => {
   const body = await c.req.json();
   const { facilityId, childId, date } = body;
 
-  await assertFacilityStaffOrOwner(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "daily_reports:manage");
 
   const [existing] = await db
     .select()
@@ -137,7 +137,7 @@ app.put("/:reportId", async (c) => {
     .limit(1);
 
   if (!report) throw new Error("Report not found");
-  await assertFacilityStaffOrOwner(report.facilityId, userId);
+  await assertFacilityPermission(report.facilityId, userId, "daily_reports:manage");
 
   const [updated] = await db
     .update(dailyReports)
@@ -165,7 +165,7 @@ app.post("/:reportId/publish", async (c) => {
     .limit(1);
 
   if (!report) throw new Error("Report not found");
-  await assertFacilityStaffOrOwner(report.facilityId, userId);
+  await assertFacilityPermission(report.facilityId, userId, "daily_reports:manage");
 
   const [updated] = await db
     .update(dailyReports)
@@ -213,7 +213,7 @@ app.post("/bulk-publish", async (c) => {
   const body = await c.req.json();
   const { reportIds, facilityId } = body;
 
-  await assertFacilityStaffOrOwner(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "daily_reports:manage");
 
   const results = [];
   for (const reportId of reportIds) {

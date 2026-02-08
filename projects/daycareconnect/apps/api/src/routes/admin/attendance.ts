@@ -14,7 +14,7 @@ import {
   isNotNull,
   count,
 } from "@daycare-hub/db";
-import { assertFacilityStaffOrOwner } from "../../lib/facility-auth";
+import { assertFacilityPermission } from "../../lib/facility-auth";
 import { sendNotification } from "../../lib/notification-service";
 
 const app = new Hono();
@@ -26,7 +26,7 @@ app.get("/:facilityId/activity-log", async (c) => {
   const limit = Math.min(Number(c.req.query("limit") || 20), 50);
   const cursor = c.req.query("cursor");
 
-  await assertFacilityStaffOrOwner(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "attendance:manage");
 
   const actionTime = sql<string>`coalesce(${attendance.checkOutTime}, ${attendance.checkInTime})`;
 
@@ -73,7 +73,7 @@ app.get("/:facilityId/child-history/:childId", async (c) => {
   const limit = Math.min(Number(c.req.query("limit") || 30), 100);
   const offset = Number(c.req.query("offset") || 0);
 
-  await assertFacilityStaffOrOwner(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "attendance:manage");
 
   const [totalResult] = await db
     .select({ total: count() })
@@ -115,7 +115,7 @@ app.get("/:facilityId/:date", async (c) => {
   const facilityId = c.req.param("facilityId");
   const date = c.req.param("date");
 
-  await assertFacilityStaffOrOwner(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "attendance:manage");
 
   // Find active enrollments that don't have attendance records for this date
   const activeEnrollments = await db
@@ -214,7 +214,7 @@ app.post("/check-in", async (c) => {
     .limit(1);
 
   if (!record) throw new Error("Attendance record not found");
-  await assertFacilityStaffOrOwner(record.facilityId, userId);
+  await assertFacilityPermission(record.facilityId, userId, "attendance:manage");
 
   const [updated] = await db
     .update(attendance)
@@ -271,7 +271,7 @@ app.post("/check-out", async (c) => {
     .limit(1);
 
   if (!record) throw new Error("Attendance record not found");
-  await assertFacilityStaffOrOwner(record.facilityId, userId);
+  await assertFacilityPermission(record.facilityId, userId, "attendance:manage");
 
   const [updated] = await db
     .update(attendance)
@@ -327,7 +327,7 @@ app.post("/mark-absent", async (c) => {
     .limit(1);
 
   if (!record) throw new Error("Attendance record not found");
-  await assertFacilityStaffOrOwner(record.facilityId, userId);
+  await assertFacilityPermission(record.facilityId, userId, "attendance:manage");
 
   const [updated] = await db
     .update(attendance)

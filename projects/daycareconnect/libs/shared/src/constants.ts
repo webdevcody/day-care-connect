@@ -12,6 +12,97 @@ export type ScheduleType = (typeof SCHEDULE_TYPES)[number];
 export const STAFF_ROLES = ["lead_teacher", "assistant_teacher", "aide", "director"] as const;
 export type StaffRole = (typeof STAFF_ROLES)[number];
 
+// ─── Fine-Grained Staff Permissions ─────────────────────────────────────────
+export const STAFF_PERMISSIONS = [
+  "attendance:manage",
+  "activities:manage",
+  "daily_reports:manage",
+  "messaging:send",
+  "roster:view",
+  "enrollments:manage",
+  "billing:manage",
+  "documents:manage",
+  "reports:view",
+  "staff:manage",
+  "facility:edit",
+  "invites:manage",
+  "reviews:manage",
+] as const;
+export type StaffPermission = (typeof STAFF_PERMISSIONS)[number];
+
+export const STAFF_PERMISSION_LABELS: Record<StaffPermission, string> = {
+  "attendance:manage": "Manage Attendance",
+  "activities:manage": "Log Activities",
+  "daily_reports:manage": "Daily Reports",
+  "messaging:send": "Send Messages",
+  "roster:view": "View Roster",
+  "enrollments:manage": "Manage Enrollments",
+  "billing:manage": "Manage Billing",
+  "documents:manage": "Manage Documents",
+  "reports:view": "View Reports",
+  "staff:manage": "Manage Staff",
+  "facility:edit": "Edit Facility",
+  "invites:manage": "Manage Invites",
+  "reviews:manage": "Respond to Reviews",
+};
+
+export const STAFF_PERMISSION_DESCRIPTIONS: Record<StaffPermission, string> = {
+  "attendance:manage": "Check children in/out and manage attendance records",
+  "activities:manage": "Log meals, naps, activities, and other child updates",
+  "daily_reports:manage": "Create, edit, and publish daily reports for parents",
+  "messaging:send": "Send and receive messages with parents",
+  "roster:view": "View the list of enrolled children and their details",
+  "enrollments:manage": "Approve, reject, and manage enrollment applications",
+  "billing:manage": "Create invoices, manage billing plans, and process payments",
+  "documents:manage": "Create and manage document templates and send to parents",
+  "reports:view": "View facility reports (enrollment, attendance, revenue)",
+  "staff:manage": "Add and remove staff members, update their permissions",
+  "facility:edit": "Edit facility details, hours, photos, and services",
+  "invites:manage": "Create and manage invite links for parent onboarding",
+  "reviews:manage": "Respond to and manage facility reviews",
+};
+
+/** Default permissions granted to each staff role */
+export const DEFAULT_ROLE_PERMISSIONS: Record<StaffRole, StaffPermission[]> = {
+  aide: [
+    "attendance:manage",
+    "activities:manage",
+    "daily_reports:manage",
+    "messaging:send",
+    "roster:view",
+  ],
+  assistant_teacher: [
+    "attendance:manage",
+    "activities:manage",
+    "daily_reports:manage",
+    "messaging:send",
+    "roster:view",
+  ],
+  lead_teacher: [
+    "attendance:manage",
+    "activities:manage",
+    "daily_reports:manage",
+    "messaging:send",
+    "roster:view",
+    "enrollments:manage",
+  ],
+  director: [
+    "attendance:manage",
+    "activities:manage",
+    "daily_reports:manage",
+    "messaging:send",
+    "roster:view",
+    "enrollments:manage",
+    "billing:manage",
+    "documents:manage",
+    "reports:view",
+    "staff:manage",
+    "facility:edit",
+    "invites:manage",
+    "reviews:manage",
+  ],
+};
+
 export const FACILITY_SERVICES_SUGGESTIONS = [
   "Meals Included",
   "Outdoor Play",

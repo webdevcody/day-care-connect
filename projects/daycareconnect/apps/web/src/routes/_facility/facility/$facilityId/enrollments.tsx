@@ -7,7 +7,6 @@ import {
   useRejectEnrollment,
   useBulkEnrollmentAction,
 } from "@daycare-hub/hooks";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { EnrollmentReviewDialog } from "@/components/admin/enrollment-review-dialog";
 import { EnrollmentStatusBadge } from "@/components/admin/status-badge";
 import {
@@ -135,8 +134,6 @@ function EnrollmentsPage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <h1 className="mb-4 text-2xl font-bold">Enrollments</h1>
 
       <div className="mb-4 flex gap-1 rounded-lg bg-muted p-1">

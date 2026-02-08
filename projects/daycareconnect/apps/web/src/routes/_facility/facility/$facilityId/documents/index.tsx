@@ -5,7 +5,6 @@ import {
   useSendDocumentReminder,
   useVoidDocument,
 } from "@daycare-hub/hooks";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { DocumentStatusBadge } from "@/components/documents/document-status-badge";
 import {
   Card,
@@ -61,8 +60,6 @@ function DocumentsPage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Documents</h1>
         <div className="flex gap-2">

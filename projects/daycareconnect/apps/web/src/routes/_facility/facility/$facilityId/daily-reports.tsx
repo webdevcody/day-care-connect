@@ -6,7 +6,6 @@ import {
   usePublishDailyReport,
   useBulkPublishDailyReports,
 } from "@daycare-hub/hooks";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import {
   Card,
   CardContent,
@@ -82,8 +81,6 @@ function DailyReportsPage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Daily Reports</h1>
         <div className="flex items-center gap-3">

@@ -6,7 +6,6 @@ import {
   useDeleteFacilityPhoto,
   useReorderFacilityPhotos,
 } from "@daycare-hub/hooks";
-import { FacilitySubNav } from "@/components/admin/facility-sub-nav";
 import {
   Button,
   Card,
@@ -82,8 +81,6 @@ function FacilityPhotosPage() {
 
   return (
     <div>
-      <FacilitySubNav facilityId={facilityId} />
-
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Photos</h1>
         <div className="flex items-center gap-3">

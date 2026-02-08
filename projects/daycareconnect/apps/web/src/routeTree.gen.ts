@@ -37,6 +37,7 @@ import { Route as ParentParentNotificationsRouteImport } from './routes/_parent/
 import { Route as FacilityFacilitySettingsRouteImport } from './routes/_facility/facility/settings'
 import { Route as FacilityFacilityNotificationsRouteImport } from './routes/_facility/facility/notifications'
 import { Route as FacilityFacilityNewRouteImport } from './routes/_facility/facility/new'
+import { Route as FacilityFacilityFacilityIdRouteImport } from './routes/_facility/facility/$facilityId'
 import { Route as StaffStaffMessagesIndexRouteImport } from './routes/_staff/staff/messages/index'
 import { Route as ParentParentMessagesIndexRouteImport } from './routes/_parent/parent/messages/index'
 import { Route as ParentParentDocumentsIndexRouteImport } from './routes/_parent/parent/documents/index'
@@ -223,6 +224,12 @@ const FacilityFacilityNewRoute = FacilityFacilityNewRouteImport.update({
   path: '/facility/new',
   getParentRoute: () => FacilityRoute,
 } as any)
+const FacilityFacilityFacilityIdRoute =
+  FacilityFacilityFacilityIdRouteImport.update({
+    id: '/facility/$facilityId',
+    path: '/facility/$facilityId',
+    getParentRoute: () => FacilityRoute,
+  } as any)
 const StaffStaffMessagesIndexRoute = StaffStaffMessagesIndexRouteImport.update({
   id: '/staff/messages/',
   path: '/staff/messages/',
@@ -260,9 +267,9 @@ const FacilityFacilityMessagesIndexRoute =
   } as any)
 const FacilityFacilityFacilityIdIndexRoute =
   FacilityFacilityFacilityIdIndexRouteImport.update({
-    id: '/facility/$facilityId/',
-    path: '/facility/$facilityId/',
-    getParentRoute: () => FacilityRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const StaffStaffMessagesConversationIdRoute =
   StaffStaffMessagesConversationIdRouteImport.update({
@@ -319,93 +326,93 @@ const FacilityFacilityMessagesConversationIdRoute =
   } as any)
 const FacilityFacilityFacilityIdStaffRoute =
   FacilityFacilityFacilityIdStaffRouteImport.update({
-    id: '/facility/$facilityId/staff',
-    path: '/facility/$facilityId/staff',
-    getParentRoute: () => FacilityRoute,
+    id: '/staff',
+    path: '/staff',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdServicesRoute =
   FacilityFacilityFacilityIdServicesRouteImport.update({
-    id: '/facility/$facilityId/services',
-    path: '/facility/$facilityId/services',
-    getParentRoute: () => FacilityRoute,
+    id: '/services',
+    path: '/services',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdRosterRoute =
   FacilityFacilityFacilityIdRosterRouteImport.update({
-    id: '/facility/$facilityId/roster',
-    path: '/facility/$facilityId/roster',
-    getParentRoute: () => FacilityRoute,
+    id: '/roster',
+    path: '/roster',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdReviewsRoute =
   FacilityFacilityFacilityIdReviewsRouteImport.update({
-    id: '/facility/$facilityId/reviews',
-    path: '/facility/$facilityId/reviews',
-    getParentRoute: () => FacilityRoute,
+    id: '/reviews',
+    path: '/reviews',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdReportsRoute =
   FacilityFacilityFacilityIdReportsRouteImport.update({
-    id: '/facility/$facilityId/reports',
-    path: '/facility/$facilityId/reports',
-    getParentRoute: () => FacilityRoute,
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdPhotosRoute =
   FacilityFacilityFacilityIdPhotosRouteImport.update({
-    id: '/facility/$facilityId/photos',
-    path: '/facility/$facilityId/photos',
-    getParentRoute: () => FacilityRoute,
+    id: '/photos',
+    path: '/photos',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdInvitesRoute =
   FacilityFacilityFacilityIdInvitesRouteImport.update({
-    id: '/facility/$facilityId/invites',
-    path: '/facility/$facilityId/invites',
-    getParentRoute: () => FacilityRoute,
+    id: '/invites',
+    path: '/invites',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdHoursRoute =
   FacilityFacilityFacilityIdHoursRouteImport.update({
-    id: '/facility/$facilityId/hours',
-    path: '/facility/$facilityId/hours',
-    getParentRoute: () => FacilityRoute,
+    id: '/hours',
+    path: '/hours',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdEnrollmentsRoute =
   FacilityFacilityFacilityIdEnrollmentsRouteImport.update({
-    id: '/facility/$facilityId/enrollments',
-    path: '/facility/$facilityId/enrollments',
-    getParentRoute: () => FacilityRoute,
+    id: '/enrollments',
+    path: '/enrollments',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdEditRoute =
   FacilityFacilityFacilityIdEditRouteImport.update({
-    id: '/facility/$facilityId/edit',
-    path: '/facility/$facilityId/edit',
-    getParentRoute: () => FacilityRoute,
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdDailyReportsRoute =
   FacilityFacilityFacilityIdDailyReportsRouteImport.update({
-    id: '/facility/$facilityId/daily-reports',
-    path: '/facility/$facilityId/daily-reports',
-    getParentRoute: () => FacilityRoute,
+    id: '/daily-reports',
+    path: '/daily-reports',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdAttendanceRoute =
   FacilityFacilityFacilityIdAttendanceRouteImport.update({
-    id: '/facility/$facilityId/attendance',
-    path: '/facility/$facilityId/attendance',
-    getParentRoute: () => FacilityRoute,
+    id: '/attendance',
+    path: '/attendance',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdActivitiesRoute =
   FacilityFacilityFacilityIdActivitiesRouteImport.update({
-    id: '/facility/$facilityId/activities',
-    path: '/facility/$facilityId/activities',
-    getParentRoute: () => FacilityRoute,
+    id: '/activities',
+    path: '/activities',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdDocumentsIndexRoute =
   FacilityFacilityFacilityIdDocumentsIndexRouteImport.update({
-    id: '/facility/$facilityId/documents/',
-    path: '/facility/$facilityId/documents/',
-    getParentRoute: () => FacilityRoute,
+    id: '/documents/',
+    path: '/documents/',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdBillingIndexRoute =
   FacilityFacilityFacilityIdBillingIndexRouteImport.update({
-    id: '/facility/$facilityId/billing/',
-    path: '/facility/$facilityId/billing/',
-    getParentRoute: () => FacilityRoute,
+    id: '/billing/',
+    path: '/billing/',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const ParentParentChildrenChildIdPhotosRoute =
   ParentParentChildrenChildIdPhotosRouteImport.update({
@@ -439,27 +446,27 @@ const FacilityFacilityFacilityIdInvitesFormsRoute =
   } as any)
 const FacilityFacilityFacilityIdDocumentsTemplatesRoute =
   FacilityFacilityFacilityIdDocumentsTemplatesRouteImport.update({
-    id: '/facility/$facilityId/documents/templates',
-    path: '/facility/$facilityId/documents/templates',
-    getParentRoute: () => FacilityRoute,
+    id: '/documents/templates',
+    path: '/documents/templates',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdDocumentsSendRoute =
   FacilityFacilityFacilityIdDocumentsSendRouteImport.update({
-    id: '/facility/$facilityId/documents/send',
-    path: '/facility/$facilityId/documents/send',
-    getParentRoute: () => FacilityRoute,
+    id: '/documents/send',
+    path: '/documents/send',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdDocumentsComplianceRoute =
   FacilityFacilityFacilityIdDocumentsComplianceRouteImport.update({
-    id: '/facility/$facilityId/documents/compliance',
-    path: '/facility/$facilityId/documents/compliance',
-    getParentRoute: () => FacilityRoute,
+    id: '/documents/compliance',
+    path: '/documents/compliance',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdBillingInvoicesIndexRoute =
   FacilityFacilityFacilityIdBillingInvoicesIndexRouteImport.update({
-    id: '/facility/$facilityId/billing/invoices/',
-    path: '/facility/$facilityId/billing/invoices/',
-    getParentRoute: () => FacilityRoute,
+    id: '/billing/invoices/',
+    path: '/billing/invoices/',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const ParentParentChildrenChildIdDailyReportDateRoute =
   ParentParentChildrenChildIdDailyReportDateRouteImport.update({
@@ -469,15 +476,15 @@ const ParentParentChildrenChildIdDailyReportDateRoute =
   } as any)
 const FacilityFacilityFacilityIdBillingInvoicesNewRoute =
   FacilityFacilityFacilityIdBillingInvoicesNewRouteImport.update({
-    id: '/facility/$facilityId/billing/invoices/new',
-    path: '/facility/$facilityId/billing/invoices/new',
-    getParentRoute: () => FacilityRoute,
+    id: '/billing/invoices/new',
+    path: '/billing/invoices/new',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute =
   FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRouteImport.update({
-    id: '/facility/$facilityId/billing/invoices/$invoiceId',
-    path: '/facility/$facilityId/billing/invoices/$invoiceId',
-    getParentRoute: () => FacilityRoute,
+    id: '/billing/invoices/$invoiceId',
+    path: '/billing/invoices/$invoiceId',
+    getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -491,6 +498,7 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof AuthVerifyEmailRoute
   '/invite/$code': typeof InviteCodeRoute
   '/facilities/': typeof FacilitiesIndexRoute
+  '/facility/$facilityId': typeof FacilityFacilityFacilityIdRouteWithChildren
   '/facility/new': typeof FacilityFacilityNewRoute
   '/facility/notifications': typeof FacilityFacilityNotificationsRoute
   '/facility/settings': typeof FacilityFacilitySettingsRoute
@@ -634,6 +642,7 @@ export interface FileRoutesById {
   '/_auth/verify-email': typeof AuthVerifyEmailRoute
   '/invite/$code': typeof InviteCodeRoute
   '/facilities/': typeof FacilitiesIndexRoute
+  '/_facility/facility/$facilityId': typeof FacilityFacilityFacilityIdRouteWithChildren
   '/_facility/facility/new': typeof FacilityFacilityNewRoute
   '/_facility/facility/notifications': typeof FacilityFacilityNotificationsRoute
   '/_facility/facility/settings': typeof FacilityFacilitySettingsRoute
@@ -705,6 +714,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/invite/$code'
     | '/facilities/'
+    | '/facility/$facilityId'
     | '/facility/new'
     | '/facility/notifications'
     | '/facility/settings'
@@ -847,6 +857,7 @@ export interface FileRouteTypes {
     | '/_auth/verify-email'
     | '/invite/$code'
     | '/facilities/'
+    | '/_facility/facility/$facilityId'
     | '/_facility/facility/new'
     | '/_facility/facility/notifications'
     | '/_facility/facility/settings'
@@ -1119,6 +1130,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FacilityFacilityNewRouteImport
       parentRoute: typeof FacilityRoute
     }
+    '/_facility/facility/$facilityId': {
+      id: '/_facility/facility/$facilityId'
+      path: '/facility/$facilityId'
+      fullPath: '/facility/$facilityId'
+      preLoaderRoute: typeof FacilityFacilityFacilityIdRouteImport
+      parentRoute: typeof FacilityRoute
+    }
     '/_staff/staff/messages/': {
       id: '/_staff/staff/messages/'
       path: '/staff/messages'
@@ -1163,10 +1181,10 @@ declare module '@tanstack/react-router' {
     }
     '/_facility/facility/$facilityId/': {
       id: '/_facility/facility/$facilityId/'
-      path: '/facility/$facilityId'
+      path: '/'
       fullPath: '/facility/$facilityId/'
       preLoaderRoute: typeof FacilityFacilityFacilityIdIndexRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_staff/staff/messages/$conversationId': {
       id: '/_staff/staff/messages/$conversationId'
@@ -1233,108 +1251,108 @@ declare module '@tanstack/react-router' {
     }
     '/_facility/facility/$facilityId/staff': {
       id: '/_facility/facility/$facilityId/staff'
-      path: '/facility/$facilityId/staff'
+      path: '/staff'
       fullPath: '/facility/$facilityId/staff'
       preLoaderRoute: typeof FacilityFacilityFacilityIdStaffRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/services': {
       id: '/_facility/facility/$facilityId/services'
-      path: '/facility/$facilityId/services'
+      path: '/services'
       fullPath: '/facility/$facilityId/services'
       preLoaderRoute: typeof FacilityFacilityFacilityIdServicesRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/roster': {
       id: '/_facility/facility/$facilityId/roster'
-      path: '/facility/$facilityId/roster'
+      path: '/roster'
       fullPath: '/facility/$facilityId/roster'
       preLoaderRoute: typeof FacilityFacilityFacilityIdRosterRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/reviews': {
       id: '/_facility/facility/$facilityId/reviews'
-      path: '/facility/$facilityId/reviews'
+      path: '/reviews'
       fullPath: '/facility/$facilityId/reviews'
       preLoaderRoute: typeof FacilityFacilityFacilityIdReviewsRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/reports': {
       id: '/_facility/facility/$facilityId/reports'
-      path: '/facility/$facilityId/reports'
+      path: '/reports'
       fullPath: '/facility/$facilityId/reports'
       preLoaderRoute: typeof FacilityFacilityFacilityIdReportsRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/photos': {
       id: '/_facility/facility/$facilityId/photos'
-      path: '/facility/$facilityId/photos'
+      path: '/photos'
       fullPath: '/facility/$facilityId/photos'
       preLoaderRoute: typeof FacilityFacilityFacilityIdPhotosRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/invites': {
       id: '/_facility/facility/$facilityId/invites'
-      path: '/facility/$facilityId/invites'
+      path: '/invites'
       fullPath: '/facility/$facilityId/invites'
       preLoaderRoute: typeof FacilityFacilityFacilityIdInvitesRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/hours': {
       id: '/_facility/facility/$facilityId/hours'
-      path: '/facility/$facilityId/hours'
+      path: '/hours'
       fullPath: '/facility/$facilityId/hours'
       preLoaderRoute: typeof FacilityFacilityFacilityIdHoursRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/enrollments': {
       id: '/_facility/facility/$facilityId/enrollments'
-      path: '/facility/$facilityId/enrollments'
+      path: '/enrollments'
       fullPath: '/facility/$facilityId/enrollments'
       preLoaderRoute: typeof FacilityFacilityFacilityIdEnrollmentsRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/edit': {
       id: '/_facility/facility/$facilityId/edit'
-      path: '/facility/$facilityId/edit'
+      path: '/edit'
       fullPath: '/facility/$facilityId/edit'
       preLoaderRoute: typeof FacilityFacilityFacilityIdEditRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/daily-reports': {
       id: '/_facility/facility/$facilityId/daily-reports'
-      path: '/facility/$facilityId/daily-reports'
+      path: '/daily-reports'
       fullPath: '/facility/$facilityId/daily-reports'
       preLoaderRoute: typeof FacilityFacilityFacilityIdDailyReportsRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/attendance': {
       id: '/_facility/facility/$facilityId/attendance'
-      path: '/facility/$facilityId/attendance'
+      path: '/attendance'
       fullPath: '/facility/$facilityId/attendance'
       preLoaderRoute: typeof FacilityFacilityFacilityIdAttendanceRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/activities': {
       id: '/_facility/facility/$facilityId/activities'
-      path: '/facility/$facilityId/activities'
+      path: '/activities'
       fullPath: '/facility/$facilityId/activities'
       preLoaderRoute: typeof FacilityFacilityFacilityIdActivitiesRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/documents/': {
       id: '/_facility/facility/$facilityId/documents/'
-      path: '/facility/$facilityId/documents'
+      path: '/documents'
       fullPath: '/facility/$facilityId/documents/'
       preLoaderRoute: typeof FacilityFacilityFacilityIdDocumentsIndexRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/billing/': {
       id: '/_facility/facility/$facilityId/billing/'
-      path: '/facility/$facilityId/billing'
+      path: '/billing'
       fullPath: '/facility/$facilityId/billing/'
       preLoaderRoute: typeof FacilityFacilityFacilityIdBillingIndexRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_parent/parent/children/$childId/photos': {
       id: '/_parent/parent/children/$childId/photos'
@@ -1373,31 +1391,31 @@ declare module '@tanstack/react-router' {
     }
     '/_facility/facility/$facilityId/documents/templates': {
       id: '/_facility/facility/$facilityId/documents/templates'
-      path: '/facility/$facilityId/documents/templates'
+      path: '/documents/templates'
       fullPath: '/facility/$facilityId/documents/templates'
       preLoaderRoute: typeof FacilityFacilityFacilityIdDocumentsTemplatesRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/documents/send': {
       id: '/_facility/facility/$facilityId/documents/send'
-      path: '/facility/$facilityId/documents/send'
+      path: '/documents/send'
       fullPath: '/facility/$facilityId/documents/send'
       preLoaderRoute: typeof FacilityFacilityFacilityIdDocumentsSendRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/documents/compliance': {
       id: '/_facility/facility/$facilityId/documents/compliance'
-      path: '/facility/$facilityId/documents/compliance'
+      path: '/documents/compliance'
       fullPath: '/facility/$facilityId/documents/compliance'
       preLoaderRoute: typeof FacilityFacilityFacilityIdDocumentsComplianceRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/billing/invoices/': {
       id: '/_facility/facility/$facilityId/billing/invoices/'
-      path: '/facility/$facilityId/billing/invoices'
+      path: '/billing/invoices'
       fullPath: '/facility/$facilityId/billing/invoices/'
       preLoaderRoute: typeof FacilityFacilityFacilityIdBillingInvoicesIndexRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_parent/parent/children/$childId/daily-report/$date': {
       id: '/_parent/parent/children/$childId/daily-report/$date'
@@ -1408,17 +1426,17 @@ declare module '@tanstack/react-router' {
     }
     '/_facility/facility/$facilityId/billing/invoices/new': {
       id: '/_facility/facility/$facilityId/billing/invoices/new'
-      path: '/facility/$facilityId/billing/invoices/new'
+      path: '/billing/invoices/new'
       fullPath: '/facility/$facilityId/billing/invoices/new'
       preLoaderRoute: typeof FacilityFacilityFacilityIdBillingInvoicesNewRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/billing/invoices/$invoiceId': {
       id: '/_facility/facility/$facilityId/billing/invoices/$invoiceId'
-      path: '/facility/$facilityId/billing/invoices/$invoiceId'
+      path: '/billing/invoices/$invoiceId'
       fullPath: '/facility/$facilityId/billing/invoices/$invoiceId'
       preLoaderRoute: typeof FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRouteImport
-      parentRoute: typeof FacilityRoute
+      parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
   }
 }
@@ -1456,11 +1474,7 @@ const FacilityFacilityFacilityIdInvitesRouteWithChildren =
     FacilityFacilityFacilityIdInvitesRouteChildren,
   )
 
-interface FacilityRouteChildren {
-  FacilityFacilityNewRoute: typeof FacilityFacilityNewRoute
-  FacilityFacilityNotificationsRoute: typeof FacilityFacilityNotificationsRoute
-  FacilityFacilitySettingsRoute: typeof FacilityFacilitySettingsRoute
-  FacilityFacilityIndexRoute: typeof FacilityFacilityIndexRoute
+interface FacilityFacilityFacilityIdRouteChildren {
   FacilityFacilityFacilityIdActivitiesRoute: typeof FacilityFacilityFacilityIdActivitiesRoute
   FacilityFacilityFacilityIdAttendanceRoute: typeof FacilityFacilityFacilityIdAttendanceRoute
   FacilityFacilityFacilityIdDailyReportsRoute: typeof FacilityFacilityFacilityIdDailyReportsRoute
@@ -1474,9 +1488,7 @@ interface FacilityRouteChildren {
   FacilityFacilityFacilityIdRosterRoute: typeof FacilityFacilityFacilityIdRosterRoute
   FacilityFacilityFacilityIdServicesRoute: typeof FacilityFacilityFacilityIdServicesRoute
   FacilityFacilityFacilityIdStaffRoute: typeof FacilityFacilityFacilityIdStaffRoute
-  FacilityFacilityMessagesConversationIdRoute: typeof FacilityFacilityMessagesConversationIdRoute
   FacilityFacilityFacilityIdIndexRoute: typeof FacilityFacilityFacilityIdIndexRoute
-  FacilityFacilityMessagesIndexRoute: typeof FacilityFacilityMessagesIndexRoute
   FacilityFacilityFacilityIdDocumentsComplianceRoute: typeof FacilityFacilityFacilityIdDocumentsComplianceRoute
   FacilityFacilityFacilityIdDocumentsSendRoute: typeof FacilityFacilityFacilityIdDocumentsSendRoute
   FacilityFacilityFacilityIdDocumentsTemplatesRoute: typeof FacilityFacilityFacilityIdDocumentsTemplatesRoute
@@ -1487,52 +1499,74 @@ interface FacilityRouteChildren {
   FacilityFacilityFacilityIdBillingInvoicesIndexRoute: typeof FacilityFacilityFacilityIdBillingInvoicesIndexRoute
 }
 
+const FacilityFacilityFacilityIdRouteChildren: FacilityFacilityFacilityIdRouteChildren =
+  {
+    FacilityFacilityFacilityIdActivitiesRoute:
+      FacilityFacilityFacilityIdActivitiesRoute,
+    FacilityFacilityFacilityIdAttendanceRoute:
+      FacilityFacilityFacilityIdAttendanceRoute,
+    FacilityFacilityFacilityIdDailyReportsRoute:
+      FacilityFacilityFacilityIdDailyReportsRoute,
+    FacilityFacilityFacilityIdEditRoute: FacilityFacilityFacilityIdEditRoute,
+    FacilityFacilityFacilityIdEnrollmentsRoute:
+      FacilityFacilityFacilityIdEnrollmentsRoute,
+    FacilityFacilityFacilityIdHoursRoute: FacilityFacilityFacilityIdHoursRoute,
+    FacilityFacilityFacilityIdInvitesRoute:
+      FacilityFacilityFacilityIdInvitesRouteWithChildren,
+    FacilityFacilityFacilityIdPhotosRoute:
+      FacilityFacilityFacilityIdPhotosRoute,
+    FacilityFacilityFacilityIdReportsRoute:
+      FacilityFacilityFacilityIdReportsRoute,
+    FacilityFacilityFacilityIdReviewsRoute:
+      FacilityFacilityFacilityIdReviewsRoute,
+    FacilityFacilityFacilityIdRosterRoute:
+      FacilityFacilityFacilityIdRosterRoute,
+    FacilityFacilityFacilityIdServicesRoute:
+      FacilityFacilityFacilityIdServicesRoute,
+    FacilityFacilityFacilityIdStaffRoute: FacilityFacilityFacilityIdStaffRoute,
+    FacilityFacilityFacilityIdIndexRoute: FacilityFacilityFacilityIdIndexRoute,
+    FacilityFacilityFacilityIdDocumentsComplianceRoute:
+      FacilityFacilityFacilityIdDocumentsComplianceRoute,
+    FacilityFacilityFacilityIdDocumentsSendRoute:
+      FacilityFacilityFacilityIdDocumentsSendRoute,
+    FacilityFacilityFacilityIdDocumentsTemplatesRoute:
+      FacilityFacilityFacilityIdDocumentsTemplatesRoute,
+    FacilityFacilityFacilityIdBillingIndexRoute:
+      FacilityFacilityFacilityIdBillingIndexRoute,
+    FacilityFacilityFacilityIdDocumentsIndexRoute:
+      FacilityFacilityFacilityIdDocumentsIndexRoute,
+    FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute:
+      FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute,
+    FacilityFacilityFacilityIdBillingInvoicesNewRoute:
+      FacilityFacilityFacilityIdBillingInvoicesNewRoute,
+    FacilityFacilityFacilityIdBillingInvoicesIndexRoute:
+      FacilityFacilityFacilityIdBillingInvoicesIndexRoute,
+  }
+
+const FacilityFacilityFacilityIdRouteWithChildren =
+  FacilityFacilityFacilityIdRoute._addFileChildren(
+    FacilityFacilityFacilityIdRouteChildren,
+  )
+
+interface FacilityRouteChildren {
+  FacilityFacilityFacilityIdRoute: typeof FacilityFacilityFacilityIdRouteWithChildren
+  FacilityFacilityNewRoute: typeof FacilityFacilityNewRoute
+  FacilityFacilityNotificationsRoute: typeof FacilityFacilityNotificationsRoute
+  FacilityFacilitySettingsRoute: typeof FacilityFacilitySettingsRoute
+  FacilityFacilityIndexRoute: typeof FacilityFacilityIndexRoute
+  FacilityFacilityMessagesConversationIdRoute: typeof FacilityFacilityMessagesConversationIdRoute
+  FacilityFacilityMessagesIndexRoute: typeof FacilityFacilityMessagesIndexRoute
+}
+
 const FacilityRouteChildren: FacilityRouteChildren = {
+  FacilityFacilityFacilityIdRoute: FacilityFacilityFacilityIdRouteWithChildren,
   FacilityFacilityNewRoute: FacilityFacilityNewRoute,
   FacilityFacilityNotificationsRoute: FacilityFacilityNotificationsRoute,
   FacilityFacilitySettingsRoute: FacilityFacilitySettingsRoute,
   FacilityFacilityIndexRoute: FacilityFacilityIndexRoute,
-  FacilityFacilityFacilityIdActivitiesRoute:
-    FacilityFacilityFacilityIdActivitiesRoute,
-  FacilityFacilityFacilityIdAttendanceRoute:
-    FacilityFacilityFacilityIdAttendanceRoute,
-  FacilityFacilityFacilityIdDailyReportsRoute:
-    FacilityFacilityFacilityIdDailyReportsRoute,
-  FacilityFacilityFacilityIdEditRoute: FacilityFacilityFacilityIdEditRoute,
-  FacilityFacilityFacilityIdEnrollmentsRoute:
-    FacilityFacilityFacilityIdEnrollmentsRoute,
-  FacilityFacilityFacilityIdHoursRoute: FacilityFacilityFacilityIdHoursRoute,
-  FacilityFacilityFacilityIdInvitesRoute:
-    FacilityFacilityFacilityIdInvitesRouteWithChildren,
-  FacilityFacilityFacilityIdPhotosRoute: FacilityFacilityFacilityIdPhotosRoute,
-  FacilityFacilityFacilityIdReportsRoute:
-    FacilityFacilityFacilityIdReportsRoute,
-  FacilityFacilityFacilityIdReviewsRoute:
-    FacilityFacilityFacilityIdReviewsRoute,
-  FacilityFacilityFacilityIdRosterRoute: FacilityFacilityFacilityIdRosterRoute,
-  FacilityFacilityFacilityIdServicesRoute:
-    FacilityFacilityFacilityIdServicesRoute,
-  FacilityFacilityFacilityIdStaffRoute: FacilityFacilityFacilityIdStaffRoute,
   FacilityFacilityMessagesConversationIdRoute:
     FacilityFacilityMessagesConversationIdRoute,
-  FacilityFacilityFacilityIdIndexRoute: FacilityFacilityFacilityIdIndexRoute,
   FacilityFacilityMessagesIndexRoute: FacilityFacilityMessagesIndexRoute,
-  FacilityFacilityFacilityIdDocumentsComplianceRoute:
-    FacilityFacilityFacilityIdDocumentsComplianceRoute,
-  FacilityFacilityFacilityIdDocumentsSendRoute:
-    FacilityFacilityFacilityIdDocumentsSendRoute,
-  FacilityFacilityFacilityIdDocumentsTemplatesRoute:
-    FacilityFacilityFacilityIdDocumentsTemplatesRoute,
-  FacilityFacilityFacilityIdBillingIndexRoute:
-    FacilityFacilityFacilityIdBillingIndexRoute,
-  FacilityFacilityFacilityIdDocumentsIndexRoute:
-    FacilityFacilityFacilityIdDocumentsIndexRoute,
-  FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute:
-    FacilityFacilityFacilityIdBillingInvoicesInvoiceIdRoute,
-  FacilityFacilityFacilityIdBillingInvoicesNewRoute:
-    FacilityFacilityFacilityIdBillingInvoicesNewRoute,
-  FacilityFacilityFacilityIdBillingInvoicesIndexRoute:
-    FacilityFacilityFacilityIdBillingInvoicesIndexRoute,
 }
 
 const FacilityRouteWithChildren = FacilityRoute._addFileChildren(

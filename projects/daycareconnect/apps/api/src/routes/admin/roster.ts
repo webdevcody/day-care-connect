@@ -8,7 +8,7 @@ import {
   and,
   or,
 } from "@daycare-hub/db";
-import { assertFacilityStaffOrOwner } from "../../lib/facility-auth";
+import { assertFacilityPermission } from "../../lib/facility-auth";
 
 const app = new Hono();
 
@@ -18,7 +18,7 @@ app.get("/:facilityId", async (c) => {
   const facilityId = c.req.param("facilityId");
   const search = c.req.query("search");
 
-  await assertFacilityStaffOrOwner(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "roster:view");
 
   const conditions = [
     eq(enrollments.facilityId, facilityId),
@@ -67,7 +67,7 @@ app.get("/:facilityId/export", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityStaffOrOwner(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "roster:view");
 
   const results = await db
     .select({

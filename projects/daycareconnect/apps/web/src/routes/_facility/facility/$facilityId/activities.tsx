@@ -7,7 +7,6 @@ import {
   useBulkCreateActivityEntries,
   useDeleteActivityEntry,
 } from "@daycare-hub/hooks";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import { ActivityTimeline } from "@/components/activities/activity-timeline";
 import { ActivityEntryForm } from "@/components/activities/activity-entry-form";
 import { ActivityIcon, getActivityLabel } from "@/components/activities/activity-icon";
@@ -99,8 +98,6 @@ function ActivitiesPage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Activities</h1>
         <div className="flex items-center gap-3">

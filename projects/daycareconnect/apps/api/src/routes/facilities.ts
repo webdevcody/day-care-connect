@@ -6,6 +6,7 @@ import {
   facilityPhotos,
   facilityServices,
   facilityStaff,
+  facilityStaffPermissions,
   users,
   enrollments,
   favorites,
@@ -18,12 +19,15 @@ import {
   createFacilitySchema,
   updateFacilitySchema,
   facilityHoursEntrySchema,
+  DEFAULT_ROLE_PERMISSIONS,
+  STAFF_PERMISSIONS,
 } from "@daycare-hub/shared";
-import type { StaffRole } from "@daycare-hub/shared";
+import type { StaffRole, StaffPermission } from "@daycare-hub/shared";
 import { z } from "zod";
 import {
   assertFacilityOwner,
   assertFacilityManager,
+  assertFacilityPermission,
 } from "../lib/facility-auth";
 
 const app = new Hono();
@@ -343,12 +347,12 @@ app.get("/:facilityId", async (c) => {
 });
 
 // ─── Update Facility ─────────────────────────────────────────────────────────
-// PUT /:facilityId - update facility details (owner or director)
+// PUT /:facilityId - update facility details (requires facility:edit permission)
 app.put("/:facilityId", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "facility:edit");
 
   const body = await c.req.json();
   const updateData = updateFacilitySchema.parse(body);
@@ -395,7 +399,7 @@ app.put("/:facilityId/hours", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "facility:edit");
 
   const body = await c.req.json();
   const hours = z.array(facilityHoursEntrySchema).parse(body.hours);
@@ -423,7 +427,7 @@ app.post("/:facilityId/photos", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "facility:edit");
 
   const body = await c.req.json();
   const { url, altText } = body;
@@ -456,7 +460,7 @@ app.delete("/:facilityId/photos/:photoId", async (c) => {
   const facilityId = c.req.param("facilityId");
   const photoId = c.req.param("photoId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "facility:edit");
 
   await db
     .delete(facilityPhotos)
@@ -475,7 +479,7 @@ app.put("/:facilityId/photos/reorder", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "facility:edit");
 
   const body = await c.req.json();
   const { photoIds } = body as { photoIds: string[] };
@@ -503,7 +507,7 @@ app.put("/:facilityId/services", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "facility:edit");
 
   const body = await c.req.json();
   const { services } = body as { services: string[] };
@@ -526,12 +530,12 @@ app.put("/:facilityId/services", async (c) => {
 });
 
 // ─── Facility Staff ──────────────────────────────────────────────────────────
-// GET /:facilityId/staff - list staff members
+// GET /:facilityId/staff - list staff members with their permissions
 app.get("/:facilityId/staff", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "staff:manage");
 
   const staff = await db
     .select({
@@ -546,15 +550,38 @@ app.get("/:facilityId/staff", async (c) => {
     .innerJoin(users, eq(facilityStaff.userId, users.id))
     .where(eq(facilityStaff.facilityId, facilityId));
 
-  return c.json(staff);
+  // Load permissions for all staff members
+  const staffIds = staff.map((s) => s.id);
+  let permissionsMap: Record<string, string[]> = {};
+  if (staffIds.length > 0) {
+    const allPerms = await db
+      .select({
+        facilityStaffId: facilityStaffPermissions.facilityStaffId,
+        permission: facilityStaffPermissions.permission,
+      })
+      .from(facilityStaffPermissions)
+      .where(sql`${facilityStaffPermissions.facilityStaffId} IN ${staffIds}`);
+
+    for (const p of allPerms) {
+      if (!permissionsMap[p.facilityStaffId]) permissionsMap[p.facilityStaffId] = [];
+      permissionsMap[p.facilityStaffId].push(p.permission);
+    }
+  }
+
+  const staffWithPermissions = staff.map((s) => ({
+    ...s,
+    permissions: permissionsMap[s.id] || [],
+  }));
+
+  return c.json(staffWithPermissions);
 });
 
-// POST /:facilityId/staff - add a staff member by email
+// POST /:facilityId/staff - add a staff member by email (auto-assigns default permissions)
 app.post("/:facilityId/staff", async (c) => {
   const userId = c.get("userId") as string;
   const facilityId = c.req.param("facilityId");
 
-  await assertFacilityManager(facilityId, userId);
+  await assertFacilityPermission(facilityId, userId, "staff:manage");
 
   const body = await c.req.json();
   const { email, staffRole } = body as { email: string; staffRole: StaffRole };
@@ -587,6 +614,9 @@ app.post("/:facilityId/staff", async (c) => {
     );
   }
 
+  // Insert staff member and auto-assign default permissions for their role
+  const defaultPerms = DEFAULT_ROLE_PERMISSIONS[staffRole] || [];
+
   const [staff] = await db
     .insert(facilityStaff)
     .values({
@@ -596,7 +626,108 @@ app.post("/:facilityId/staff", async (c) => {
     })
     .returning();
 
-  return c.json(staff, 201);
+  if (defaultPerms.length > 0) {
+    await db.insert(facilityStaffPermissions).values(
+      defaultPerms.map((permission) => ({
+        facilityStaffId: staff.id,
+        permission,
+      }))
+    );
+  }
+
+  return c.json({ ...staff, permissions: defaultPerms }, 201);
+});
+
+// GET /:facilityId/staff/:staffId/permissions - get permissions for a staff member
+app.get("/:facilityId/staff/:staffId/permissions", async (c) => {
+  const userId = c.get("userId") as string;
+  const facilityId = c.req.param("facilityId");
+  const staffId = c.req.param("staffId");
+
+  await assertFacilityPermission(facilityId, userId, "staff:manage");
+
+  const [staffMember] = await db
+    .select({
+      id: facilityStaff.id,
+      staffRole: facilityStaff.staffRole,
+      userName: users.name,
+      userEmail: users.email,
+    })
+    .from(facilityStaff)
+    .innerJoin(users, eq(facilityStaff.userId, users.id))
+    .where(
+      and(
+        eq(facilityStaff.id, staffId),
+        eq(facilityStaff.facilityId, facilityId)
+      )
+    )
+    .limit(1);
+
+  if (!staffMember) {
+    return c.json({ error: "Staff member not found" }, 404);
+  }
+
+  const perms = await db
+    .select({ permission: facilityStaffPermissions.permission })
+    .from(facilityStaffPermissions)
+    .where(eq(facilityStaffPermissions.facilityStaffId, staffId));
+
+  return c.json({
+    ...staffMember,
+    permissions: perms.map((p) => p.permission),
+    allPermissions: STAFF_PERMISSIONS,
+  });
+});
+
+// PUT /:facilityId/staff/:staffId/permissions - update permissions for a staff member
+app.put("/:facilityId/staff/:staffId/permissions", async (c) => {
+  const userId = c.get("userId") as string;
+  const facilityId = c.req.param("facilityId");
+  const staffId = c.req.param("staffId");
+
+  await assertFacilityPermission(facilityId, userId, "staff:manage");
+
+  const body = await c.req.json();
+  const { permissions } = body as { permissions: string[] };
+
+  // Validate all permissions are valid
+  const validPermissions = permissions.filter((p) =>
+    (STAFF_PERMISSIONS as readonly string[]).includes(p)
+  );
+
+  // Verify staff member belongs to this facility
+  const [staffMember] = await db
+    .select({ id: facilityStaff.id })
+    .from(facilityStaff)
+    .where(
+      and(
+        eq(facilityStaff.id, staffId),
+        eq(facilityStaff.facilityId, facilityId)
+      )
+    )
+    .limit(1);
+
+  if (!staffMember) {
+    return c.json({ error: "Staff member not found" }, 404);
+  }
+
+  // Replace all permissions in a transaction
+  await db.transaction(async (tx) => {
+    await tx
+      .delete(facilityStaffPermissions)
+      .where(eq(facilityStaffPermissions.facilityStaffId, staffId));
+
+    if (validPermissions.length > 0) {
+      await tx.insert(facilityStaffPermissions).values(
+        validPermissions.map((permission) => ({
+          facilityStaffId: staffId,
+          permission,
+        }))
+      );
+    }
+  });
+
+  return c.json({ permissions: validPermissions });
 });
 
 // DELETE /:facilityId/staff/:staffId - remove a staff member (owner only)
@@ -607,6 +738,7 @@ app.delete("/:facilityId/staff/:staffId", async (c) => {
 
   await assertFacilityOwner(facilityId, userId);
 
+  // Permissions are cascade-deleted via FK constraint
   await db
     .delete(facilityStaff)
     .where(

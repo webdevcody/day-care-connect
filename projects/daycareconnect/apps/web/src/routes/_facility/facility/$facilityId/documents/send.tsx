@@ -6,7 +6,6 @@ import {
   useSendDocument,
   useSendBulkDocument,
 } from "@daycare-hub/hooks";
-import { AdminFacilityNav } from "@/components/admin/admin-facility-nav";
 import {
   Card,
   CardContent,
@@ -93,8 +92,6 @@ function SendDocumentPage() {
 
   return (
     <div>
-      <AdminFacilityNav facilityId={facilityId} />
-
       <h1 className="mb-4 text-2xl font-bold">Send Document</h1>
 
       {successMessage && (
