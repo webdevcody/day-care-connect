@@ -1,4 +1,14 @@
-import { pgTable, uuid, varchar, text, integer, numeric, timestamp, boolean, date } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  integer,
+  numeric,
+  timestamp,
+  boolean,
+  date,
+} from "drizzle-orm/pg-core";
 import { users } from "./users";
 
 export const facilities = pgTable("facilities", {
@@ -28,8 +38,6 @@ export const facilities = pgTable("facilities", {
   licenseExpiry: date("license_expiry"),
   licensingAuthority: varchar("licensing_authority", { length: 255 }),
   isActive: boolean("is_active").notNull().default(true),
-  ratingAverage: numeric("rating_average", { precision: 2, scale: 1 }),
-  reviewCount: integer("review_count").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

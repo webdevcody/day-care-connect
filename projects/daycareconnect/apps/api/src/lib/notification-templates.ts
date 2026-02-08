@@ -77,16 +77,6 @@ export const NOTIFICATION_TEMPLATES: Record<NotificationType, NotificationTempla
     body: (data) =>
       `Your payment for invoice ${data.invoiceNumber || ""} could not be processed. Please try again.`,
   },
-  review_posted: {
-    title: () => `New review posted`,
-    body: (data) =>
-      `${data.parentName || "A parent"} left a ${data.rating || ""}-star review for ${data.facilityName || "your facility"}`,
-  },
-  review_response: {
-    title: () => `Response to your review`,
-    body: (data) =>
-      `${data.facilityName || "A facility"} responded to your review`,
-  },
 };
 
 export const NOTIFICATION_TYPE_LABELS: Record<
@@ -148,13 +138,5 @@ export const NOTIFICATION_TYPE_LABELS: Record<
   payment_failed: {
     label: "Payment Failures",
     description: "When a payment attempt fails",
-  },
-  review_posted: {
-    label: "New Reviews",
-    description: "When a parent posts a review for your facility",
-  },
-  review_response: {
-    label: "Review Responses",
-    description: "When a facility responds to your review",
   },
 };

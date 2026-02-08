@@ -28,14 +28,13 @@ import { Route as FacilitiesFacilityIdIndexRouteImport } from './routes/faciliti
 import { Route as StaffStaffIndexRouteImport } from './routes/_staff/staff/index'
 import { Route as ParentParentIndexRouteImport } from './routes/_parent/parent/index'
 import { Route as FacilityFacilityIndexRouteImport } from './routes/_facility/facility/index'
-import { Route as FacilitiesFacilityIdReviewRouteImport } from './routes/facilities/$facilityId/review'
 import { Route as FacilitiesFacilityIdEnrollRouteImport } from './routes/facilities/$facilityId/enroll'
 import { Route as StaffStaffSettingsRouteImport } from './routes/_staff/staff/settings'
 import { Route as StaffStaffNotificationsRouteImport } from './routes/_staff/staff/notifications'
 import { Route as ParentParentSettingsRouteImport } from './routes/_parent/parent/settings'
-import { Route as ParentParentReviewsRouteImport } from './routes/_parent/parent/reviews'
 import { Route as ParentParentOnboardingRouteImport } from './routes/_parent/parent/onboarding'
 import { Route as ParentParentNotificationsRouteImport } from './routes/_parent/parent/notifications'
+import { Route as ParentParentFacilitiesRouteImport } from './routes/_parent/parent/facilities'
 import { Route as FacilityFacilitySettingsRouteImport } from './routes/_facility/facility/settings'
 import { Route as FacilityFacilityNotificationsRouteImport } from './routes/_facility/facility/notifications'
 import { Route as FacilityFacilityNewRouteImport } from './routes/_facility/facility/new'
@@ -59,7 +58,6 @@ import { Route as FacilityFacilityMessagesConversationIdRouteImport } from './ro
 import { Route as FacilityFacilityFacilityIdStaffRouteImport } from './routes/_facility/facility/$facilityId/staff'
 import { Route as FacilityFacilityFacilityIdServicesRouteImport } from './routes/_facility/facility/$facilityId/services'
 import { Route as FacilityFacilityFacilityIdRosterRouteImport } from './routes/_facility/facility/$facilityId/roster'
-import { Route as FacilityFacilityFacilityIdReviewsRouteImport } from './routes/_facility/facility/$facilityId/reviews'
 import { Route as FacilityFacilityFacilityIdReportsRouteImport } from './routes/_facility/facility/$facilityId/reports'
 import { Route as FacilityFacilityFacilityIdPhotosRouteImport } from './routes/_facility/facility/$facilityId/photos'
 import { Route as FacilityFacilityFacilityIdInvitesRouteImport } from './routes/_facility/facility/$facilityId/invites'
@@ -180,12 +178,6 @@ const FacilityFacilityIndexRoute = FacilityFacilityIndexRouteImport.update({
   path: '/facility/',
   getParentRoute: () => FacilityRoute,
 } as any)
-const FacilitiesFacilityIdReviewRoute =
-  FacilitiesFacilityIdReviewRouteImport.update({
-    id: '/facilities/$facilityId/review',
-    path: '/facilities/$facilityId/review',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const FacilitiesFacilityIdEnrollRoute =
   FacilitiesFacilityIdEnrollRouteImport.update({
     id: '/facilities/$facilityId/enroll',
@@ -207,11 +199,6 @@ const ParentParentSettingsRoute = ParentParentSettingsRouteImport.update({
   path: '/parent/settings',
   getParentRoute: () => ParentRoute,
 } as any)
-const ParentParentReviewsRoute = ParentParentReviewsRouteImport.update({
-  id: '/parent/reviews',
-  path: '/parent/reviews',
-  getParentRoute: () => ParentRoute,
-} as any)
 const ParentParentOnboardingRoute = ParentParentOnboardingRouteImport.update({
   id: '/parent/onboarding',
   path: '/parent/onboarding',
@@ -223,6 +210,11 @@ const ParentParentNotificationsRoute =
     path: '/parent/notifications',
     getParentRoute: () => ParentRoute,
   } as any)
+const ParentParentFacilitiesRoute = ParentParentFacilitiesRouteImport.update({
+  id: '/parent/facilities',
+  path: '/parent/facilities',
+  getParentRoute: () => ParentRoute,
+} as any)
 const FacilityFacilitySettingsRoute =
   FacilityFacilitySettingsRouteImport.update({
     id: '/facility/settings',
@@ -356,12 +348,6 @@ const FacilityFacilityFacilityIdRosterRoute =
   FacilityFacilityFacilityIdRosterRouteImport.update({
     id: '/roster',
     path: '/roster',
-    getParentRoute: () => FacilityFacilityFacilityIdRoute,
-  } as any)
-const FacilityFacilityFacilityIdReviewsRoute =
-  FacilityFacilityFacilityIdReviewsRouteImport.update({
-    id: '/reviews',
-    path: '/reviews',
     getParentRoute: () => FacilityFacilityFacilityIdRoute,
   } as any)
 const FacilityFacilityFacilityIdReportsRoute =
@@ -543,14 +529,13 @@ export interface FileRoutesByFullPath {
   '/facility/new': typeof FacilityFacilityNewRoute
   '/facility/notifications': typeof FacilityFacilityNotificationsRoute
   '/facility/settings': typeof FacilityFacilitySettingsRoute
+  '/parent/facilities': typeof ParentParentFacilitiesRoute
   '/parent/notifications': typeof ParentParentNotificationsRoute
   '/parent/onboarding': typeof ParentParentOnboardingRoute
-  '/parent/reviews': typeof ParentParentReviewsRoute
   '/parent/settings': typeof ParentParentSettingsRoute
   '/staff/notifications': typeof StaffStaffNotificationsRoute
   '/staff/settings': typeof StaffStaffSettingsRoute
   '/facilities/$facilityId/enroll': typeof FacilitiesFacilityIdEnrollRoute
-  '/facilities/$facilityId/review': typeof FacilitiesFacilityIdReviewRoute
   '/facility/': typeof FacilityFacilityIndexRoute
   '/parent/': typeof ParentParentIndexRoute
   '/staff/': typeof StaffStaffIndexRoute
@@ -566,7 +551,6 @@ export interface FileRoutesByFullPath {
   '/facility/$facilityId/invites': typeof FacilityFacilityFacilityIdInvitesRouteWithChildren
   '/facility/$facilityId/photos': typeof FacilityFacilityFacilityIdPhotosRoute
   '/facility/$facilityId/reports': typeof FacilityFacilityFacilityIdReportsRoute
-  '/facility/$facilityId/reviews': typeof FacilityFacilityFacilityIdReviewsRoute
   '/facility/$facilityId/roster': typeof FacilityFacilityFacilityIdRosterRoute
   '/facility/$facilityId/services': typeof FacilityFacilityFacilityIdServicesRoute
   '/facility/$facilityId/staff': typeof FacilityFacilityFacilityIdStaffRoute
@@ -618,14 +602,13 @@ export interface FileRoutesByTo {
   '/facility/new': typeof FacilityFacilityNewRoute
   '/facility/notifications': typeof FacilityFacilityNotificationsRoute
   '/facility/settings': typeof FacilityFacilitySettingsRoute
+  '/parent/facilities': typeof ParentParentFacilitiesRoute
   '/parent/notifications': typeof ParentParentNotificationsRoute
   '/parent/onboarding': typeof ParentParentOnboardingRoute
-  '/parent/reviews': typeof ParentParentReviewsRoute
   '/parent/settings': typeof ParentParentSettingsRoute
   '/staff/notifications': typeof StaffStaffNotificationsRoute
   '/staff/settings': typeof StaffStaffSettingsRoute
   '/facilities/$facilityId/enroll': typeof FacilitiesFacilityIdEnrollRoute
-  '/facilities/$facilityId/review': typeof FacilitiesFacilityIdReviewRoute
   '/facility': typeof FacilityFacilityIndexRoute
   '/parent': typeof ParentParentIndexRoute
   '/staff': typeof StaffStaffIndexRoute
@@ -641,7 +624,6 @@ export interface FileRoutesByTo {
   '/facility/$facilityId/invites': typeof FacilityFacilityFacilityIdInvitesRouteWithChildren
   '/facility/$facilityId/photos': typeof FacilityFacilityFacilityIdPhotosRoute
   '/facility/$facilityId/reports': typeof FacilityFacilityFacilityIdReportsRoute
-  '/facility/$facilityId/reviews': typeof FacilityFacilityFacilityIdReviewsRoute
   '/facility/$facilityId/roster': typeof FacilityFacilityFacilityIdRosterRoute
   '/facility/$facilityId/services': typeof FacilityFacilityFacilityIdServicesRoute
   '/facility/$facilityId/staff': typeof FacilityFacilityFacilityIdStaffRoute
@@ -699,14 +681,13 @@ export interface FileRoutesById {
   '/_facility/facility/new': typeof FacilityFacilityNewRoute
   '/_facility/facility/notifications': typeof FacilityFacilityNotificationsRoute
   '/_facility/facility/settings': typeof FacilityFacilitySettingsRoute
+  '/_parent/parent/facilities': typeof ParentParentFacilitiesRoute
   '/_parent/parent/notifications': typeof ParentParentNotificationsRoute
   '/_parent/parent/onboarding': typeof ParentParentOnboardingRoute
-  '/_parent/parent/reviews': typeof ParentParentReviewsRoute
   '/_parent/parent/settings': typeof ParentParentSettingsRoute
   '/_staff/staff/notifications': typeof StaffStaffNotificationsRoute
   '/_staff/staff/settings': typeof StaffStaffSettingsRoute
   '/facilities/$facilityId/enroll': typeof FacilitiesFacilityIdEnrollRoute
-  '/facilities/$facilityId/review': typeof FacilitiesFacilityIdReviewRoute
   '/_facility/facility/': typeof FacilityFacilityIndexRoute
   '/_parent/parent/': typeof ParentParentIndexRoute
   '/_staff/staff/': typeof StaffStaffIndexRoute
@@ -722,7 +703,6 @@ export interface FileRoutesById {
   '/_facility/facility/$facilityId/invites': typeof FacilityFacilityFacilityIdInvitesRouteWithChildren
   '/_facility/facility/$facilityId/photos': typeof FacilityFacilityFacilityIdPhotosRoute
   '/_facility/facility/$facilityId/reports': typeof FacilityFacilityFacilityIdReportsRoute
-  '/_facility/facility/$facilityId/reviews': typeof FacilityFacilityFacilityIdReviewsRoute
   '/_facility/facility/$facilityId/roster': typeof FacilityFacilityFacilityIdRosterRoute
   '/_facility/facility/$facilityId/services': typeof FacilityFacilityFacilityIdServicesRoute
   '/_facility/facility/$facilityId/staff': typeof FacilityFacilityFacilityIdStaffRoute
@@ -777,14 +757,13 @@ export interface FileRouteTypes {
     | '/facility/new'
     | '/facility/notifications'
     | '/facility/settings'
+    | '/parent/facilities'
     | '/parent/notifications'
     | '/parent/onboarding'
-    | '/parent/reviews'
     | '/parent/settings'
     | '/staff/notifications'
     | '/staff/settings'
     | '/facilities/$facilityId/enroll'
-    | '/facilities/$facilityId/review'
     | '/facility/'
     | '/parent/'
     | '/staff/'
@@ -800,7 +779,6 @@ export interface FileRouteTypes {
     | '/facility/$facilityId/invites'
     | '/facility/$facilityId/photos'
     | '/facility/$facilityId/reports'
-    | '/facility/$facilityId/reviews'
     | '/facility/$facilityId/roster'
     | '/facility/$facilityId/services'
     | '/facility/$facilityId/staff'
@@ -852,14 +830,13 @@ export interface FileRouteTypes {
     | '/facility/new'
     | '/facility/notifications'
     | '/facility/settings'
+    | '/parent/facilities'
     | '/parent/notifications'
     | '/parent/onboarding'
-    | '/parent/reviews'
     | '/parent/settings'
     | '/staff/notifications'
     | '/staff/settings'
     | '/facilities/$facilityId/enroll'
-    | '/facilities/$facilityId/review'
     | '/facility'
     | '/parent'
     | '/staff'
@@ -875,7 +852,6 @@ export interface FileRouteTypes {
     | '/facility/$facilityId/invites'
     | '/facility/$facilityId/photos'
     | '/facility/$facilityId/reports'
-    | '/facility/$facilityId/reviews'
     | '/facility/$facilityId/roster'
     | '/facility/$facilityId/services'
     | '/facility/$facilityId/staff'
@@ -932,14 +908,13 @@ export interface FileRouteTypes {
     | '/_facility/facility/new'
     | '/_facility/facility/notifications'
     | '/_facility/facility/settings'
+    | '/_parent/parent/facilities'
     | '/_parent/parent/notifications'
     | '/_parent/parent/onboarding'
-    | '/_parent/parent/reviews'
     | '/_parent/parent/settings'
     | '/_staff/staff/notifications'
     | '/_staff/staff/settings'
     | '/facilities/$facilityId/enroll'
-    | '/facilities/$facilityId/review'
     | '/_facility/facility/'
     | '/_parent/parent/'
     | '/_staff/staff/'
@@ -955,7 +930,6 @@ export interface FileRouteTypes {
     | '/_facility/facility/$facilityId/invites'
     | '/_facility/facility/$facilityId/photos'
     | '/_facility/facility/$facilityId/reports'
-    | '/_facility/facility/$facilityId/reviews'
     | '/_facility/facility/$facilityId/roster'
     | '/_facility/facility/$facilityId/services'
     | '/_facility/facility/$facilityId/staff'
@@ -1005,7 +979,6 @@ export interface RootRouteChildren {
   StaffInviteTokenRoute: typeof StaffInviteTokenRoute
   FacilitiesIndexRoute: typeof FacilitiesIndexRoute
   FacilitiesFacilityIdEnrollRoute: typeof FacilitiesFacilityIdEnrollRoute
-  FacilitiesFacilityIdReviewRoute: typeof FacilitiesFacilityIdReviewRoute
   FacilitiesFacilityIdIndexRoute: typeof FacilitiesFacilityIdIndexRoute
 }
 
@@ -1144,13 +1117,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FacilityFacilityIndexRouteImport
       parentRoute: typeof FacilityRoute
     }
-    '/facilities/$facilityId/review': {
-      id: '/facilities/$facilityId/review'
-      path: '/facilities/$facilityId/review'
-      fullPath: '/facilities/$facilityId/review'
-      preLoaderRoute: typeof FacilitiesFacilityIdReviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/facilities/$facilityId/enroll': {
       id: '/facilities/$facilityId/enroll'
       path: '/facilities/$facilityId/enroll'
@@ -1179,13 +1145,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParentParentSettingsRouteImport
       parentRoute: typeof ParentRoute
     }
-    '/_parent/parent/reviews': {
-      id: '/_parent/parent/reviews'
-      path: '/parent/reviews'
-      fullPath: '/parent/reviews'
-      preLoaderRoute: typeof ParentParentReviewsRouteImport
-      parentRoute: typeof ParentRoute
-    }
     '/_parent/parent/onboarding': {
       id: '/_parent/parent/onboarding'
       path: '/parent/onboarding'
@@ -1198,6 +1157,13 @@ declare module '@tanstack/react-router' {
       path: '/parent/notifications'
       fullPath: '/parent/notifications'
       preLoaderRoute: typeof ParentParentNotificationsRouteImport
+      parentRoute: typeof ParentRoute
+    }
+    '/_parent/parent/facilities': {
+      id: '/_parent/parent/facilities'
+      path: '/parent/facilities'
+      fullPath: '/parent/facilities'
+      preLoaderRoute: typeof ParentParentFacilitiesRouteImport
       parentRoute: typeof ParentRoute
     }
     '/_facility/facility/settings': {
@@ -1359,13 +1325,6 @@ declare module '@tanstack/react-router' {
       path: '/roster'
       fullPath: '/facility/$facilityId/roster'
       preLoaderRoute: typeof FacilityFacilityFacilityIdRosterRouteImport
-      parentRoute: typeof FacilityFacilityFacilityIdRoute
-    }
-    '/_facility/facility/$facilityId/reviews': {
-      id: '/_facility/facility/$facilityId/reviews'
-      path: '/reviews'
-      fullPath: '/facility/$facilityId/reviews'
-      preLoaderRoute: typeof FacilityFacilityFacilityIdReviewsRouteImport
       parentRoute: typeof FacilityFacilityFacilityIdRoute
     }
     '/_facility/facility/$facilityId/reports': {
@@ -1605,7 +1564,6 @@ interface FacilityFacilityFacilityIdRouteChildren {
   FacilityFacilityFacilityIdInvitesRoute: typeof FacilityFacilityFacilityIdInvitesRouteWithChildren
   FacilityFacilityFacilityIdPhotosRoute: typeof FacilityFacilityFacilityIdPhotosRoute
   FacilityFacilityFacilityIdReportsRoute: typeof FacilityFacilityFacilityIdReportsRoute
-  FacilityFacilityFacilityIdReviewsRoute: typeof FacilityFacilityFacilityIdReviewsRoute
   FacilityFacilityFacilityIdRosterRoute: typeof FacilityFacilityFacilityIdRosterRoute
   FacilityFacilityFacilityIdServicesRoute: typeof FacilityFacilityFacilityIdServicesRoute
   FacilityFacilityFacilityIdStaffRoute: typeof FacilityFacilityFacilityIdStaffRoute
@@ -1644,8 +1602,6 @@ const FacilityFacilityFacilityIdRouteChildren: FacilityFacilityFacilityIdRouteCh
       FacilityFacilityFacilityIdPhotosRoute,
     FacilityFacilityFacilityIdReportsRoute:
       FacilityFacilityFacilityIdReportsRoute,
-    FacilityFacilityFacilityIdReviewsRoute:
-      FacilityFacilityFacilityIdReviewsRoute,
     FacilityFacilityFacilityIdRosterRoute:
       FacilityFacilityFacilityIdRosterRoute,
     FacilityFacilityFacilityIdServicesRoute:
@@ -1728,9 +1684,9 @@ const ParentParentChildrenChildIdRouteWithChildren =
   )
 
 interface ParentRouteChildren {
+  ParentParentFacilitiesRoute: typeof ParentParentFacilitiesRoute
   ParentParentNotificationsRoute: typeof ParentParentNotificationsRoute
   ParentParentOnboardingRoute: typeof ParentParentOnboardingRoute
-  ParentParentReviewsRoute: typeof ParentParentReviewsRoute
   ParentParentSettingsRoute: typeof ParentParentSettingsRoute
   ParentParentIndexRoute: typeof ParentParentIndexRoute
   ParentParentBillingPaymentMethodsRoute: typeof ParentParentBillingPaymentMethodsRoute
@@ -1748,9 +1704,9 @@ interface ParentRouteChildren {
 }
 
 const ParentRouteChildren: ParentRouteChildren = {
+  ParentParentFacilitiesRoute: ParentParentFacilitiesRoute,
   ParentParentNotificationsRoute: ParentParentNotificationsRoute,
   ParentParentOnboardingRoute: ParentParentOnboardingRoute,
-  ParentParentReviewsRoute: ParentParentReviewsRoute,
   ParentParentSettingsRoute: ParentParentSettingsRoute,
   ParentParentIndexRoute: ParentParentIndexRoute,
   ParentParentBillingPaymentMethodsRoute:
@@ -1805,7 +1761,6 @@ const rootRouteChildren: RootRouteChildren = {
   StaffInviteTokenRoute: StaffInviteTokenRoute,
   FacilitiesIndexRoute: FacilitiesIndexRoute,
   FacilitiesFacilityIdEnrollRoute: FacilitiesFacilityIdEnrollRoute,
-  FacilitiesFacilityIdReviewRoute: FacilitiesFacilityIdReviewRoute,
   FacilitiesFacilityIdIndexRoute: FacilitiesFacilityIdIndexRoute,
 }
 export const routeTree = rootRouteImport

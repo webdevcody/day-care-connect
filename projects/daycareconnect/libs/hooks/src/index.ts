@@ -9,7 +9,6 @@ export * from "./use-notifications";
 export * from "./use-messaging";
 export * from "./use-documents";
 export * from "./use-billing";
-export * from "./use-reviews";
 export * from "./use-account";
 export * from "./use-user-roles";
 export * from "./use-onboarding";

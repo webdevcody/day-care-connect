@@ -3,6 +3,11 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer } from "better-auth/plugins";
 import { db, users, sessions, accounts, verifications, userRoles } from "@daycare-hub/db";
 
+if (!process.env.BETTER_AUTH_SECRET) {
+  console.error("BETTER_AUTH_SECRET environment variable is required");
+  throw new Error("BETTER_AUTH_SECRET environment variable is required");
+}
+
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:4000",
   secret: process.env.BETTER_AUTH_SECRET,
@@ -73,18 +78,29 @@ export const auth = betterAuth({
     user: {
       create: {
         before: async (user) => {
-          const firstName = (user as any).firstName || "";
-          const lastName = (user as any).lastName || "";
-          return {
-            data: {
-              ...user,
-              name: `${firstName} ${lastName}`.trim() || user.name,
-            },
-          };
+          try {
+            const firstName = (user as any).firstName || "";
+            const lastName = (user as any).lastName || "";
+            return {
+              data: {
+                ...user,
+                name: `${firstName} ${lastName}`.trim() || user.name,
+              },
+            };
+          } catch (error) {
+            console.error("Error in user create before hook:", error);
+            throw error;
+          }
         },
         after: async (user) => {
-          const role = (user as any).role || "parent";
-          await db.insert(userRoles).values({ userId: user.id, role }).onConflictDoNothing();
+          try {
+            const role = (user as any).role || "parent";
+            await db.insert(userRoles).values({ userId: user.id, role }).onConflictDoNothing();
+          } catch (error) {
+            console.error("Error in user create after hook:", error);
+            // Don't throw - allow user creation to succeed even if role insert fails
+            // The role can be added later if needed
+          }
         },
       },
     },

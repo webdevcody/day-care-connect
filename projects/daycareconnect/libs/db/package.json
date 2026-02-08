@@ -12,7 +12,8 @@
     "migrate": "node migrate.mjs",
     "push": "drizzle-kit push",
     "studio": "drizzle-kit studio",
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/seed.ts",
+    "reset": "node reset.mjs"
   },
   "dependencies": {
     "@daycare-hub/shared": "workspace:*",

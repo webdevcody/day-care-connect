@@ -20,8 +20,7 @@ export const queryKeys = {
     staff: (id: string) => ["facilities", id, "staff"] as const,
     staffPermissions: (facilityId: string, staffId: string) =>
       ["facilities", facilityId, "staff", staffId, "permissions"] as const,
-    staffInvites: (facilityId: string) =>
-      ["facilities", facilityId, "staff-invites"] as const,
+    staffInvites: (facilityId: string) => ["facilities", facilityId, "staff-invites"] as const,
   },
   favorites: {
     all: ["favorites"] as const,
@@ -55,13 +54,6 @@ export const queryKeys = {
     payments: ["billing", "payments"] as const,
     paymentMethods: ["billing", "payment-methods"] as const,
     summary: ["billing", "summary"] as const,
-  },
-  reviews: {
-    mine: ["reviews", "mine"] as const,
-    eligibility: (facilityId: string) => ["reviews", "eligibility", facilityId] as const,
-    summary: (facilityId: string) => ["reviews", "summary", facilityId] as const,
-    list: (params: Record<string, any>) => ["reviews", "list", params] as const,
-    admin: (facilityId: string) => ["reviews", "admin", facilityId] as const,
   },
   userRoles: {
     all: ["user-roles"] as const,

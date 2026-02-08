@@ -1,13 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMyDocuments } from "@daycare-hub/hooks";
 import { DocumentStatusBadge } from "@/components/documents/document-status-badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Button,
-} from "@daycare-hub/ui";
+import { Card, CardContent, CardHeader, CardTitle, Button } from "@daycare-hub/ui";
 
 export const Route = createFileRoute("/_parent/parent/documents/")({
   component: ParentDocumentsPage,
@@ -16,13 +10,16 @@ export const Route = createFileRoute("/_parent/parent/documents/")({
 function ParentDocumentsPage() {
   const { data: documents, isLoading } = useMyDocuments();
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
 
-  const docs = documents ?? [];
+  const docs = Array.isArray(documents) ? documents : [];
 
-  const actionNeeded = docs.filter(
-    (d) => d.status === "pending" || d.status === "viewed"
-  );
+  const actionNeeded = docs.filter((d) => d.status === "pending" || d.status === "viewed");
   const signed = docs.filter((d) => d.status === "signed");
   const other = docs.filter(
     (d) => d.status !== "pending" && d.status !== "viewed" && d.status !== "signed"
@@ -89,7 +86,9 @@ function ParentDocumentsPage() {
                     </p>
                   </div>
                   <Link to="/parent/documents/$documentId" params={{ documentId: doc.id }}>
-                    <Button variant="outline" size="sm">View</Button>
+                    <Button variant="outline" size="sm">
+                      View
+                    </Button>
                   </Link>
                 </CardContent>
               </Card>
@@ -117,7 +116,9 @@ function ParentDocumentsPage() {
                     </p>
                   </div>
                   <Link to="/parent/documents/$documentId" params={{ documentId: doc.id }}>
-                    <Button variant="outline" size="sm">View</Button>
+                    <Button variant="outline" size="sm">
+                      View
+                    </Button>
                   </Link>
                 </CardContent>
               </Card>

@@ -11,7 +11,6 @@ export * as notificationsService from "./notifications";
 export * as messagingService from "./messaging";
 export * as documentsService from "./documents";
 export * as billingService from "./billing";
-export * as reviewsService from "./reviews";
 export * as userRolesService from "./user-roles";
 export * as onboardingService from "./onboarding";
 

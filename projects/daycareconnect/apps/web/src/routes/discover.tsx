@@ -30,6 +30,8 @@ function DiscoverPage() {
   const [isGeocoding, setIsGeocoding] = useState(false);
 
   const hasLocation = searchParams.lat != null && searchParams.lng != null;
+  const hasSearchQuery = searchParams.name || searchParams.city || searchParams.q;
+  const hasSearch = hasLocation || hasSearchQuery;
   const viewMode = searchParams.view || "split";
 
   const updateParams = useCallback(
@@ -50,26 +52,21 @@ function DiscoverPage() {
     [navigate]
   );
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    isError,
-  } = useSearchFacilities({
-    lat: searchParams.lat,
-    lng: searchParams.lng,
-    radius: searchParams.radius ?? 25,
-    age: searchParams.age,
-    maxPrice: searchParams.maxPrice,
-    services: searchParams.services,
-    available: searchParams.available,
-    openBefore: searchParams.openBefore,
-    minRating: searchParams.minRating,
-    sort: searchParams.sort ?? "distance",
-    limit: 12,
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } =
+    useSearchFacilities({
+      lat: searchParams.lat,
+      lng: searchParams.lng,
+      radius: searchParams.radius ?? 25,
+      name: searchParams.name || (searchParams.q && !searchParams.lat ? searchParams.q : undefined),
+      city: searchParams.city || (searchParams.q && !searchParams.lat ? searchParams.q : undefined),
+      age: searchParams.age,
+      maxPrice: searchParams.maxPrice,
+      services: searchParams.services,
+      available: searchParams.available,
+      openBefore: searchParams.openBefore,
+      sort: searchParams.sort ?? (searchParams.lat && searchParams.lng ? "distance" : "name"),
+      limit: hasSearch ? 12 : 10,
+    });
 
   // Infinite scroll via IntersectionObserver
   useEffect(() => {
@@ -93,8 +90,16 @@ function DiscoverPage() {
   const favoriteMutation = useToggleFavorite();
 
   const handleSearch = useCallback(
-    (location: { lat: number; lng: number; query: string }) => {
-      updateParams({ lat: location.lat, lng: location.lng, q: location.query });
+    (location: { lat?: number; lng?: number; query: string }) => {
+      if (location.lat !== undefined && location.lng !== undefined) {
+        // Location-based search
+        updateParams({ lat: location.lat, lng: location.lng, q: location.query });
+      } else {
+        // Text-based search - try to extract name or city from query
+        // For now, treat the query as a general search term
+        // The API will search both name and city fields
+        updateParams({ name: location.query, q: location.query });
+      }
     },
     [updateParams]
   );
@@ -137,12 +142,18 @@ function DiscoverPage() {
           </a>
           <div className="flex items-center gap-4">
             {session ? (
-              <a href="/parent" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              <a
+                href="/parent"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
+              >
                 Dashboard
               </a>
             ) : (
               <>
-                <a href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                <a
+                  href="/login"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                >
                   Login
                 </a>
                 <a
@@ -167,73 +178,81 @@ function DiscoverPage() {
         />
 
         {/* Filters + View Toggle */}
-        {hasLocation && (
+        {hasSearch && (
           <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
             <FilterBar params={searchParams} onChange={updateParams} />
-            <ViewToggle
-              value={viewMode}
-              onChange={(mode) => updateParams({ view: mode })}
-            />
+            <ViewToggle value={viewMode} onChange={(mode) => updateParams({ view: mode })} />
           </div>
         )}
 
         {/* Result count */}
-        {hasLocation && !isLoading && (
+        {hasSearch && !isLoading && (
           <p className="mt-3 text-sm text-muted-foreground">
             {totalCount} {totalCount === 1 ? "facility" : "facilities"} found
-            {searchParams.q && <> near "{searchParams.q}"</>}
+            {searchParams.q && (
+              <>
+                {" "}
+                {hasLocation ? "near" : "matching"} "{searchParams.q}"
+              </>
+            )}
           </p>
         )}
       </div>
 
       {/* Main Content */}
       <div className="flex flex-1">
-        {!hasLocation ? (
-          <div className="flex flex-1 items-center justify-center px-4">
-            <EmptyState hasLocation={false} />
-          </div>
-        ) : (
-          <div
-            className={`flex flex-1 ${
-              viewMode === "split"
-                ? "flex-col lg:flex-row"
-                : viewMode === "map"
-                  ? "flex-col"
-                  : "flex-col"
-            }`}
-          >
-            {/* List Panel */}
-            {(viewMode === "split" || viewMode === "list") && (
-              <div
-                className={`overflow-y-auto px-4 pb-8 sm:px-6 lg:px-8 ${
-                  viewMode === "split" ? "lg:w-2/5" : "mx-auto w-full max-w-7xl"
-                }`}
-                style={viewMode === "split" ? { maxHeight: "calc(100vh - 220px)" } : undefined}
-              >
-                {isLoading ? (
+        <div
+          className={`flex flex-1 ${
+            viewMode === "split"
+              ? "flex-col lg:flex-row"
+              : viewMode === "map"
+                ? "flex-col"
+                : "flex-col"
+          }`}
+        >
+          {/* List Panel */}
+          {(viewMode === "split" || viewMode === "list") && (
+            <div
+              className={`overflow-y-auto ${
+                viewMode === "split" && hasLocation
+                  ? "px-4 pb-8 sm:px-6 lg:px-8 lg:w-2/5"
+                  : "mx-auto w-full max-w-7xl overflow-x-hidden px-4 pb-8 sm:px-6 lg:px-8"
+              }`}
+              style={viewMode === "split" && hasLocation ? { maxHeight: "calc(100vh - 220px)" } : undefined}
+            >
+              {isLoading ? (
+                <div
+                  className={`grid w-full gap-4 ${
+                    viewMode === "list" || (viewMode === "split" && !hasLocation)
+                      ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
+                      : "grid-cols-1 sm:grid-cols-2"
+                  }`}
+                >
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <FacilityCardSkeleton key={i} />
+                  ))}
+                </div>
+              ) : allFacilities.length === 0 ? (
+                <EmptyState hasLocation={hasLocation} />
+              ) : (
+                <>
                   <div
-                    className={`grid gap-4 ${viewMode === "list" ? "md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}
+                    className={`grid w-full gap-4 ${
+                      viewMode === "list" || (viewMode === "split" && !hasLocation)
+                        ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
+                        : "grid-cols-1 sm:grid-cols-2"
+                  }`}
                   >
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <FacilityCardSkeleton key={i} />
+                    {allFacilities.map((facility) => (
+                      <FacilityCard
+                        key={facility.id}
+                        facility={facility}
+                        onToggleFavorite={handleToggleFavorite}
+                      />
                     ))}
                   </div>
-                ) : allFacilities.length === 0 ? (
-                  <EmptyState hasLocation={true} />
-                ) : (
-                  <>
-                    <div
-                      className={`grid gap-4 ${viewMode === "list" ? "md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}
-                    >
-                      {allFacilities.map((facility) => (
-                        <FacilityCard
-                          key={facility.id}
-                          facility={facility}
-                          onToggleFavorite={handleToggleFavorite}
-                        />
-                      ))}
-                    </div>
-                    {/* Infinite scroll sentinel */}
+                  {/* Infinite scroll sentinel */}
+                  {hasSearch && (
                     <div ref={sentinelRef} className="py-4 text-center">
                       {isFetchingNextPage && (
                         <div className="grid gap-4">
@@ -242,35 +261,36 @@ function DiscoverPage() {
                         </div>
                       )}
                     </div>
-                  </>
-                )}
-              </div>
-            )}
+                  )}
+                </>
+              )}
+            </div>
+          )}
 
-            {/* Map Panel */}
-            {(viewMode === "split" || viewMode === "map") && (
-              <div
-                className={`${
-                  viewMode === "split" ? "lg:w-3/5" : "w-full"
-                }`}
-                style={{ minHeight: viewMode === "map" ? "calc(100vh - 220px)" : "400px", height: viewMode === "split" ? "calc(100vh - 220px)" : undefined }}
+          {/* Map Panel */}
+          {(viewMode === "split" || viewMode === "map") && hasLocation && (
+            <div
+              className={`${viewMode === "split" ? "lg:w-3/5" : "w-full"}`}
+              style={{
+                minHeight: viewMode === "map" ? "calc(100vh - 220px)" : "400px",
+                height: viewMode === "split" ? "calc(100vh - 220px)" : undefined,
+              }}
+            >
+              <Suspense
+                fallback={
+                  <div className="flex h-full items-center justify-center bg-muted">
+                    Loading map...
+                  </div>
+                }
               >
-                <Suspense
-                  fallback={
-                    <div className="flex h-full items-center justify-center bg-muted">
-                      Loading map...
-                    </div>
-                  }
-                >
-                  <DiscoveryMap
-                    facilities={allFacilities}
-                    center={{ lat: searchParams.lat!, lng: searchParams.lng! }}
-                  />
-                </Suspense>
-              </div>
-            )}
-          </div>
-        )}
+                <DiscoveryMap
+                  facilities={allFacilities}
+                  center={{ lat: searchParams.lat!, lng: searchParams.lng! }}
+                />
+              </Suspense>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

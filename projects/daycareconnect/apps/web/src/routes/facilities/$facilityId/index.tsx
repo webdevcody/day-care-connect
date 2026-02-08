@@ -1,15 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { useFacility, useReviewEligibility, useReviewSummary } from "@daycare-hub/hooks";
-import { useSession } from "@/lib/auth-client";
+import { useFacility } from "@daycare-hub/hooks";
 import { PhotoCarousel } from "@/components/facility/photo-carousel";
 import { HoursTable } from "@/components/facility/hours-table";
 import { PricingCards } from "@/components/facility/pricing-cards";
 import { StaffGrid } from "@/components/facility/staff-grid";
 import { ServiceTags } from "@/components/facility/service-tags";
-import { StarRating } from "@/components/reviews/star-rating";
-import { RatingSummary } from "@/components/reviews/rating-summary";
-import { ReviewList } from "@/components/reviews/review-list";
 import { APP_NAME } from "@daycare-hub/shared";
 import {
   Button,
@@ -30,12 +25,13 @@ export const Route = createFileRoute("/facilities/$facilityId/")({
 function FacilityProfilePage() {
   const { facilityId } = Route.useParams();
   const { data: facility, isLoading } = useFacility(facilityId);
-  const { data: session } = useSession();
-  const { data: reviewSummary } = useReviewSummary(facilityId);
-  const { data: eligibility } = useReviewEligibility(facilityId);
-  const [ratingFilter, setRatingFilter] = useState<number | undefined>();
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
 
   if (!facility) return null;
 
@@ -43,7 +39,9 @@ function FacilityProfilePage() {
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <a href="/" className="text-xl font-bold text-primary">{APP_NAME}</a>
+          <a href="/" className="text-xl font-bold text-primary">
+            {APP_NAME}
+          </a>
           <Link to="/facilities" className="text-sm text-muted-foreground hover:text-foreground">
             &larr; Back to Facilities
           </Link>
@@ -57,14 +55,6 @@ function FacilityProfilePage() {
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold">{facility.name}</h1>
-          {facility.ratingAverage && (
-            <div className="mt-1 flex items-center gap-2">
-              <StarRating rating={parseFloat(facility.ratingAverage)} size="sm" showValue />
-              <span className="text-sm text-muted-foreground">
-                ({facility.reviewCount} {facility.reviewCount === 1 ? "review" : "reviews"})
-              </span>
-            </div>
-          )}
           <p className="mt-1 text-muted-foreground">
             {facility.address}, {facility.city}, {facility.state} {facility.zipCode}
           </p>
@@ -74,7 +64,12 @@ function FacilityProfilePage() {
             {facility.website && (
               <>
                 <span> &middot; </span>
-                <a href={facility.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                <a
+                  href={facility.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
                   Website
                 </a>
               </>
@@ -82,10 +77,7 @@ function FacilityProfilePage() {
           </div>
           <div className="mt-4">
             <Button asChild size="lg">
-              <Link
-                to="/facilities/$facilityId/enroll"
-                params={{ facilityId: facility.id }}
-              >
+              <Link to="/facilities/$facilityId/enroll" params={{ facilityId: facility.id }}>
                 Apply for Enrollment
               </Link>
             </Button>
@@ -98,7 +90,6 @@ function FacilityProfilePage() {
             <TabsTrigger value="hours-pricing">Hours & Pricing</TabsTrigger>
             <TabsTrigger value="staff">Staff</TabsTrigger>
             <TabsTrigger value="photos">Photos</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6 space-y-6">
@@ -108,7 +99,9 @@ function FacilityProfilePage() {
                   <CardTitle>About</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="whitespace-pre-line text-muted-foreground">{facility.description}</p>
+                  <p className="whitespace-pre-line text-muted-foreground">
+                    {facility.description}
+                  </p>
                 </CardContent>
               </Card>
             )}
@@ -125,7 +118,9 @@ function FacilityProfilePage() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Age Range</p>
-                    <p className="font-medium">{facility.ageRangeMin}–{facility.ageRangeMax} years</p>
+                    <p className="font-medium">
+                      {facility.ageRangeMin}–{facility.ageRangeMax} years
+                    </p>
                   </div>
                   {facility.licenseNumber && (
                     <div>
@@ -195,48 +190,6 @@ function FacilityProfilePage() {
                 ))}
               </div>
             )}
-          </TabsContent>
-
-          <TabsContent value="reviews" className="mt-6 space-y-6">
-            {reviewSummary && (
-              <RatingSummary
-                summary={reviewSummary}
-                onFilterByRating={(rating) => setRatingFilter(rating)}
-              />
-            )}
-
-            {eligibility?.eligible && !eligibility.existingReview && (
-              <div className="flex justify-center">
-                <Button asChild>
-                  <Link
-                    to="/facilities/$facilityId/review"
-                    params={{ facilityId: facility.id }}
-                  >
-                    Write a Review
-                  </Link>
-                </Button>
-              </div>
-            )}
-
-            {eligibility?.eligible && eligibility.existingReview && (
-              <div className="flex justify-center">
-                <Button variant="outline" asChild>
-                  <Link
-                    to="/facilities/$facilityId/review"
-                    params={{ facilityId: facility.id }}
-                  >
-                    Edit Your Review
-                  </Link>
-                </Button>
-              </div>
-            )}
-
-            <ReviewList
-              facilityId={facility.id}
-              currentUserId={session?.user?.id}
-              ratingFilter={ratingFilter}
-              onFilterChange={setRatingFilter}
-            />
           </TabsContent>
         </Tabs>
       </div>

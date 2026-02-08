@@ -27,7 +27,7 @@ async function seed() {
 
   // Clean existing data
   await db.execute(
-    sql`TRUNCATE TABLE review_responses, reviews, report_templates, daily_reports, activity_entries, quiet_hours, notification_preferences, notifications, push_subscriptions, messages, conversation_participants, conversations, attendance, enrollment_status_history, favorites, facility_services, facility_staff, enrollments, facility_photos, facility_hours, children, facilities, user_roles, account, session, verification, document_instances, document_templates, stripe_accounts, billing_plans, invoice_line_items, invoices, payment_methods, payments, "user" CASCADE`
+    sql`TRUNCATE TABLE report_templates, daily_reports, activity_entries, quiet_hours, notification_preferences, notifications, push_subscriptions, messages, conversation_participants, conversations, attendance, enrollment_status_history, favorites, facility_services, facility_staff, enrollments, facility_photos, facility_hours, children, facilities, user_roles, account, session, verification, document_instances, document_templates, stripe_accounts, billing_plans, invoice_line_items, invoices, payment_methods, payments, "user" CASCADE`
   );
 
   const hashedPassword = await hashPassword("12345678");
@@ -38,9 +38,33 @@ async function seed() {
   const staffId = genId();
 
   await db.insert(users).values([
-    { id: parentId, name: "Parent User", email: "parent@example.com", firstName: "Parent", lastName: "User", role: "parent", emailVerified: false },
-    { id: facilityOwnerId, name: "Facility Owner", email: "facility@example.com", firstName: "Facility", lastName: "Owner", role: "admin", emailVerified: false },
-    { id: staffId, name: "Staff Member", email: "staff@example.com", firstName: "Staff", lastName: "Member", role: "staff", emailVerified: false },
+    {
+      id: parentId,
+      name: "Parent User",
+      email: "parent@example.com",
+      firstName: "Parent",
+      lastName: "User",
+      role: "parent",
+      emailVerified: false,
+    },
+    {
+      id: facilityOwnerId,
+      name: "Facility Owner",
+      email: "facility@example.com",
+      firstName: "Facility",
+      lastName: "Owner",
+      role: "admin",
+      emailVerified: false,
+    },
+    {
+      id: staffId,
+      name: "Staff Member",
+      email: "staff@example.com",
+      firstName: "Staff",
+      lastName: "Member",
+      role: "staff",
+      emailVerified: false,
+    },
   ]);
 
   // --- Credential accounts ---
@@ -67,6 +91,7 @@ async function seed() {
   ]);
 
   // --- Facility ---
+  // Springfield, IL coordinates: ~39.7817, -89.6501
   const [facility] = await db
     .insert(facilities)
     .values({
@@ -77,6 +102,8 @@ async function seed() {
       city: "Springfield",
       state: "IL",
       zipCode: "62701",
+      latitude: "39.7817",
+      longitude: "-89.6501",
       phone: "555-1001",
       email: "info@sunshinekids.example.com",
       capacity: 50,

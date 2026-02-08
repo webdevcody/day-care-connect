@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@daycare-hub/ui";
-import { signIn } from "@/lib/auth-client";
+import { signIn, useSession } from "@/lib/auth-client";
 import { ROLE_DASHBOARD_PATHS } from "@daycare-hub/shared";
+import type { UserRole } from "@daycare-hub/shared";
 
 const SEED_USERS = [
   { label: "Parent", email: "parent@example.com", role: "parent" as const },
@@ -12,15 +13,40 @@ const SEED_USERS = [
 export function DevUserSwitcher() {
   const [open, setOpen] = useState(false);
   const [loadingEmail, setLoadingEmail] = useState<string | null>(null);
+  const { data: session, isPending } = useSession();
 
   if (!import.meta.env.DEV) return null;
+
+  // Handle redirect after page reload (fallback for cases where direct redirect didn't work)
+  useEffect(() => {
+    const redirectPath = sessionStorage.getItem("devLoginRedirect");
+
+    // Only handle redirect if we have both the path and a valid session
+    if (redirectPath && !isPending && session) {
+      sessionStorage.removeItem("devLoginRedirect");
+      window.location.href = redirectPath;
+    }
+  }, [session, isPending]);
 
   async function handleLogin(email: string, role: "parent" | "admin" | "staff") {
     setLoadingEmail(email);
     try {
-      await signIn.email({ email, password: "12345678" });
-      window.location.href = ROLE_DASHBOARD_PATHS[role];
-    } catch {
+      const result = await signIn.email({ email, password: "12345678" });
+
+      if (result.error) {
+        console.error("Login error:", result.error);
+        setLoadingEmail(null);
+        return;
+      }
+
+      // Wait a moment for the session cookie to be set, then redirect
+      // This avoids the need for a page reload
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      const redirectPath = ROLE_DASHBOARD_PATHS[role];
+      window.location.href = redirectPath;
+    } catch (error) {
+      console.error("Login failed:", error);
       setLoadingEmail(null);
     }
   }

@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { db, children, enrollments, eq, and, sql } from "@daycare-hub/db";
 import { assertChildOwner } from "../lib/parent-auth";
+import { createChildSchema } from "@daycare-hub/shared";
 
 const app = new Hono();
 
@@ -65,9 +66,18 @@ app.post("/", async (c) => {
   const userId = c.get("userId") as string;
   const body = await c.req.json();
 
+  // Validate the request body
+  const validationResult = createChildSchema.safeParse(body);
+  if (!validationResult.success) {
+    const errorMessages = validationResult.error.errors.map(
+      (err) => `${err.path.join(".")}: ${err.message}`
+    );
+    return c.json({ error: `Validation failed: ${errorMessages.join(", ")}` }, 400);
+  }
+
   const [created] = await db
     .insert(children)
-    .values({ ...body, parentId: userId })
+    .values({ ...validationResult.data, parentId: userId })
     .returning();
 
   return c.json(created);
@@ -107,10 +117,7 @@ app.delete("/:childId", async (c) => {
     .limit(1);
 
   if (activeEnrollments.length > 0) {
-    return c.json(
-      { error: "Cannot delete child with active or pending enrollments" },
-      400
-    );
+    return c.json({ error: "Cannot delete child with active or pending enrollments" }, 400);
   }
 
   const [updated] = await db

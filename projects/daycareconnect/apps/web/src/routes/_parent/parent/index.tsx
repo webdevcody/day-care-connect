@@ -22,15 +22,18 @@ function calculateAge(dateOfBirth: string) {
 function DashboardPage() {
   const { data, isLoading } = useDashboard();
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="mt-1 text-muted-foreground">
-          Overview of your children and enrollments.
-        </p>
+        <p className="mt-1 text-muted-foreground">Overview of your children and enrollments.</p>
       </div>
 
       {/* Quick Actions */}
@@ -43,62 +46,15 @@ function DashboardPage() {
         </Button>
       </div>
 
-      {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Children
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{data?.children.length}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Active Enrollments
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{data?.activeEnrollments.length}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pending Applications
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{data?.pendingEnrollments.length}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Saved Facilities
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{data?.favoritesCount}</p>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* My Children */}
       <div>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold">My Children</h2>
-          <Link
-            to="/parent/children"
-            className="text-sm text-primary hover:underline"
-          >
+          <Link to="/parent/children" className="text-sm text-primary hover:underline">
             View all
           </Link>
         </div>
-        {data?.children.length === 0 ? (
+        {(data?.children?.length ?? 0) === 0 ? (
           <Card>
             <CardContent className="py-8 text-center">
               <p className="text-muted-foreground">No children added yet.</p>
@@ -109,7 +65,7 @@ function DashboardPage() {
           </Card>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {data?.children.map((child) => (
+            {(data?.children ?? []).map((child) => (
               <Link
                 key={child.id}
                 to="/parent/children/$childId"
@@ -134,11 +90,11 @@ function DashboardPage() {
       </div>
 
       {/* Recent Activities */}
-      {data?.recentActivities && data.recentActivities.length > 0 && (
+      {(data?.recentActivities?.length ?? 0) > 0 && (
         <div>
           <h2 className="mb-4 text-xl font-semibold">Recent Activities</h2>
           <div className="space-y-3">
-            {data.recentActivities.map((activity) => (
+            {(data?.recentActivities ?? []).map((activity) => (
               <Link
                 key={activity.id}
                 to="/parent/children/$childId/activities"
@@ -158,8 +114,7 @@ function DashboardPage() {
                         </span>
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {activity.facilityName} ·{" "}
-                        {new Date(activity.occurredAt).toLocaleString()}
+                        {activity.facilityName} · {new Date(activity.occurredAt).toLocaleString()}
                       </p>
                     </div>
                   </CardContent>
@@ -171,11 +126,11 @@ function DashboardPage() {
       )}
 
       {/* Recent Daily Reports */}
-      {data?.recentReports && data.recentReports.length > 0 && (
+      {(data?.recentReports?.length ?? 0) > 0 && (
         <div>
           <h2 className="mb-4 text-xl font-semibold">Recent Daily Reports</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            {data.recentReports.map((report) => (
+            {(data?.recentReports ?? []).map((report) => (
               <Link
                 key={report.id}
                 to="/parent/children/$childId/daily-report/$date"
@@ -188,14 +143,13 @@ function DashboardPage() {
                       {report.childFirstName} {report.childLastName}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {new Date(report.date + "T00:00:00").toLocaleDateString(
-                        "en-US",
-                        { weekday: "short", month: "short", day: "numeric" }
-                      )}
+                      {new Date(report.date + "T00:00:00").toLocaleDateString("en-US", {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {report.facilityName}
-                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">{report.facilityName}</p>
                   </CardContent>
                 </Card>
               </Link>
@@ -207,7 +161,7 @@ function DashboardPage() {
       {/* Active Enrollments */}
       <div>
         <h2 className="mb-4 text-xl font-semibold">Active Enrollments</h2>
-        {data?.activeEnrollments.length === 0 ? (
+        {(data?.activeEnrollments?.length ?? 0) === 0 ? (
           <Card>
             <CardContent className="py-8 text-center">
               <p className="text-muted-foreground">No active enrollments.</p>
@@ -218,7 +172,7 @@ function DashboardPage() {
           </Card>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
-            {data?.activeEnrollments.map((enrollment) => (
+            {(data?.activeEnrollments ?? []).map((enrollment) => (
               <Link
                 key={enrollment.id}
                 to="/parent/enrollments/$enrollmentId"
@@ -232,9 +186,7 @@ function DashboardPage() {
                         <p className="font-semibold">
                           {enrollment.childFirstName} {enrollment.childLastName}
                         </p>
-                        <p className="text-sm text-muted-foreground">
-                          {enrollment.facilityName}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{enrollment.facilityName}</p>
                       </div>
                       <Badge>{enrollment.status}</Badge>
                     </div>
@@ -251,11 +203,11 @@ function DashboardPage() {
       </div>
 
       {/* Pending Applications */}
-      {data?.pendingEnrollments && data.pendingEnrollments.length > 0 && (
+      {(data?.pendingEnrollments?.length ?? 0) > 0 && (
         <div>
           <h2 className="mb-4 text-xl font-semibold">Pending Applications</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            {data.pendingEnrollments.map((enrollment) => (
+            {(data?.pendingEnrollments ?? []).map((enrollment) => (
               <Link
                 key={enrollment.id}
                 to="/parent/enrollments/$enrollmentId"
@@ -269,15 +221,12 @@ function DashboardPage() {
                         <p className="font-semibold">
                           {enrollment.childFirstName} {enrollment.childLastName}
                         </p>
-                        <p className="text-sm text-muted-foreground">
-                          {enrollment.facilityName}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{enrollment.facilityName}</p>
                       </div>
                       <Badge variant="secondary">{enrollment.status}</Badge>
                     </div>
                     <p className="mt-2 text-xs text-muted-foreground">
-                      Applied{" "}
-                      {new Date(enrollment.createdAt).toLocaleDateString()}
+                      Applied {new Date(enrollment.createdAt).toLocaleDateString()}
                     </p>
                   </CardContent>
                 </Card>

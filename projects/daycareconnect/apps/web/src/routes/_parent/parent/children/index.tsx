@@ -18,9 +18,37 @@ function calculateAge(dateOfBirth: string) {
 }
 
 function ChildrenListPage() {
-  const { data, isLoading } = useChildren();
+  const { data, isLoading, error } = useChildren();
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">My Children</h1>
+            <p className="mt-1 text-muted-foreground">Manage your children's profiles.</p>
+          </div>
+        </div>
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-destructive">
+              Error loading children: {error instanceof Error ? error.message : "Unknown error"}
+            </p>
+            <Button asChild className="mt-4">
+              <Link to="/parent/children/new">Add Child</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const children = Array.isArray(data) ? data : (data?.children ?? []);
 
@@ -29,9 +57,7 @@ function ChildrenListPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">My Children</h1>
-          <p className="mt-1 text-muted-foreground">
-            Manage your children's profiles.
-          </p>
+          <p className="mt-1 text-muted-foreground">Manage your children's profiles.</p>
         </div>
         <Button asChild>
           <Link to="/parent/children/new">Add Child</Link>
@@ -66,15 +92,9 @@ function ChildrenListPage() {
                     {child.gender && ` · ${child.gender}`}
                   </p>
                   <div className="mt-3 flex gap-2">
-                    {child.activeEnrollments > 0 && (
-                      <Badge>
-                        {child.activeEnrollments} active
-                      </Badge>
-                    )}
+                    {child.activeEnrollments > 0 && <Badge>{child.activeEnrollments} active</Badge>}
                     {child.pendingEnrollments > 0 && (
-                      <Badge variant="secondary">
-                        {child.pendingEnrollments} pending
-                      </Badge>
+                      <Badge variant="secondary">{child.pendingEnrollments} pending</Badge>
                     )}
                     {child.activeEnrollments === 0 && child.pendingEnrollments === 0 && (
                       <Badge variant="outline">No enrollments</Badge>

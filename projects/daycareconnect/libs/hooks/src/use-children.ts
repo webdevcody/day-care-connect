@@ -21,9 +21,12 @@ export function useCreateChild() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: childrenService.createChild,
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.children.all });
-      qc.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+    onSuccess: async () => {
+      // Refetch queries to ensure fresh data
+      await Promise.all([
+        qc.refetchQueries({ queryKey: queryKeys.children.all }),
+        qc.invalidateQueries({ queryKey: queryKeys.dashboard.all }),
+      ]);
     },
   });
 }

@@ -1,6 +1,6 @@
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { useSession } from "@/lib/auth-client";
+import { MessageSquare } from "lucide-react";
 import { useConversations, useCreateOrGetConversation, useEnrollments } from "@daycare-hub/hooks";
 import { ConversationItem } from "@/components/messaging/conversation-item";
 import {
@@ -9,6 +9,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -16,11 +17,39 @@ import {
 
 export function MessagesPage({ messagesBasePath }: { messagesBasePath: string }) {
   const [search, setSearch] = useState("");
-  const { data: session } = useSession();
-  const role = (session?.user as any)?.role;
-  const isParent = role === "parent";
+  const isParent = messagesBasePath.startsWith("/parent");
 
   const { data: conversations, isLoading } = useConversations(search || undefined);
+  const { data: enrollments, isLoading: enrollmentsLoading } = useEnrollments();
+
+  // Check if user has any active/approved enrollments
+  const hasActiveEnrollments =
+    enrollments && enrollments.some((e) => e.status === "active" || e.status === "approved");
+
+  // Show empty state if parent has no enrollments
+  if (isParent && !enrollmentsLoading && !hasActiveEnrollments) {
+    return (
+      <div className="mx-auto max-w-2xl p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">Messages</h1>
+        </div>
+
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+            <MessageSquare className="h-10 w-10 text-muted-foreground" />
+          </div>
+          <h2 className="mt-6 text-xl font-semibold">No Active Enrollments</h2>
+          <p className="mt-2 max-w-md text-muted-foreground">
+            You need to enroll your child in a facility before you can start messaging. Discover
+            nearby daycare facilities and enroll your child to begin conversations.
+          </p>
+          <Button asChild className="mt-6" size="lg">
+            <Link to="/discover">Discover Facilities</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-2xl p-6">
@@ -46,7 +75,8 @@ export function MessagesPage({ messagesBasePath }: { messagesBasePath: string })
       ) : conversations && conversations.length > 0 ? (
         <div className="space-y-2">
           {conversations.map((conv) => {
-            const otherName = isParent || role === "staff" ? conv.facilityName : conv.parentName;
+            const isStaff = messagesBasePath.startsWith("/staff");
+            const otherName = isParent || isStaff ? conv.facilityName : conv.parentName;
             return (
               <ConversationItem
                 key={conv.id}
@@ -111,11 +141,13 @@ function NewConversationDialog({ messagesBasePath }: { messagesBasePath: string 
       <DialogTrigger asChild>
         <Button size="sm">New Message</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Start a Conversation</DialogTitle>
+          {(isLoading || uniqueFacilities.length > 0) && (
+            <DialogDescription>Select a facility to message:</DialogDescription>
+          )}
         </DialogHeader>
-        <DialogDescription>Select a facility to message:</DialogDescription>
         {isLoading ? (
           <div className="space-y-2 py-4">
             {Array.from({ length: 2 }).map((_, i) => (
@@ -129,7 +161,7 @@ function NewConversationDialog({ messagesBasePath }: { messagesBasePath: string 
                 key={facilityId}
                 onClick={() => handleCreate(facilityId)}
                 disabled={createMutation.isPending}
-                className="flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-accent"
+                className="flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-accent disabled:opacity-50"
               >
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
                   <span className="text-sm font-semibold">{facilityName.charAt(0)}</span>
@@ -139,10 +171,32 @@ function NewConversationDialog({ messagesBasePath }: { messagesBasePath: string 
             ))}
           </div>
         ) : (
-          <p className="py-4 text-center text-sm text-muted-foreground">
-            No facilities with active enrollments found.
-          </p>
+          <div className="py-6 text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mx-auto">
+              <MessageSquare className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <p className="mt-4 text-sm text-muted-foreground">
+              No facilities with active enrollments found.
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Enroll your child in a facility to start messaging.
+            </p>
+            <Button
+              className="mt-4"
+              onClick={() => {
+                setOpen(false);
+                navigate({ to: "/discover" });
+              }}
+            >
+              Discover Facilities
+            </Button>
+          </div>
         )}
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

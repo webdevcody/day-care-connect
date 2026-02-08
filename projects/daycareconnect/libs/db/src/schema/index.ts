@@ -32,8 +32,6 @@ export * from "./invoices";
 export * from "./invoice-line-items";
 export * from "./payment-methods";
 export * from "./payments";
-export * from "./reviews";
-export * from "./review-responses";
 export * from "./user-roles";
 export * from "./facility-invites";
 export * from "./invite-submissions";

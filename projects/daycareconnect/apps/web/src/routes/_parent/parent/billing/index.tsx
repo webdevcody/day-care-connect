@@ -29,9 +29,14 @@ function ParentBillingDashboard() {
 
   const isLoading = summaryLoading || invoicesLoading;
 
-  if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-muted-foreground">Loading...</div></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
 
-  const invoices = invoicesList ?? [];
+  const invoices = Array.isArray(invoicesList) ? invoicesList : [];
 
   return (
     <div>
@@ -46,7 +51,8 @@ function ParentBillingDashboard() {
               ${parseFloat(summary?.outstandingAmount ?? "0").toFixed(2)}
             </p>
             <p className="text-xs text-muted-foreground">
-              {summary?.outstandingCount ?? 0} unpaid invoice{summary?.outstandingCount !== 1 ? "s" : ""}
+              {summary?.outstandingCount ?? 0} unpaid invoice
+              {summary?.outstandingCount !== 1 ? "s" : ""}
             </p>
           </CardContent>
         </Card>
@@ -66,10 +72,7 @@ function ParentBillingDashboard() {
                 ${parseFloat(summary.nextDueInvoice.total).toFixed(2)}
               </p>
               <p className="text-xs text-muted-foreground">
-                Due{" "}
-                {new Date(
-                  summary.nextDueInvoice.dueDate + "T00:00:00"
-                ).toLocaleDateString()}{" "}
+                Due {new Date(summary.nextDueInvoice.dueDate + "T00:00:00").toLocaleDateString()}{" "}
                 &middot; {summary.nextDueInvoice.facilityName}
               </p>
             </CardContent>
@@ -123,20 +126,13 @@ function ParentBillingDashboard() {
                   </TableCell>
                   <TableCell>{inv.facilityName}</TableCell>
                   <TableCell>${parseFloat(inv.total).toFixed(2)}</TableCell>
+                  <TableCell>{new Date(inv.dueDate + "T00:00:00").toLocaleDateString()}</TableCell>
                   <TableCell>
-                    {new Date(inv.dueDate + "T00:00:00").toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={statusColors[inv.status] || ""}>
-                      {inv.status}
-                    </Badge>
+                    <Badge className={statusColors[inv.status] || ""}>{inv.status}</Badge>
                   </TableCell>
                   <TableCell>
                     {(inv.status === "sent" || inv.status === "overdue") && (
-                      <Link
-                        to="/parent/billing/invoices/$invoiceId"
-                        params={{ invoiceId: inv.id }}
-                      >
+                      <Link to="/parent/billing/invoices/$invoiceId" params={{ invoiceId: inv.id }}>
                         <Button size="sm">Pay Now</Button>
                       </Link>
                     )}

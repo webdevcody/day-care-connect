@@ -20,21 +20,40 @@ export function ChildForm({ defaultValues, onSubmit, submitLabel = "Save" }: Chi
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
+
+    // Helper to convert empty strings to undefined
+    const getValue = (key: string): string | undefined => {
+      const value = formData.get(key) as string;
+      return value && value.trim() ? value.trim() : undefined;
+    };
+
     const data: CreateChildInput = {
-      firstName: formData.get("firstName") as string,
-      lastName: formData.get("lastName") as string,
-      dateOfBirth: formData.get("dateOfBirth") as string,
-      gender: (formData.get("gender") as string) || undefined,
-      allergies: (formData.get("allergies") as string) || undefined,
-      medicalNotes: (formData.get("medicalNotes") as string) || undefined,
-      emergencyContactName: (formData.get("emergencyContactName") as string) || undefined,
-      emergencyContactPhone: (formData.get("emergencyContactPhone") as string) || undefined,
+      firstName: (formData.get("firstName") as string)?.trim() || "",
+      lastName: (formData.get("lastName") as string)?.trim() || "",
+      dateOfBirth: (formData.get("dateOfBirth") as string)?.trim() || "",
+      gender: getValue("gender"),
+      allergies: getValue("allergies"),
+      medicalNotes: getValue("medicalNotes"),
+      emergencyContactName: getValue("emergencyContactName"),
+      emergencyContactPhone: getValue("emergencyContactPhone"),
     };
 
     try {
       await onSubmit(data);
+      // Reset loading state on success (navigation will happen in parent)
+      setLoading(false);
     } catch (err: any) {
-      setError(err.message || "Something went wrong");
+      // Handle validation errors from API
+      let errorMessage = "Something went wrong";
+      if (err.message) {
+        errorMessage = err.message;
+      } else if (err.details && Array.isArray(err.details)) {
+        // Format validation errors from API
+        errorMessage = err.details.map((d: any) => d.message || d.path?.join(".")).join(", ");
+      } else if (typeof err === "string") {
+        errorMessage = err;
+      }
+      setError(errorMessage);
       setLoading(false);
     }
   }
@@ -42,9 +61,7 @@ export function ChildForm({ defaultValues, onSubmit, submitLabel = "Save" }: Chi
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-          {error}
-        </div>
+        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</div>
       )}
 
       <div>
@@ -61,12 +78,7 @@ export function ChildForm({ defaultValues, onSubmit, submitLabel = "Save" }: Chi
           </div>
           <div className="space-y-2">
             <Label htmlFor="lastName">Last Name *</Label>
-            <Input
-              id="lastName"
-              name="lastName"
-              required
-              defaultValue={defaultValues?.lastName}
-            />
+            <Input id="lastName" name="lastName" required defaultValue={defaultValues?.lastName} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="dateOfBirth">Date of Birth *</Label>

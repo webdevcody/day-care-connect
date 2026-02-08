@@ -15,6 +15,7 @@
     "db:push": "pnpm --filter @daycare-hub/db push",
     "db:studio": "pnpm --filter @daycare-hub/db studio",
     "db:seed": "pnpm --filter @daycare-hub/db seed",
+    "db:reset": "pnpm --filter @daycare-hub/db reset",
     "mobile": "pnpm --filter @daycare-hub/mobile start"
   },
   "devDependencies": {

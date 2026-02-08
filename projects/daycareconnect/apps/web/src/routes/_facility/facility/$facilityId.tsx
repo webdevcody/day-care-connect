@@ -19,7 +19,6 @@ import {
   LinkIcon,
   BarChart3,
   Mail,
-  Star,
   Settings,
   TrendingUp,
   MessageSquare,
@@ -123,11 +122,6 @@ const navGroups = [
         to: "/facility/$facilityId/reports" as const,
         label: "Reports",
         icon: BarChart3,
-      },
-      {
-        to: "/facility/$facilityId/reviews" as const,
-        label: "Reviews",
-        icon: Star,
       },
       {
         to: "/facility/$facilityId/edit" as const,

@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { Card, CardContent, Badge } from "@daycare-hub/ui";
-import { StarRating } from "@/components/reviews/star-rating";
 
 interface FacilityCardProps {
   facility: {
@@ -10,8 +9,6 @@ interface FacilityCardProps {
     state: string;
     distance: number;
     monthlyRate: string | null;
-    ratingAverage: string | null;
-    reviewCount: number;
     ageRangeMin: number;
     ageRangeMax: number;
     availableSpots: number;
@@ -46,20 +43,10 @@ export function FacilityCard({ facility, onToggleFavorite }: FacilityCardProps) 
             className="block flex-1"
           >
             <h3 className="font-semibold leading-tight">{facility.name}</h3>
-            {facility.ratingAverage && (
-              <div className="mt-0.5 flex items-center gap-1">
-                <StarRating rating={parseFloat(facility.ratingAverage)} size="sm" />
-                <span className="text-xs text-muted-foreground">
-                  ({facility.reviewCount})
-                </span>
-              </div>
-            )}
             <p className="mt-0.5 text-sm text-muted-foreground">
               {facility.city}, {facility.state}
               {facility.distance != null && (
-                <span className="ml-1">
-                  &middot; {facility.distance.toFixed(1)} mi
-                </span>
+                <span className="ml-1">&middot; {facility.distance.toFixed(1)} mi</span>
               )}
             </p>
           </Link>
@@ -77,9 +64,7 @@ export function FacilityCard({ facility, onToggleFavorite }: FacilityCardProps) 
         </div>
 
         <div className="mt-2 flex items-center justify-between text-sm">
-          {facility.monthlyRate && (
-            <span className="font-medium">${facility.monthlyRate}/mo</span>
-          )}
+          {facility.monthlyRate && <span className="font-medium">${facility.monthlyRate}/mo</span>}
           <span className="text-muted-foreground">
             Ages {facility.ageRangeMin}-{facility.ageRangeMax}
           </span>

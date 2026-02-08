@@ -13,9 +13,11 @@ import {
   favorites,
   eq,
   and,
+  or,
   sql,
   isNotNull,
   isNull,
+  ilike,
 } from "@daycare-hub/db";
 import {
   createFacilitySchema,
@@ -37,44 +39,51 @@ import { auth } from "../lib/auth";
 const app = new Hono();
 
 // ─── Discovery: Search Facilities ────────────────────────────────────────────
-// GET /search - Haversine distance search with filters and pagination
+// GET /search - Search facilities by location (lat/lng), name, or city with filters and pagination
 app.get("/search", async (c) => {
   const userId = (c.get("userId") as string) || null;
 
-  const lat = parseFloat(c.req.query("lat") || "");
-  const lng = parseFloat(c.req.query("lng") || "");
+  const latParam = c.req.query("lat");
+  const lngParam = c.req.query("lng");
+  const lat = latParam ? parseFloat(latParam) : undefined;
+  const lng = lngParam ? parseFloat(lngParam) : undefined;
   const radius = parseFloat(c.req.query("radius") || "25");
+  const nameParam = c.req.query("name");
+  const cityParam = c.req.query("city");
+  const qParam = c.req.query("q"); // General query string
+  // Use name/city params if provided, otherwise use q for both
+  const name = nameParam || (qParam && !lat ? qParam : undefined);
+  const city = cityParam || (qParam && !lat ? qParam : undefined);
   const age = c.req.query("age") ? parseInt(c.req.query("age")!) : undefined;
-  const maxPrice = c.req.query("maxPrice")
-    ? parseFloat(c.req.query("maxPrice")!)
-    : undefined;
+  const maxPrice = c.req.query("maxPrice") ? parseFloat(c.req.query("maxPrice")!) : undefined;
   const servicesParam = c.req.query("services");
   const services = servicesParam ? servicesParam.split(",") : undefined;
   const available = c.req.query("available") === "true" ? true : undefined;
   const openBefore = c.req.query("openBefore") || undefined;
-  const minRating = c.req.query("minRating")
-    ? parseFloat(c.req.query("minRating")!)
-    : undefined;
-  const sort = (c.req.query("sort") as string) || "distance";
+  const sort = (c.req.query("sort") as string) || (lat && lng ? "distance" : "name");
   const page = parseInt(c.req.query("page") || "1");
   const limit = parseInt(c.req.query("limit") || "12");
 
-  if (isNaN(lat) || isNaN(lng)) {
-    return c.json({ error: "lat and lng are required" }, 400);
+  // If lat/lng provided, both must be valid
+  if ((lat !== undefined && isNaN(lat)) || (lng !== undefined && isNaN(lng))) {
+    return c.json({ error: "Invalid lat or lng values" }, 400);
   }
 
+  const hasLocation = lat !== undefined && lng !== undefined && !isNaN(lat) && !isNaN(lng);
   const offset = (page - 1) * limit;
 
-  // Haversine distance in miles
-  const distanceSql = sql<number>`(
-    3959 * acos(
-      cos(radians(${lat}))
-      * cos(radians(CAST(${facilities.latitude} AS double precision)))
-      * cos(radians(CAST(${facilities.longitude} AS double precision)) - radians(${lng}))
-      + sin(radians(${lat}))
-      * sin(radians(CAST(${facilities.latitude} AS double precision)))
-    )
-  )`;
+  // Haversine distance in miles (only used when lat/lng provided)
+  const distanceSql = hasLocation
+    ? sql<number>`(
+        3959 * acos(
+          cos(radians(${lat}))
+          * cos(radians(CAST(${facilities.latitude} AS double precision)))
+          * cos(radians(CAST(${facilities.longitude} AS double precision)) - radians(${lng}))
+          + sin(radians(${lat}))
+          * sin(radians(CAST(${facilities.latitude} AS double precision)))
+        )
+      )`
+    : sql<number>`NULL`;
 
   // Available spots subquery
   const availableSpotsSql = sql<number>`(
@@ -103,12 +112,29 @@ app.get("/search", async (c) => {
   )`;
 
   // Build WHERE conditions
-  const conditions = [
-    eq(facilities.isActive, true),
-    isNotNull(facilities.latitude),
-    isNotNull(facilities.longitude),
-    sql`${distanceSql} <= ${radius}`,
-  ];
+  const conditions = [eq(facilities.isActive, true)];
+
+  // Location-based search: require coordinates and filter by distance
+  if (hasLocation) {
+    conditions.push(isNotNull(facilities.latitude));
+    conditions.push(isNotNull(facilities.longitude));
+    conditions.push(sql`${distanceSql} <= ${radius}`);
+  }
+
+  // Text-based search: name or city (OR logic - matches if name OR city contains the search term)
+  if (name || city) {
+    const textConditions = [];
+    if (name) {
+      textConditions.push(ilike(facilities.name, `%${name}%`));
+    }
+    if (city) {
+      textConditions.push(ilike(facilities.city, `%${city}%`));
+    }
+    if (textConditions.length > 0) {
+      // Use OR so facilities match if name OR city contains the search term
+      conditions.push(or(...textConditions));
+    }
+  }
 
   if (age !== undefined) {
     conditions.push(sql`${facilities.ageRangeMin} <= ${age}`);
@@ -116,9 +142,7 @@ app.get("/search", async (c) => {
   }
 
   if (maxPrice !== undefined) {
-    conditions.push(
-      sql`CAST(${facilities.monthlyRate} AS numeric) <= ${maxPrice}`
-    );
+    conditions.push(sql`CAST(${facilities.monthlyRate} AS numeric) <= ${maxPrice}`);
   }
 
   if (services && services.length > 0) {
@@ -147,12 +171,6 @@ app.get("/search", async (c) => {
     );
   }
 
-  if (minRating !== undefined) {
-    conditions.push(
-      sql`CAST(${facilities.ratingAverage} AS numeric) >= ${minRating}`
-    );
-  }
-
   const whereClause = and(...conditions);
 
   // Order by
@@ -164,11 +182,18 @@ app.get("/search", async (c) => {
     case "price_desc":
       orderBy = sql`CAST(${facilities.monthlyRate} AS numeric) DESC NULLS LAST`;
       break;
-    case "rating_desc":
-      orderBy = sql`CAST(${facilities.ratingAverage} AS numeric) DESC NULLS LAST`;
+    case "distance":
+      if (hasLocation) {
+        orderBy = sql`${distanceSql} ASC`;
+      } else {
+        orderBy = sql`${facilities.name} ASC`;
+      }
+      break;
+    case "name":
+      orderBy = sql`${facilities.name} ASC`;
       break;
     default:
-      orderBy = sql`${distanceSql} ASC`;
+      orderBy = hasLocation ? sql`${distanceSql} ASC` : sql`${facilities.name} ASC`;
   }
 
   // Get total count
@@ -192,9 +217,7 @@ app.get("/search", async (c) => {
       ageRangeMin: facilities.ageRangeMin,
       ageRangeMax: facilities.ageRangeMax,
       monthlyRate: facilities.monthlyRate,
-      ratingAverage: facilities.ratingAverage,
-      reviewCount: facilities.reviewCount,
-      distance: distanceSql.as("distance"),
+      distance: hasLocation ? distanceSql.as("distance") : sql<number | null>`NULL`.as("distance"),
       availableSpots: availableSpotsSql.as("available_spots"),
       isFavorited: isFavoritedSql.as("is_favorited"),
       primaryPhotoUrl: primaryPhotoSql.as("primary_photo_url"),
@@ -240,10 +263,7 @@ app.get("/search", async (c) => {
 app.get("/mine", async (c) => {
   const userId = c.get("userId") as string;
 
-  const result = await db
-    .select()
-    .from(facilities)
-    .where(eq(facilities.ownerId, userId));
+  const result = await db.select().from(facilities).where(eq(facilities.ownerId, userId));
 
   return c.json(result);
 });
@@ -251,17 +271,11 @@ app.get("/mine", async (c) => {
 // ─── Active Facilities (for parents browsing) ───────────────────────────────
 // GET / - get all active facilities with photos and services
 app.get("/", async (c) => {
-  const result = await db
-    .select()
-    .from(facilities)
-    .where(eq(facilities.isActive, true));
+  const result = await db.select().from(facilities).where(eq(facilities.isActive, true));
 
   if (!result.length) return c.json([]);
 
-  const allPhotos = await db
-    .select()
-    .from(facilityPhotos)
-    .orderBy(facilityPhotos.sortOrder);
+  const allPhotos = await db.select().from(facilityPhotos).orderBy(facilityPhotos.sortOrder);
 
   const allServices = await db.select().from(facilityServices);
 
@@ -278,11 +292,6 @@ app.get("/", async (c) => {
 // POST / - create a new facility
 app.post("/", async (c) => {
   const userId = c.get("userId") as string;
-  const user = c.get("user") as any;
-
-  if (user.role !== "admin") {
-    return c.json({ error: "Admin only" }, 403);
-  }
 
   const body = await c.req.json();
   const data = createFacilitySchema.parse(body);
@@ -301,6 +310,9 @@ app.post("/", async (c) => {
       licenseExpiry: data.licenseExpiry || null,
     })
     .returning();
+
+  // Ensure the user has the "admin" role after creating a facility
+  await db.update(users).set({ role: "admin", updatedAt: new Date() }).where(eq(users.id, userId));
 
   return c.json(facility, 201);
 });
@@ -321,19 +333,13 @@ app.get("/:facilityId", async (c) => {
   }
 
   const [hours, photos, services, staff] = await Promise.all([
-    db
-      .select()
-      .from(facilityHours)
-      .where(eq(facilityHours.facilityId, facilityId)),
+    db.select().from(facilityHours).where(eq(facilityHours.facilityId, facilityId)),
     db
       .select()
       .from(facilityPhotos)
       .where(eq(facilityPhotos.facilityId, facilityId))
       .orderBy(facilityPhotos.sortOrder),
-    db
-      .select()
-      .from(facilityServices)
-      .where(eq(facilityServices.facilityId, facilityId)),
+    db.select().from(facilityServices).where(eq(facilityServices.facilityId, facilityId)),
     db
       .select({
         id: facilityStaff.id,
@@ -409,9 +415,7 @@ app.put("/:facilityId/hours", async (c) => {
   const hours = z.array(facilityHoursEntrySchema).parse(body.hours);
 
   await db.transaction(async (tx) => {
-    await tx
-      .delete(facilityHours)
-      .where(eq(facilityHours.facilityId, facilityId));
+    await tx.delete(facilityHours).where(eq(facilityHours.facilityId, facilityId));
     if (hours.length > 0) {
       await tx.insert(facilityHours).values(
         hours.map((h) => ({
@@ -468,12 +472,7 @@ app.delete("/:facilityId/photos/:photoId", async (c) => {
 
   await db
     .delete(facilityPhotos)
-    .where(
-      and(
-        eq(facilityPhotos.id, photoId),
-        eq(facilityPhotos.facilityId, facilityId)
-      )
-    );
+    .where(and(eq(facilityPhotos.id, photoId), eq(facilityPhotos.facilityId, facilityId)));
 
   return c.json({ success: true });
 });
@@ -493,12 +492,7 @@ app.put("/:facilityId/photos/reorder", async (c) => {
       await tx
         .update(facilityPhotos)
         .set({ sortOrder: i })
-        .where(
-          and(
-            eq(facilityPhotos.id, photoIds[i]),
-            eq(facilityPhotos.facilityId, facilityId)
-          )
-        );
+        .where(and(eq(facilityPhotos.id, photoIds[i]), eq(facilityPhotos.facilityId, facilityId)));
     }
   });
 
@@ -517,9 +511,7 @@ app.put("/:facilityId/services", async (c) => {
   const { services } = body as { services: string[] };
 
   await db.transaction(async (tx) => {
-    await tx
-      .delete(facilityServices)
-      .where(eq(facilityServices.facilityId, facilityId));
+    await tx.delete(facilityServices).where(eq(facilityServices.facilityId, facilityId));
     if (services.length > 0) {
       await tx.insert(facilityServices).values(
         services.map((serviceName) => ({
@@ -612,7 +604,10 @@ app.post("/:facilityId/staff/create-account", async (c) => {
     .limit(1);
 
   if (existingUser) {
-    return c.json({ error: "A user with that email already exists. Use 'Existing User' tab to add them." }, 409);
+    return c.json(
+      { error: "A user with that email already exists. Use 'Existing User' tab to add them." },
+      409
+    );
   }
 
   // Create user via better-auth server API
@@ -637,12 +632,7 @@ app.post("/:facilityId/staff/create-account", async (c) => {
   const existing = await db
     .select({ id: facilityStaff.id })
     .from(facilityStaff)
-    .where(
-      and(
-        eq(facilityStaff.facilityId, facilityId),
-        eq(facilityStaff.userId, newUserId)
-      )
-    )
+    .where(and(eq(facilityStaff.facilityId, facilityId), eq(facilityStaff.userId, newUserId)))
     .limit(1);
 
   if (existing.length) {
@@ -717,12 +707,7 @@ app.get("/:facilityId/staff/invites", async (c) => {
   const invites = await db
     .select()
     .from(staffInvites)
-    .where(
-      and(
-        eq(staffInvites.facilityId, facilityId),
-        isNull(staffInvites.usedAt)
-      )
-    );
+    .where(and(eq(staffInvites.facilityId, facilityId), isNull(staffInvites.usedAt)));
 
   const webUrl = process.env.WEB_URL || "http://localhost:3000";
   const invitesWithUrls = invites.map((invite) => ({
@@ -757,19 +742,11 @@ app.post("/:facilityId/staff", async (c) => {
   const existing = await db
     .select({ id: facilityStaff.id })
     .from(facilityStaff)
-    .where(
-      and(
-        eq(facilityStaff.facilityId, facilityId),
-        eq(facilityStaff.userId, user.id)
-      )
-    )
+    .where(and(eq(facilityStaff.facilityId, facilityId), eq(facilityStaff.userId, user.id)))
     .limit(1);
 
   if (existing.length) {
-    return c.json(
-      { error: "User is already a staff member at this facility" },
-      409
-    );
+    return c.json({ error: "User is already a staff member at this facility" }, 409);
   }
 
   // Insert staff member and auto-assign default permissions for their role
@@ -813,12 +790,7 @@ app.get("/:facilityId/staff/:staffId/permissions", async (c) => {
     })
     .from(facilityStaff)
     .innerJoin(users, eq(facilityStaff.userId, users.id))
-    .where(
-      and(
-        eq(facilityStaff.id, staffId),
-        eq(facilityStaff.facilityId, facilityId)
-      )
-    )
+    .where(and(eq(facilityStaff.id, staffId), eq(facilityStaff.facilityId, facilityId)))
     .limit(1);
 
   if (!staffMember) {
@@ -857,12 +829,7 @@ app.put("/:facilityId/staff/:staffId/permissions", async (c) => {
   const [staffMember] = await db
     .select({ id: facilityStaff.id })
     .from(facilityStaff)
-    .where(
-      and(
-        eq(facilityStaff.id, staffId),
-        eq(facilityStaff.facilityId, facilityId)
-      )
-    )
+    .where(and(eq(facilityStaff.id, staffId), eq(facilityStaff.facilityId, facilityId)))
     .limit(1);
 
   if (!staffMember) {
@@ -899,12 +866,7 @@ app.delete("/:facilityId/staff/:staffId", async (c) => {
   // Permissions are cascade-deleted via FK constraint
   await db
     .delete(facilityStaff)
-    .where(
-      and(
-        eq(facilityStaff.id, staffId),
-        eq(facilityStaff.facilityId, facilityId)
-      )
-    );
+    .where(and(eq(facilityStaff.id, staffId), eq(facilityStaff.facilityId, facilityId)));
 
   return c.json({ success: true });
 });

@@ -53,13 +53,15 @@ export function useToggleFacilityStatus() {
 }
 
 export function useSearchFacilities(params: Record<string, any>) {
+  // Always enable the query - if no search params, it will return default facilities
   return useInfiniteQuery({
     queryKey: queryKeys.facilities.search(params),
-    queryFn: ({ pageParam = 1 }) => facilitiesService.searchFacilities({ ...params, page: pageParam }),
+    queryFn: ({ pageParam = 1 }) =>
+      facilitiesService.searchFacilities({ ...params, page: pageParam }),
     getNextPageParam: (lastPage: any, allPages: any[]) =>
       lastPage.hasMore ? allPages.length + 1 : undefined,
     initialPageParam: 1,
-    enabled: params.lat !== undefined && params.lng !== undefined,
+    enabled: true,
   });
 }
 
@@ -76,8 +78,13 @@ export function useUpdateFacilityHours() {
 export function useAddFacilityPhoto() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ facilityId, data }: { facilityId: string; data: { url: string; altText?: string } }) =>
-      facilitiesService.addFacilityPhoto(facilityId, data),
+    mutationFn: ({
+      facilityId,
+      data,
+    }: {
+      facilityId: string;
+      data: { url: string; altText?: string };
+    }) => facilitiesService.addFacilityPhoto(facilityId, data),
     onSuccess: (_, { facilityId }) =>
       qc.invalidateQueries({ queryKey: queryKeys.facilities.detail(facilityId) }),
   });
@@ -124,8 +131,13 @@ export function useFacilityStaff(facilityId: string) {
 export function useAddStaffMember() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ facilityId, data }: { facilityId: string; data: { email: string; staffRole: string } }) =>
-      facilitiesService.addStaffMember(facilityId, data),
+    mutationFn: ({
+      facilityId,
+      data,
+    }: {
+      facilityId: string;
+      data: { email: string; staffRole: string };
+    }) => facilitiesService.addStaffMember(facilityId, data),
     onSuccess: (_, { facilityId }) => {
       qc.invalidateQueries({ queryKey: queryKeys.facilities.staff(facilityId) });
       qc.invalidateQueries({ queryKey: queryKeys.facilities.detail(facilityId) });
@@ -173,7 +185,9 @@ export function useUpdateStaffPermissions() {
       permissions: string[];
     }) => facilitiesService.updateStaffPermissions(facilityId, staffId, permissions),
     onSuccess: (_, { facilityId, staffId }) => {
-      qc.invalidateQueries({ queryKey: queryKeys.facilities.staffPermissions(facilityId, staffId) });
+      qc.invalidateQueries({
+        queryKey: queryKeys.facilities.staffPermissions(facilityId, staffId),
+      });
       qc.invalidateQueries({ queryKey: queryKeys.facilities.staff(facilityId) });
     },
   });
@@ -205,13 +219,8 @@ export function useCreateStaffAccount() {
 export function useCreateStaffInvite() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      facilityId,
-      data,
-    }: {
-      facilityId: string;
-      data: { staffRole: string };
-    }) => facilitiesService.createStaffInvite(facilityId, data),
+    mutationFn: ({ facilityId, data }: { facilityId: string; data: { staffRole: string } }) =>
+      facilitiesService.createStaffInvite(facilityId, data),
     onSuccess: (_, { facilityId }) => {
       qc.invalidateQueries({ queryKey: queryKeys.facilities.staffInvites(facilityId) });
     },

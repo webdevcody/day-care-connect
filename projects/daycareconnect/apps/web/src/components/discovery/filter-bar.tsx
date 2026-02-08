@@ -76,21 +76,6 @@ export function FilterBar({ params, onChange }: FilterBarProps) {
         Has openings
       </label>
 
-      {/* Min Rating */}
-      <div className="w-28">
-        <Label className="text-xs">Min Rating</Label>
-        <select
-          className="mt-1 block w-full rounded-md border border-input bg-background px-2 py-1 text-xs"
-          value={params.minRating ?? ""}
-          onChange={(e) => onChange({ minRating: e.target.value ? Number(e.target.value) : undefined })}
-        >
-          <option value="">Any</option>
-          <option value="4">4+ stars</option>
-          <option value="3">3+ stars</option>
-          <option value="2">2+ stars</option>
-        </select>
-      </div>
-
       {/* Sort */}
       <div>
         <Label className="text-xs">Sort by</Label>
@@ -102,7 +87,6 @@ export function FilterBar({ params, onChange }: FilterBarProps) {
           <option value="distance">Distance</option>
           <option value="price_asc">Price: Low to High</option>
           <option value="price_desc">Price: High to Low</option>
-          <option value="rating_desc">Rating: High to Low</option>
         </select>
       </div>
 
@@ -118,7 +102,6 @@ export function FilterBar({ params, onChange }: FilterBarProps) {
             services: undefined,
             available: undefined,
             openBefore: undefined,
-            minRating: undefined,
             sort: undefined,
           })
         }
