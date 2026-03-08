@@ -24,6 +24,10 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nodejs
 
 COPY --from=builder /app/.output ./.output
+COPY --from=builder /app/drizzle ./drizzle
+COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+COPY --from=builder /app/package.json ./package.json
+COPY --from=deps /app/node_modules ./node_modules
 
 EXPOSE 3000
 
